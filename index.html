@@ -124,7 +124,10 @@ main{max-width:850px;margin:auto;padding:16px}
 .installTip strong{display:block;margin-bottom:3px}
 .budgetHero{padding:17px;margin:12px 0;background:linear-gradient(135deg,#173a78,#235ca6);color:white;border-radius:20px}
 .budgetHero .kicker{color:#d8e9ff}.budgetHero .big{font-size:31px}.budgetMeta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-.budgetMini{background:#ffffff17;border:1px solid #ffffff24;border-radius:13px;padding:10px}.budgetMini b{display:block;font-size:16px;margin-top:3px}
+.budgetMini{background:#ffffff17;border:1px solid #ffffff24;border-radius:13px;padding:10px}.budgetMini b{display:block;font-size:16px;margin-top:3px}.budgetTap{width:100%;color:white;text-align:left;font:inherit;cursor:pointer}.budgetTap:active{transform:scale(.98)}
+.lifeRow{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 2px;border-bottom:1px solid var(--line)}
+.lifeRow:last-child{border-bottom:0}.lifeMerchant{font-weight:850;font-size:14px}.lifeDate{font-size:11px;color:var(--muted);margin-top:3px}.lifeAmount{font-weight:900;color:var(--danger);white-space:nowrap}
+.lifeTotals{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.lifeTotals .card{padding:12px}
 .recurringItem{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 13px;border-bottom:1px solid var(--line)}.recurringItem:last-child{border-bottom:0}
 .recName{font-size:14px;font-weight:800}.recMeta{font-size:11px;color:var(--muted);margin-top:3px}.recAmount{font-size:14px;font-weight:900;text-align:right}.recBtns{display:flex;gap:5px;justify-content:flex-end;margin-top:5px}.miniBtn{border:1px solid var(--line);background:white;border-radius:9px;padding:5px 7px;font-size:10px;font-weight:800;color:var(--accent)}.miniBtn.paid{background:#e6f6ee;color:#087049;border-color:#bde4d1}.warnText{color:#9a6500}.offText{color:#8b95a7;text-decoration:line-through}
 .infoStrip{padding:12px 13px;background:#fff7df;border:1px solid #f1dfad;border-radius:14px;font-size:12px;color:#6e5210;margin:9px 0}
@@ -183,7 +186,7 @@ main{max-width:850px;margin:auto;padding:16px}
       <div class="small" id="freeToSpendNote" style="color:#d8e9ff">Budget minimo per uscite e divertimento</div>
       <div class="budgetMeta">
         <div class="budgetMini"><span class="small" style="color:#d8e9ff">Budget vita del mese</span><b id="lifeBudgetTotal">€ 200,00</b></div>
-        <div class="budgetMini"><span class="small" style="color:#d8e9ff">Già usato</span><b id="lifeBudgetUsed">€ 0,00</b></div>
+        <button class="budgetMini budgetTap" onclick="openLifeBudgetDetail()"><span class="small" style="color:#d8e9ff">Già usato · tocca per vedere</span><b id="lifeBudgetUsed">€ 0,00</b></button>
       </div>
     </div>
 
@@ -191,6 +194,8 @@ main{max-width:850px;margin:auto;padding:16px}
       <button class="primary" onclick="openQuick()">＋ Spesa</button>
       <button class="photo" onclick="openModal('photoModal')">📸 Foto / screenshot</button>
     </div>
+    <button class="settingsShortcut" onclick="openCashSpend()" style="margin-bottom:5px">💵 Portafoglio <b id="cashHomeBalance" style="float:right">€ 0,00</b><div class="small" style="margin-top:4px;font-weight:600">Tocca per registrare una spesa in contanti</div></button>
+    <button class="settingsShortcut" onclick="openCashWithdrawal()" style="margin-top:5px">🏧 Ho prelevato contanti</button>
 
     <div class="sectionTitle"><h2>Questo mese</h2><span class="small" id="simpleMonthName"></span></div>
     <div class="monthSimple">
@@ -261,7 +266,7 @@ main{max-width:850px;margin:auto;padding:16px}
     <div class="sectionTitle"><h2>Dati & backup</h2></div>
     <div class="settingsGrid">
       <div class="card settingCard"><h3>📥 Importa estratto conto</h3><p>Prima indica da dove arriva. Tutti i movimenti passano dal controllo anti-duplicati e trasferimenti.</p>
-<div class="field"><label>PROVENIENZA</label><select id="importSource"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option>Contanti</option></select></div>
+<div class="field"><label>PROVENIENZA</label><select id="importSource"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
 <input type="file" id="csvFile" accept=".csv,text/csv" onchange="importCSV(this.files[0])">
 <div class="sourceNote">Per screenshot o foto usa 📸 Foto / screenshot. CSV consigliato per gli estratti completi.</div></div>
       <div class="card settingCard"><h3>🔐 Unisci aggiornamento personale</h3><p>Aggiunge conti, salvadanai, debiti e nuovi movimenti senza cancellare quelli già presenti. I duplicati vengono saltati o messi da controllare.</p><input type="file" id="mergeFile" accept=".json" onchange="mergeFinancialPatch(this.files[0])"></div>
@@ -290,11 +295,22 @@ main{max-width:850px;margin:auto;padding:16px}
   <div class="field"><label>CATEGORIA</label><div class="catgrid" id="quickCats"></div></div>
   <div class="grid2">
     <div class="field"><label>DATA</label><input id="qDate" type="date"></div>
-    <div class="field"><label>CONTO</label><select id="qAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option>Contanti</option></select></div>
+    <div class="field"><label>CONTO</label><select id="qAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
   </div>
   <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;margin:5px 2px 10px"><input type="checkbox" id="qReimb"> Da rimborsare</label>
   <button class="save" onclick="saveQuick()">Salva ✓</button>
   <button class="secondary" onclick="closeModal('quickModal')">Annulla</button>
+ </div>
+</div>
+
+<div class="modal" id="cashWithdrawalModal" onclick="backdrop(event,this)">
+ <div class="sheet">
+  <div class="grab"></div><h2>🏧 Prelievo contanti</h2>
+  <p class="small">Sposta denaro dal Mediolanum al portafoglio. Non viene contato come spesa.</p>
+  <div class="field"><label>IMPORTO PRELEVATO</label><input class="moneyInput" id="cashWithdrawalAmount" inputmode="decimal" placeholder="0,00 €"></div>
+  <div class="field"><label>DATA</label><input id="cashWithdrawalDate" type="date"></div>
+  <button class="save" onclick="saveCashWithdrawal()">Aggiungi al portafoglio ✓</button>
+  <button class="secondary" onclick="closeModal('cashWithdrawalModal')">Annulla</button>
  </div>
 </div>
 
@@ -309,7 +325,7 @@ main{max-width:850px;margin:auto;padding:16px}
     <div class="field"><label>DATA</label><input id="eDate" type="date"></div>
   </div>
   <div class="field"><label>CATEGORIA</label><select id="eCategory"></select></div>
-  <div class="field"><label>PROVENIENZA</label><select id="eAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option>Contanti</option></select></div>
+  <div class="field"><label>PROVENIENZA</label><select id="eAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
   <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;margin:6px 2px"><input type="checkbox" id="eReimb"> Da rimborsare</label>
   <div class="grid2">
     <div class="field"><label>TIPO</label><select id="eType"><option value="expense">Spesa</option><option value="refund">Rimborso / storno</option><option value="transfer">Spostamento di denaro</option><option value="income">Entrata</option></select></div>
@@ -332,7 +348,7 @@ main{max-width:850px;margin:auto;padding:16px}
     <button class="chip active" id="modeReceipt" onclick="setPhotoMode('receipt')">🧾 Scontrino</button>
     <button class="chip" id="modeBank" onclick="setPhotoMode('bank')">🏦 Screenshot banca</button>
   </div>
-  <div class="field"><label>PROVENIENZA / METODO DI PAGAMENTO</label><select id="photoSource"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option>Contanti</option></select></div>
+  <div class="field"><label>PROVENIENZA / METODO DI PAGAMENTO</label><select id="photoSource"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
   <div class="drop" onclick="document.getElementById('photoFile').click()">
     <strong>Scatta una foto o scegli uno screenshot</strong>
     Tocca qui. L'immagine viene analizzata sul dispositivo.
@@ -356,7 +372,7 @@ main{max-width:850px;margin:auto;padding:16px}
   </div>
   <div class="grid2">
     <div class="field"><label>CATEGORIA</label><select id="rCategory"></select></div>
-    <div class="field"><label>CONTO</label><select id="rAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option>Contanti</option></select></div>
+    <div class="field"><label>CONTO</label><select id="rAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
   </div>
   <div class="grid2">
     <div class="field" id="dueDayField"><label>GIORNO (FACOLTATIVO)</label><input id="rDueDay" inputmode="numeric" placeholder="es. 10"></div>
@@ -385,10 +401,24 @@ main{max-width:850px;margin:auto;padding:16px}
   <button class="secondary" onclick="carryPreviousBalance()">↳ Usa saldo finale anno precedente</button>
   <div class="field"><label>SALDO DISPONIBILE ATTUALE (€)</label><input id="sBalance" inputmode="decimal" placeholder="Serve per “Quanto posso spendere?”"></div>
   <div class="field"><label>OBIETTIVO SALDO MINIMO (€)</label><input id="sGoal" inputmode="decimal"></div><div class="field"><label>BUDGET USCITE E DIVERTIMENTO / MESE (€)</label><input id="sLifeBudget" inputmode="decimal" placeholder="200,00"></div>
-  <div class="field"><label>CONTO PREDEFINITO</label><select id="sDefaultAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option>Contanti</option></select></div>
+  <div class="field"><label>CONTO PREDEFINITO</label><select id="sDefaultAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
   <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p>
   <button class="save" onclick="saveSettings()">Salva impostazioni</button>
   <button class="settingsShortcut" onclick="closeModal('settingsModal');switchView('data')">⚙️ Dati, importazioni e backup</button>
+ </div>
+</div>
+
+<div class="modal" id="lifeBudgetModal" onclick="backdrop(event,this)">
+ <div class="sheet">
+  <div class="grab"></div>
+  <h2>🎉 Uscite e divertimento</h2>
+  <p class="small" id="lifeBudgetDetailMonth"></p>
+  <div class="lifeTotals">
+    <div class="card"><div class="kicker">GIÀ USATO</div><div class="big red" id="lifeDetailUsed">€ 0,00</div></div>
+    <div class="card"><div class="kicker">RESTA</div><div class="big" id="lifeDetailRemaining">€ 0,00</div></div>
+  </div>
+  <div class="card" id="lifeBudgetDetailList"></div>
+  <button class="secondary" onclick="closeModal('lifeBudgetModal')">Chiudi</button>
  </div>
 </div>
 
@@ -538,6 +568,38 @@ function renderCats(){
 function chooseCat(c){selectedCategory=c;renderCats()}
 function fillCategorySelect(){const opts=CATEGORIES.map(c=>`<option>${c[0]}</option>`).join('');document.getElementById('eCategory').innerHTML=opts;document.getElementById('rCategory').innerHTML=opts}
 
+function cashAccount(){
+ let a=state.accounts.find(x=>x.id==='cash-wallet'||/portafoglio|contanti/i.test(x.name||''));
+ if(!a){
+   a={id:'cash-wallet',name:'Portafoglio',kind:'Contanti',balance:0,spendable:true,primary:false,snapshotDate:today()};
+   state.accounts.push(a);
+ }
+ return a;
+}
+function cashBalance(){return Number(cashAccount().balance)||0}
+function setCashBalance(v){cashAccount().balance=Math.max(0,Math.round((Number(v)||0)*100)/100);cashAccount().snapshotDate=today()}
+function openCashSpend(){
+ openQuick();
+ qAccount.value='Contanti';
+ qMerchant.placeholder='Dove li hai spesi? Es. bar, pizzeria…';
+}
+function openCashWithdrawal(){
+ cashWithdrawalAmount.value='';
+ cashWithdrawalDate.value=today();
+ openModal('cashWithdrawalModal');
+ setTimeout(()=>cashWithdrawalAmount.focus(),250);
+}
+function saveCashWithdrawal(){
+ const amount=parseAmount(cashWithdrawalAmount.value);
+ if(!amount){toast('Inserisci l’importo prelevato');return}
+ const date=cashWithdrawalDate.value||today();
+ setCashBalance(cashBalance()+amount);
+ const main=state.accounts.find(a=>a.primary===true)||state.accounts.find(a=>a.id==='mediolanum-main');
+ if(main)main.balance=Math.round(((Number(main.balance)||0)-amount)*100)/100;
+ ingestTransaction({id:'cashwd'+Date.now(),date,merchant:'Prelievo contanti → Portafoglio',amount,category:'Altro',account:'Conto Mediolanum → Portafoglio',verified:true,reimb:false,origin:'manual',type:'transfer',excluded:true,reviewReason:''});
+ saveState();closeModal('cashWithdrawalModal');renderAll();toast('Contanti aggiunti al portafoglio ✓');
+}
+
 function openQuick(){
  selectedCategory='Altro';renderCats();
  qAmount.value='';qMerchant.value='';qDate.value=today();qAccount.value=state.settings.defaultAccount||'Carta';qReimb.checked=false;
@@ -553,10 +615,12 @@ function autoCategory(){
 function saveQuick(){
  const amount=parseAmount(qAmount.value); if(!amount){toast('Inserisci un importo');qAmount.focus();return}
  const merchant=qMerchant.value.trim()||'Spesa';
+ if(qAccount.value==='Contanti' && amount>cashBalance()){toast('Nel portafoglio risultano '+euro(cashBalance()));return}
  const tx={id:'t'+Date.now(),date:qDate.value||today(),merchant,amount,category:selectedCategory,account:qAccount.value,verified:true,reimb:qReimb.checked,origin:'manual',type:'expense',excluded:false,reviewReason:''};
  ingestTransaction(tx);
+ if(qAccount.value==='Contanti')setCashBalance(cashBalance()-amount);
  if(merchant!=='Spesa') state.rules[merchant.toLowerCase()]=selectedCategory;
- saveState();closeModal('quickModal');currentMonth=monthKey(tx.date);renderAll();toast('Spesa salvata ✓');
+ saveState();closeModal('quickModal');currentMonth=monthKey(tx.date);renderAll();toast(qAccount.value==='Contanti'?'Spesa contanti salvata · restano '+euro(cashBalance()):'Spesa salvata ✓');
 }
 function openEdit(id){
  const t=state.transactions.find(x=>x.id===id); if(!t)return;
@@ -779,6 +843,29 @@ function incomeForMonth(month=currentMonth){
    .reduce((a,t)=>a+(Number(t.amount)||0),0);
 }
 
+function lifeBudgetTransactions(month=currentMonth){
+ return state.transactions.filter(t=>
+   monthKey(t.date)===month && countable(t) && ['Ristoranti','Svago'].includes(t.category)
+ ).sort((a,b)=>b.date.localeCompare(a.date));
+}
+function openLifeBudgetDetail(){
+ const list=lifeBudgetTransactions(currentMonth);
+ const budget=Number(state.settings.lifeBudget)||200;
+ const used=Math.max(0,list.reduce((sum,t)=>sum+spendImpact(t),0));
+ const remaining=Math.max(0,budget-used);
+ lifeBudgetDetailMonth.textContent=monthName(currentMonth)+' · budget mensile '+euro(budget);
+ lifeDetailUsed.textContent=euro(used);
+ lifeDetailRemaining.textContent=euro(remaining);
+ lifeBudgetDetailList.innerHTML=list.length?list.map(t=>{
+   const impact=spendImpact(t);
+   return `<div class="lifeRow">
+     <div><div class="lifeMerchant">${esc(t.merchant||'Spesa')}</div><div class="lifeDate">${new Date(t.date+'T12:00').toLocaleDateString('it-IT')} · ${esc(t.category)}</div></div>
+     <div class="lifeAmount">${impact<0?'+':'−'}${euro(Math.abs(impact))}</div>
+   </div>`;
+ }).join(''):'<div class="empty">Non hai ancora usato il budget vita questo mese.</div>';
+ openModal('lifeBudgetModal');
+}
+
 function renderHome(){
  const txs=state.transactions.filter(t=>monthKey(t.date)===currentMonth);
  const counted=txs.filter(countable);
@@ -811,6 +898,7 @@ function renderHome(){
  simpleIncome.textContent=euro(income);
  simpleExpense.textContent=euro(spent);
  simpleSavings.textContent=euro(savings);
+ const chb=document.getElementById('cashHomeBalance');if(chb)chb.textContent=euro(cashBalance());
  recentList.innerHTML=txHTML([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5));
 }
 function drawChart(txs){
