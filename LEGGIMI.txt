@@ -1,0 +1,18 @@
+SPese PWA — iPhone
+=================
+
+File principali:
+- index.html
+- manifest.webmanifest
+- sw.js
+- icon-192.png / icon-512.png / apple-touch-icon.png
+
+Per installarla come app iPhone, questi file devono essere pubblicati insieme su un sito HTTPS.
+Dopo la pubblicazione:
+1. Apri l'indirizzo in Safari.
+2. Tocca Condividi.
+3. Aggiungi alla schermata Home.
+4. Attiva "Apri come app web" se viene mostrato.
+5. Aggiungi.
+
+I movimenti sono salvati localmente nel browser/app. Usa il backup JSON dall'app.
