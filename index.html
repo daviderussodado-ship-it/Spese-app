@@ -180,7 +180,11 @@ main{max-width:850px;margin:auto;padding:16px}
     <div class="budgetHero">
       <div class="kicker">QUANTO POSSO SPENDERE LIBERAMENTE?</div>
       <div class="big" id="freeToSpend">€ 0,00</div>
-      <div class="small" id="freeToSpendNote" style="color:#d8e9ff">Dopo obiettivo Mediolanum e impegni ancora da pagare</div>
+      <div class="small" id="freeToSpendNote" style="color:#d8e9ff">Budget minimo per uscite e divertimento</div>
+      <div class="budgetMeta">
+        <div class="budgetMini"><span class="small" style="color:#d8e9ff">Budget vita del mese</span><b id="lifeBudgetTotal">€ 200,00</b></div>
+        <div class="budgetMini"><span class="small" style="color:#d8e9ff">Già usato</span><b id="lifeBudgetUsed">€ 0,00</b></div>
+      </div>
     </div>
 
     <div class="quick">
@@ -235,7 +239,7 @@ main{max-width:850px;margin:auto;padding:16px}
   </section>
 
   <section id="budgetView" class="hidden">
-    <div class="sectionTitle"><h2>Piano mensile</h2><button class="linkbtn" onclick="openRecurring()">＋ Voce</button></div>
+    <div class="sectionTitle"><h2>Piano mensile</h2><button class="linkbtn" onclick="openRecurring()">＋ Voce</button></div><div class="infoStrip">🎉 <b>Budget vita:</b> <span id="planLifeBudget">€ 200,00</span> al mese per uscite e divertimento. È una quota da vivere, non un obiettivo di risparmio.</div>
     <div class="card sumcard">
       <div class="kicker">Impegni ancora da sostenere</div>
       <div class="big" id="remainingThisMonth">€ 0,00</div>
@@ -380,7 +384,7 @@ main{max-width:850px;margin:auto;padding:16px}
   </div>
   <button class="secondary" onclick="carryPreviousBalance()">↳ Usa saldo finale anno precedente</button>
   <div class="field"><label>SALDO DISPONIBILE ATTUALE (€)</label><input id="sBalance" inputmode="decimal" placeholder="Serve per “Quanto posso spendere?”"></div>
-  <div class="field"><label>OBIETTIVO SALDO MINIMO (€)</label><input id="sGoal" inputmode="decimal"></div>
+  <div class="field"><label>OBIETTIVO SALDO MINIMO (€)</label><input id="sGoal" inputmode="decimal"></div><div class="field"><label>BUDGET USCITE E DIVERTIMENTO / MESE (€)</label><input id="sLifeBudget" inputmode="decimal" placeholder="200,00"></div>
   <div class="field"><label>CONTO PREDEFINITO</label><select id="sDefaultAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option>Contanti</option></select></div>
   <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p>
   <button class="save" onclick="saveSettings()">Salva impostazioni</button>
@@ -418,6 +422,7 @@ if(!Array.isArray(state.debts))state.debts=[];
 state.recurring.forEach(r=>{if(!r.startDate)r.startDate='2026-01-01';});
 delete state.rules?.['pro loco']; delete state.rules?.['sumup *associazione']; delete state.rules?.['proloco'];
 state.transactions.forEach(t=>{if(!t.type)t.type='expense';if(typeof t.excluded!=='boolean')t.excluded=false;if(!t.origin)t.origin='legacy';if(!t.reviewReason)t.reviewReason='';});
+if(!Number(state.settings.lifeBudget))state.settings.lifeBudget=200;
 let selectedCategory='Altro', currentMonth='', selectedYear=new Date().getFullYear(), photoMode='receipt';
 
 function saveState(){ localStorage.setItem('spese_v1',JSON.stringify(state)); }
@@ -657,7 +662,7 @@ function recurringHTML(list,allowPaid=true){
   return `<div class="recurringItem"><div onclick="openRecurring('${r.id}')"><div class="recName ${!r.active?'offText':''}">${getIcon(r.category)} ${esc(r.name)} ${r.uncertain?'<span class="badge">DA VERIFICARE</span>':''}</div><div class="recMeta">${esc(r.category)} · ${freq}${r.endDate?' · fino al '+new Date(r.endDate+'T12:00').toLocaleDateString('it-IT'):''}</div></div><div><div class="recAmount">${a?euro(a):'<span class="warnText">da impostare</span>'}</div>${allowPaid&&r.active&&recurringApplies(r)?`<div class="recBtns"><button class="miniBtn ${isPaid?'paid':''}" onclick="event.stopPropagation();togglePaidRecurring('${r.id}')">${isPaid?'✓ Pagata':'Segna pagata'}</button></div>`:''}</div></div>`;
  }).join('');
 }
-function renderBudget(){
+function renderBudget(){const plb=document.getElementById('planLifeBudget');if(plb)plb.textContent=euro(Number(state.settings.lifeBudget)||200);
  renderAssets();const n=financialNumbers(), due=monthCommitments(), rem=remainingCommitments(), paid=paidSet();
  budgetFree.textContent=n.free===null?'—':euro(Math.max(0,n.free));
  budgetFree.classList.toggle('red',n.free!==null&&n.free<0);
@@ -765,6 +770,10 @@ function realSavingsForMonth(month=currentMonth){
    return /fond|pellet|spese macchina|invest|deposito|risparm/.test(x);
  }).reduce((a,t)=>a+(Number(t.amount)||0),0);
 }
+function lifeSpendingForMonth(month=currentMonth){
+ return state.transactions.filter(t=>monthKey(t.date)===month && countable(t) && ['Ristoranti','Svago'].includes(t.category))
+   .reduce((sum,t)=>sum+spendImpact(t),0);
+}
 function incomeForMonth(month=currentMonth){
  return state.transactions.filter(t=>monthKey(t.date)===month && t.type==='income')
    .reduce((a,t)=>a+(Number(t.amount)||0),0);
@@ -783,12 +792,20 @@ function renderHome(){
  simpleGoalBar.style.width=Math.max(0,Math.min(100,balance/goal*100))+'%';
  simpleGoalText.textContent=gap>0?'Manca per arrivare a '+euro(goal):'Obiettivo raggiunto';
  simpleGoalGap.textContent=gap>0?euro(gap):'✓';
- const free=Math.max(0,fn.free===null?0:fn.free);
+ const lifeBudget=Number(state.settings.lifeBudget)||200;
+ const lifeUsed=Math.max(0,lifeSpendingForMonth(currentMonth));
+ const lifeRemaining=Math.max(0,lifeBudget-lifeUsed);
+ const extraFree=Math.max(0,fn.free===null?0:fn.free);
+ const free=Math.max(lifeRemaining,extraFree);
  freeToSpend.textContent=euro(free);
- if(fn.free!==null && fn.free<0){
-   freeToSpendNote.textContent='Prima recupera '+euro(Math.abs(fn.free))+' tra obiettivo e impegni previsti';
+ lifeBudgetTotal.textContent=euro(lifeBudget);
+ lifeBudgetUsed.textContent=euro(lifeUsed);
+ if(extraFree>lifeRemaining){
+   freeToSpendNote.textContent='Hai anche margine oltre obiettivo e impegni';
+ }else if(lifeRemaining>0){
+   freeToSpendNote.textContent='Ti restano '+euro(lifeRemaining)+' per uscite e divertimento questo mese';
  }else{
-   freeToSpendNote.textContent='Margine oltre i '+euro(goal)+' e gli impegni ancora previsti';
+   freeToSpendNote.textContent='Budget uscite e divertimento del mese già utilizzato';
  }
  simpleMonthName.textContent=monthName(currentMonth);
  simpleIncome.textContent=euro(income);
@@ -934,11 +951,11 @@ function exportCSV(){
 function saveSettings(){
  const y=Number(sYear.value)||selectedYear,p=yearProfile(y);
  p.openingBalance=sOpeningBalance.value;p.closingBalance=sClosingBalance.value;
- state.settings.goal=parseAmount(sGoal.value)||6000;state.settings.balance=sBalance.value;state.settings.defaultAccount=sDefaultAccount.value;
+ state.settings.goal=parseAmount(sGoal.value)||6000;state.settings.lifeBudget=parseAmount(sLifeBudget.value)||200;state.settings.balance=sBalance.value;state.settings.defaultAccount=sDefaultAccount.value;
  saveState();closeModal('settingsModal');renderAll();toast('Impostazioni salvate');
 }
 settingsModal.addEventListener('click',()=>{
- sGoal.value=state.settings.goal||6000;sBalance.value=state.settings.balance||'';sDefaultAccount.value=state.settings.defaultAccount||'Carta';
+ sGoal.value=state.settings.goal||6000;sLifeBudget.value=state.settings.lifeBudget||200;sBalance.value=state.settings.balance||'';sDefaultAccount.value=state.settings.defaultAccount||'Carta';
  sYear.innerHTML=availableYears().map(y=>`<option value="${y}">${y}</option>`).join('');sYear.value=String(selectedYear);loadYearSettings();
 },{once:false});
 
