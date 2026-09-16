@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#183b78">
-<title>Spese — Gestione personale</title>
+<title>Spese — Le mie finanze</title>
 
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
@@ -131,6 +131,17 @@ main{max-width:850px;margin:auto;padding:16px}
 .badge.dup{background:#ffe6cc;color:#8a4d00}.badge.transfer{background:#e7ecf7;color:#485774}.badge.excluded{background:#f0f1f4;color:#687386}
 .reviewBox{background:#fff7df;border:1px solid #ecdba8;border-radius:14px;padding:10px 11px;font-size:12px;margin:8px 0;color:#694d08}
 .sourceNote{font-size:11px;color:var(--muted);margin-top:4px}
+.simpleHero{background:white;border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:10px;box-shadow:0 5px 18px #1d33550a}
+.simpleHeroTop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.simpleBalance{font-size:34px;font-weight:950;letter-spacing:-1px;margin:5px 0}
+.goalLine{height:9px;border-radius:20px;background:#e8edf5;overflow:hidden;margin:12px 0 7px}
+.goalLine i{display:block;height:100%;background:var(--accent);border-radius:20px}
+.goalInfo{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--muted)}
+.monthSimple{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.monthSimple .card{padding:12px}.monthSimple .v{font-size:18px;font-weight:900;margin-top:4px}
+.green{color:#078451}.amber{color:#986b00}.cleanNote{font-size:12px;color:var(--muted);line-height:1.45}
+.nav{grid-template-columns:repeat(4,1fr)!important}
+.settingsShortcut{width:100%;border:1px solid var(--line);background:white;border-radius:14px;padding:12px;font-weight:800;text-align:left;margin-top:8px}
 .assetGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.assetCard{padding:13px}.assetCard .val{font-weight:900;font-size:20px;margin-top:4px}.assetList{padding:0 13px}.assetLine{display:grid;grid-template-columns:1fr auto;gap:8px;padding:11px 0;border-bottom:1px solid var(--line)}.assetLine:last-child{border-bottom:0}.assetName{font-weight:800;font-size:13px}.assetSub{font-size:10px;color:var(--muted);margin-top:3px}.debtVal{color:#d52643}.reserveVal{color:#7b5e00}
 @media (display-mode: standalone){.installTip{display:none!important}}
 </style>
@@ -138,7 +149,7 @@ main{max-width:850px;margin:auto;padding:16px}
 <body>
 <header>
   <div class="headrow">
-    <div><div class="brand">💶 Le mie spese</div><div class="month" id="headerMonth"></div></div>
+    <div><div class="brand">💶 Spese</div><div class="month" id="headerMonth"></div></div>
     <button class="iconbtn" onclick="openModal('settingsModal')">⚙︎</button>
   </div>
 </header>
@@ -149,53 +160,42 @@ main{max-width:850px;margin:auto;padding:16px}
     Apri questa pagina in Safari → Condividi <b>□↑</b> → <b>Aggiungi alla schermata Home</b> → attiva <b>Apri come app web</b> → Aggiungi.
   </div>
 
-  <div class="filters" id="yearFilters" style="margin:2px 0 12px"></div>
   <section id="homeView">
-    <div class="summary">
-      <div class="card sumcard">
-        <div class="kicker">Spese del mese</div>
-        <div class="big red" id="monthExpense">€ 0,00</div>
-        <div class="small" id="monthCount">0 movimenti</div>
+    <div class="simpleHero">
+      <div class="simpleHeroTop">
+        <div>
+          <div class="kicker">CONTO MEDIOLANUM</div>
+          <div class="simpleBalance" id="simplePrimaryBalance">€ 0,00</div>
+          <div class="cleanNote" id="simpleBalanceDate">Saldo disponibile</div>
+        </div>
+        <div style="text-align:right">
+          <div class="kicker">OBIETTIVO</div>
+          <div style="font-size:20px;font-weight:950">€ 6.000</div>
+        </div>
       </div>
-      <div class="card sumcard">
-        <div class="kicker">Media al giorno</div>
-        <div class="big" id="dailyAvg">€ 0,00</div>
-        <div class="small" id="monthForecast">Stima mese € 0</div>
-      </div>
+      <div class="goalLine"><i id="simpleGoalBar" style="width:0%"></i></div>
+      <div class="goalInfo"><span id="simpleGoalText">Obiettivo</span><b id="simpleGoalGap">€ 0,00</b></div>
+    </div>
+
+    <div class="budgetHero">
+      <div class="kicker">QUANTO POSSO SPENDERE LIBERAMENTE?</div>
+      <div class="big" id="freeToSpend">€ 0,00</div>
+      <div class="small" id="freeToSpendNote" style="color:#d8e9ff">Dopo obiettivo Mediolanum e impegni ancora da pagare</div>
     </div>
 
     <div class="quick">
       <button class="primary" onclick="openQuick()">＋ Spesa</button>
       <button class="photo" onclick="openModal('photoModal')">📸 Foto / screenshot</button>
     </div>
-    <div class="budgetHero">
-      <div class="kicker">QUANTO POSSO SPENDERE?</div>
-      <div class="big" id="freeToSpend">Imposta il saldo</div>
-      <div class="small" id="freeToSpendNote" style="color:#d8e9ff">Solo Conto Mediolanum − obiettivo − impegni ancora da pagare</div>
-      <div class="budgetMeta">
-        <div class="budgetMini"><span class="small" style="color:#d8e9ff">Saldo Mediolanum</span><b id="homePrimaryBalance">€ 0,00</b></div>
-        <div class="budgetMini"><span class="small" style="color:#d8e9ff">Gap verso 6.000 €</span><b id="homeGoalGap">€ 0,00</b></div>
-        <div class="budgetMini"><span class="small" style="color:#d8e9ff">Impegni ancora da pagare</span><b id="homeRemainingFixed">€ 0,00</b></div>
-        <div class="budgetMini"><span class="small" style="color:#d8e9ff">Impegni tipici / mese</span><b id="homeMonthlyFixed">€ 0,00</b></div>
-      </div>
+
+    <div class="sectionTitle"><h2>Questo mese</h2><span class="small" id="simpleMonthName"></span></div>
+    <div class="monthSimple">
+      <div class="card"><div class="kicker">Entrate</div><div class="v green" id="simpleIncome">€ 0</div></div>
+      <div class="card"><div class="kicker">Spese</div><div class="v red" id="simpleExpense">€ 0</div></div>
+      <div class="card"><div class="kicker">Risparmio</div><div class="v amber" id="simpleSavings">€ 0</div></div>
     </div>
 
-    <div class="sectionTitle"><h2>Andamento del mese</h2><button class="linkbtn" onclick="switchView('stats')">Dettagli</button></div>
-    <div class="card canvasWrap"><canvas id="chart"></canvas></div>
-
-    <div class="card sumcard" style="margin-top:12px">
-  <div class="kicker">RIEPILOGO <span id="annualYearLabel"></span></div>
-  <div class="summary" style="margin-top:8px">
-    <div><div class="small">Spese dell’anno</div><div class="big red" id="yearSpent">€ 0,00</div></div>
-    <div><div class="small">Movimenti dell’anno</div><div class="big" id="yearCount">0</div></div>
-  </div>
-  <div class="summary" style="margin-top:10px">
-    <div><div class="small">Saldo iniziale 1 gennaio</div><div style="font-weight:900;margin-top:3px" id="yearOpening">Da impostare</div></div>
-    <div><div class="small">Confronto anno precedente</div><div style="font-weight:900;margin-top:3px" id="yearCompare">Nessun dato</div></div>
-  </div>
-</div>
-</div>
-<div class="sectionTitle"><h2>Ultimi movimenti</h2><button class="linkbtn" onclick="switchView('movements')">Vedi tutti</button></div>
+    <div class="sectionTitle"><h2>Ultimi movimenti</h2><button class="linkbtn" onclick="switchView('movements')">Vedi tutti</button></div>
     <div class="card txList" id="recentList"></div>
   </section>
 
@@ -207,37 +207,49 @@ main{max-width:850px;margin:auto;padding:16px}
   </section>
 
   <section id="statsView" class="hidden">
-    <div class="sectionTitle"><h2>Statistiche</h2><span class="small">Mese selezionato</span></div>
-    <div class="card sumcard"><div class="kicker">Totale uscite</div><div class="big red" id="statsTotal"></div><div id="categoryStats" style="margin-top:15px"></div></div>
-    <div class="sectionTitle"><h2>Da verificare</h2></div>
-    <div class="card txList" id="verifyList"></div>
-  </section>
-
-  <section id="budgetView" class="hidden">
-    <div class="sectionTitle"><h2>Il mio piano</h2><button class="linkbtn" onclick="openRecurring()">＋ Voce</button></div>
-    <div class="card sumcard">
-      <div class="kicker">Margine disponibile</div><div class="big" id="budgetFree"></div>
-      <div class="small" id="budgetFormula"></div>
-      <div class="goalbar" style="margin-top:12px"><i id="goalProgress" style="width:0%"></i></div>
-    </div>
-    <div class="summary" style="margin-top:10px">
-      <div class="card sumcard"><div class="kicker">Impegni del mese</div><div class="big red" id="dueThisMonth"></div><div class="small" id="dueCount"></div></div>
-      <div class="card sumcard"><div class="kicker">Ancora da pagare</div><div class="big" id="remainingThisMonth"></div><div class="small" id="paidCount"></div></div>
-    </div>
-    <div id="unknownNotice" class="infoStrip hidden"></div>
-    <div class="sectionTitle"><h2>Situazione finanziaria</h2><span class="small">Ultimo dato disponibile</span></div>
+    <div class="sectionTitle"><h2>Patrimonio</h2><span class="small">Quadro generale</span></div>
+    <div class="filters" id="yearFilters" style="margin-bottom:12px"></div>
     <div class="assetGrid">
-      <div class="card assetCard"><div class="kicker">Disponibile</div><div class="val" id="liquidTotal">€ 0,00</div><div class="small">conti + wallet spendibili</div></div>
-      <div class="card assetCard"><div class="kicker">Accantonato</div><div class="val reserveVal" id="reservedTotal">€ 0,00</div><div class="small">salvadanai, non da spendere</div></div>
+      <div class="card assetCard"><div class="kicker">Disponibile</div><div class="val" id="liquidTotal">€ 0,00</div><div class="small">conti + wallet</div></div>
+      <div class="card assetCard"><div class="kicker">Salvadanai</div><div class="val reserveVal" id="reservedTotal">€ 0,00</div><div class="small">denaro accantonato</div></div>
       <div class="card assetCard"><div class="kicker">Debiti residui</div><div class="val debtVal" id="debtTotal">€ 0,00</div><div class="small">finanziamenti noti</div></div>
-      <div class="card assetCard"><div class="kicker">Patrimonio netto noto</div><div class="val" id="knownNet">€ 0,00</div><div class="small">esclusi investimenti senza valore aggiornato</div></div>
+      <div class="card assetCard"><div class="kicker">Netto noto</div><div class="val" id="knownNet">€ 0,00</div><div class="small">senza valore fondi</div></div>
     </div>
     <div class="sectionTitle"><h2>Conti e wallet</h2></div><div class="card assetList" id="accountsList"></div>
     <div class="sectionTitle"><h2>Salvadanai</h2></div><div class="card assetList" id="potsList"></div>
     <div class="sectionTitle"><h2>Finanziamenti</h2></div><div class="card assetList" id="debtsList"></div>
-    <div class="sectionTitle"><h2>Spese fisse e abbonamenti</h2><span class="small">Tocca per modificare</span></div>
+    <div class="sectionTitle"><h2>Anno <span id="annualYearLabel"></span></h2></div>
+    <div class="card sumcard">
+      <div class="summary">
+        <div><div class="small">Spese</div><div class="big red" id="yearSpent">€ 0,00</div></div>
+        <div><div class="small">Movimenti</div><div class="big" id="yearCount">0</div></div>
+      </div>
+      <div class="summary" style="margin-top:10px">
+        <div><div class="small">Saldo 1 gennaio</div><div style="font-weight:900;margin-top:3px" id="yearOpening">Da impostare</div></div>
+        <div><div class="small">Confronto anno prima</div><div style="font-weight:900;margin-top:3px" id="yearCompare">Nessun dato</div></div>
+      </div>
+    </div>
+    <div class="sectionTitle"><h2>Da controllare</h2><span class="small">Solo ciò che richiede attenzione</span></div>
+    <div class="card txList" id="verifyList"></div>
+    <div class="hidden"><span id="statsTotal"></span><div id="categoryStats"></div></div>
+  </section>
+
+  <section id="budgetView" class="hidden">
+    <div class="sectionTitle"><h2>Piano mensile</h2><button class="linkbtn" onclick="openRecurring()">＋ Voce</button></div>
+    <div class="card sumcard">
+      <div class="kicker">Impegni ancora da sostenere</div>
+      <div class="big" id="remainingThisMonth">€ 0,00</div>
+      <div class="small" id="paidCount"></div>
+    </div>
+    <div class="summary" style="margin-top:10px">
+      <div class="card sumcard"><div class="kicker">Previsti nel mese</div><div class="big" id="dueThisMonth"></div><div class="small" id="dueCount"></div></div>
+      <div class="card sumcard"><div class="kicker">Margine libero</div><div class="big" id="budgetFree"></div><div class="small">dopo obiettivo e impegni</div></div>
+    </div>
+    <div class="hidden"><span id="budgetFormula"></span><div class="goalbar"><i id="goalProgress"></i></div></div>
+    <div id="unknownNotice" class="infoStrip hidden"></div>
+    <div class="sectionTitle"><h2>Impegni, risparmi e abbonamenti</h2><span class="small">Tocca per modificare</span></div>
     <div class="card" id="recurringList"></div>
-    <div class="sectionTitle"><h2>Voci sospese</h2></div>
+    <div class="sectionTitle"><h2>Sospesi</h2></div>
     <div class="card" id="suspendedList"></div>
   </section>
 
@@ -250,7 +262,7 @@ main{max-width:850px;margin:auto;padding:16px}
 <div class="sourceNote">Per screenshot o foto usa 📸 Foto / screenshot. CSV consigliato per gli estratti completi.</div></div>
       <div class="card settingCard"><h3>🔐 Unisci aggiornamento personale</h3><p>Aggiunge conti, salvadanai, debiti e nuovi movimenti senza cancellare quelli già presenti. I duplicati vengono saltati o messi da controllare.</p><input type="file" id="mergeFile" accept=".json" onchange="mergeFinancialPatch(this.files[0])"></div>
       <div class="card settingCard"><h3>💾 Backup completo</h3><p>Esporta tutti i movimenti e le regole apprese in un file JSON.</p><button class="secondary" onclick="exportBackup()">Esporta backup</button><input class="hidden" type="file" id="backupFile" accept=".json" onchange="restoreBackup(this.files[0])"><button class="secondary" onclick="document.getElementById('backupFile').click()">Ripristina backup</button></div>
-      <div class="card settingCard"><h3>🧹 Controllo importazioni</h3><p id="importHealth">Nessun problema rilevato.</p><button class="secondary" onclick="switchView('stats')">Apri “Da verificare”</button></div>
+      <div class="card settingCard"><h3>🧹 Movimenti da controllare</h3><p id="importHealth">Nessun problema rilevato.</p><button class="secondary" onclick="switchView('stats')">Apri “Da verificare”</button></div>
       <div class="card settingCard"><h3>📊 Excel / CSV</h3><p>Esporta i movimenti in un formato apribile con Excel.</p><button class="secondary" onclick="exportCSV()">Esporta CSV</button></div>
     </div>
   </section>
@@ -260,9 +272,8 @@ main{max-width:850px;margin:auto;padding:16px}
   <div class="nav">
     <button id="nav-home" class="active" onclick="switchView('home')"><span>⌂</span>Home</button>
     <button id="nav-movements" onclick="switchView('movements')"><span>≡</span>Movimenti</button>
-    <button id="nav-budget" onclick="switchView('budget')"><span>◎</span>Piano</button>
-    <button id="nav-stats" onclick="switchView('stats')"><span>◔</span>Statistiche</button>
-    <button id="nav-data" onclick="switchView('data')"><span>↥</span>Dati</button>
+    <button id="nav-stats" onclick="switchView('stats')"><span>◎</span>Patrimonio</button>
+    <button id="nav-budget" onclick="switchView('budget')"><span>✓</span>Piano</button>
   </div>
 </div>
 
@@ -297,7 +308,7 @@ main{max-width:850px;margin:auto;padding:16px}
   <div class="field"><label>PROVENIENZA</label><select id="eAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option>Contanti</option></select></div>
   <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;margin:6px 2px"><input type="checkbox" id="eReimb"> Da rimborsare</label>
   <div class="grid2">
-    <div class="field"><label>TIPO</label><select id="eType"><option value="expense">Spesa</option><option value="refund">Rimborso / storno</option><option value="transfer">Trasferimento interno</option><option value="income">Entrata</option></select></div>
+    <div class="field"><label>TIPO</label><select id="eType"><option value="expense">Spesa</option><option value="refund">Rimborso / storno</option><option value="transfer">Spostamento di denaro</option><option value="income">Entrata</option></select></div>
     <div class="field"><label>ORIGINE</label><input id="eOrigin" disabled></div>
   </div>
   <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;margin:6px 2px"><input type="checkbox" id="eExcluded"> Escludi dai totali</label>
@@ -373,6 +384,7 @@ main{max-width:850px;margin:auto;padding:16px}
   <div class="field"><label>CONTO PREDEFINITO</label><select id="sDefaultAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option>Contanti</option></select></div>
   <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p>
   <button class="save" onclick="saveSettings()">Salva impostazioni</button>
+  <button class="settingsShortcut" onclick="closeModal('settingsModal');switchView('data')">⚙️ Dati, importazioni e backup</button>
  </div>
 </div>
 
@@ -647,11 +659,11 @@ function recurringHTML(list,allowPaid=true){
 }
 function renderBudget(){
  renderAssets();const n=financialNumbers(), due=monthCommitments(), rem=remainingCommitments(), paid=paidSet();
- budgetFree.textContent=n.free===null?'Inserisci il saldo attuale':euro(n.free);
+ budgetFree.textContent=n.free===null?'—':euro(Math.max(0,n.free));
  budgetFree.classList.toggle('red',n.free!==null&&n.free<0);
  budgetFormula.textContent=n.free===null?'Inserisci il saldo attuale in ⚙︎ Impostazioni per calcolare il margine.':`${euro(n.balance)} saldo − ${euro(n.goal)} obiettivo − ${euro(n.remaining)} fissi residui`;
  dueThisMonth.textContent=euro(n.due);dueCount.textContent=due.length+' voci previste';
- remainingThisMonth.textContent=euro(n.remaining);paidCount.textContent=due.filter(r=>paid.has(r.id)).length+' già segnate pagate';
+ remainingThisMonth.textContent=euro(n.remaining);paidCount.textContent=due.filter(r=>recurringIsPaid(r)).length+' già rilevate/pagate';
  const pct=n.balance?Math.max(0,Math.min(100,n.balance/n.goal*100)):0;goalProgress.style.width=pct+'%';
  recurringList.innerHTML=recurringHTML(state.recurring.filter(r=>r.active).sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)));
  suspendedList.innerHTML=recurringHTML(state.recurring.filter(r=>!r.active),false);
@@ -745,21 +757,44 @@ function carryPreviousBalance(){
  sOpeningBalance.value=prev;toast('Saldo riportato ✓');
 }
 
+function realSavingsForMonth(month=currentMonth){
+ return state.transactions.filter(t=>{
+   if(monthKey(t.date)!==month || t.excluded!==true || t.type!=='transfer')return false;
+   const x=normMerchant((t.merchant||'')+' '+(t.category||''));
+   if(/ricarica satispay|verso la banca|dalla banca|regolamento carta|nexi|prelievo contanti/.test(x))return false;
+   return /fond|pellet|spese macchina|invest|deposito|risparm/.test(x);
+ }).reduce((a,t)=>a+(Number(t.amount)||0),0);
+}
+function incomeForMonth(month=currentMonth){
+ return state.transactions.filter(t=>monthKey(t.date)===month && t.type==='income')
+   .reduce((a,t)=>a+(Number(t.amount)||0),0);
+}
+
 function renderHome(){
- const nowKey=currentMonth;
- const txs=state.transactions.filter(t=>monthKey(t.date)===nowKey),counted=txs.filter(countable);
- const total=counted.reduce((sum,t)=>sum+spendImpact(t),0);
- document.getElementById('monthExpense').textContent=euro(total);
- document.getElementById('monthCount').textContent=counted.length+' spese conteggiate · '+txs.length+' movimenti';
- const maxDay=Math.max(1,...counted.map(t=>Number(t.date.slice(8,10))));
- document.getElementById('dailyAvg').textContent=euro(total/maxDay);
- const daysInMonth=new Date(+nowKey.slice(0,4),+nowKey.slice(5,7),0).getDate();
- document.getElementById('monthForecast').textContent='Stima mese '+euro(total/maxDay*daysInMonth);
- document.getElementById('recentList').innerHTML=txHTML([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,7));
- const fn=financialNumbers();freeToSpend.textContent=fn.free===null?'Inserisci il saldo attuale':euro(fn.free);freeToSpend.style.color=fn.free!==null&&fn.free<0?'#ffd5dc':'white';
- homePrimaryBalance.textContent=euro(fn.balance);homeGoalGap.textContent=euro(Math.max(0,fn.goal-fn.balance));homeRemainingFixed.textContent=euro(fn.remaining);homeMonthlyFixed.textContent=euro(fn.monthly);
- renderAnnual();
- drawChart(counted);
+ const txs=state.transactions.filter(t=>monthKey(t.date)===currentMonth);
+ const counted=txs.filter(countable);
+ const spent=counted.reduce((sum,t)=>sum+spendImpact(t),0);
+ const income=incomeForMonth(currentMonth),savings=realSavingsForMonth(currentMonth);
+ const fn=financialNumbers();
+ const main=state.accounts.find(a=>a.primary===true)||state.accounts.find(a=>a.id==='mediolanum-main');
+ const balance=fn.balance||0,goal=fn.goal||6000,gap=Math.max(0,goal-balance);
+ simplePrimaryBalance.textContent=euro(balance);
+ simpleBalanceDate.textContent=main?.snapshotDate?'Aggiornato al '+new Date(main.snapshotDate+'T12:00').toLocaleDateString('it-IT'):'Saldo disponibile';
+ simpleGoalBar.style.width=Math.max(0,Math.min(100,balance/goal*100))+'%';
+ simpleGoalText.textContent=gap>0?'Manca per arrivare a '+euro(goal):'Obiettivo raggiunto';
+ simpleGoalGap.textContent=gap>0?euro(gap):'✓';
+ const free=Math.max(0,fn.free===null?0:fn.free);
+ freeToSpend.textContent=euro(free);
+ if(fn.free!==null && fn.free<0){
+   freeToSpendNote.textContent='Prima recupera '+euro(Math.abs(fn.free))+' tra obiettivo e impegni previsti';
+ }else{
+   freeToSpendNote.textContent='Margine oltre i '+euro(goal)+' e gli impegni ancora previsti';
+ }
+ simpleMonthName.textContent=monthName(currentMonth);
+ simpleIncome.textContent=euro(income);
+ simpleExpense.textContent=euro(spent);
+ simpleSavings.textContent=euro(savings);
+ recentList.innerHTML=txHTML([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5));
 }
 function drawChart(txs){
  const c=document.getElementById('chart'), rect=c.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
@@ -780,7 +815,7 @@ function renderMovements(){
  const list=state.transactions.filter(t=>monthKey(t.date)===currentMonth && (!q || (t.merchant+' '+t.category+' '+t.amount).toLowerCase().includes(q))).sort((a,b)=>b.date.localeCompare(a.date));
  allList.innerHTML=txHTML(list);
 }
-function renderStats(){
+function renderStats(){renderAssets();renderAnnual();
  const all=state.transactions.filter(t=>monthKey(t.date)===currentMonth),list=all.filter(countable),total=list.reduce((sum,t)=>sum+spendImpact(t),0);
  statsTotal.textContent=euro(total);
  const cats={};list.forEach(t=>cats[t.category]=(cats[t.category]||0)+spendImpact(t));
@@ -788,10 +823,22 @@ function renderStats(){
  <div style="margin:11px 0"><div style="display:flex;justify-content:space-between;font-weight:750;font-size:13px"><span>${getIcon(k)} ${k}</span><span>${euro(v)}</span></div><div class="goalbar"><i style="width:${total?Math.max(3,v/total*100):0}%"></i></div></div>`).join('')||'<div class="empty">Nessun dato</div>';
  verifyList.innerHTML=txHTML(state.transactions.filter(t=>!t.verified||t.reviewReason).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,20));
 }
-function renderAll(){headerMonth.textContent='Gestione personale · '+monthName(currentMonth);renderYearFilters();renderMonthFilters();renderHome();renderMovements();renderStats();renderBudget();const q=state.transactions.filter(t=>t.reviewReason).length,e=state.transactions.filter(t=>t.excluded).length;const ih=document.getElementById('importHealth');if(ih)ih.textContent=q?`${q} movimenti richiedono controllo · ${e} esclusi dai totali per evitare doppi conteggi.`:`Nessun possibile doppio conteggio aperto · ${e} movimenti esclusi dai totali.`}
+function renderAll(){
+ headerMonth.textContent=monthName(currentMonth);
+ renderYearFilters();renderMonthFilters();renderHome();renderMovements();renderStats();renderBudget();
+ const q=state.transactions.filter(t=>t.reviewReason).length,e=state.transactions.filter(t=>t.excluded).length;
+ const ih=document.getElementById('importHealth');
+ if(ih)ih.textContent=q?`${q} movimenti da controllare · ${e} non conteggiati come spese.`:`Nessun movimento dubbio · ${e} spostamenti non conteggiati come spese.`;
+}
 function switchView(v){
- ['home','movements','budget','stats','data'].forEach(x=>{document.getElementById(x+'View').classList.toggle('hidden',x!==v);document.getElementById('nav-'+x).classList.toggle('active',x===v)});
- if(v==='stats')renderStats();if(v==='budget')renderBudget();if(v==='home')setTimeout(()=>renderHome(),20);window.scrollTo({top:0,behavior:'smooth'});
+ ['home','movements','budget','stats','data'].forEach(x=>{
+   document.getElementById(x+'View').classList.toggle('hidden',x!==v);
+   const b=document.getElementById('nav-'+x);if(b)b.classList.toggle('active',x===v);
+ });
+ if(v==='stats')renderStats();
+ if(v==='budget')renderBudget();
+ if(v==='home')renderHome();
+ window.scrollTo({top:0,behavior:'smooth'});
 }
 
 // OCR
@@ -895,7 +942,6 @@ settingsModal.addEventListener('click',()=>{
  sYear.innerHTML=availableYears().map(y=>`<option value="${y}">${y}</option>`).join('');sYear.value=String(selectedYear);loadYearSettings();
 },{once:false});
 
-window.addEventListener('resize',()=>{if(!homeView.classList.contains('hidden'))drawChart(state.transactions.filter(t=>monthKey(t.date)===currentMonth))});
 init();
 </script>
 
