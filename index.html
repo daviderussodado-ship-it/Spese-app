@@ -72,7 +72,7 @@ main{max-width:850px;margin:auto;padding:16px}
  padding:9px 14px calc(9px + env(safe-area-inset-bottom));
  background:rgba(255,255,255,.94);backdrop-filter:blur(18px);border-top:1px solid #e2e7ef
 }
-.nav{max-width:850px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.nav{max-width:850px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:2px}
 .nav button{border:0;background:transparent;padding:8px 4px;color:#748096;font-size:11px;font-weight:750}
 .nav button span{display:block;font-size:21px;margin-bottom:2px}
 .nav button.active{color:var(--accent)}
@@ -122,6 +122,12 @@ main{max-width:850px;margin:auto;padding:16px}
   background:#eaf4ff; border:1px solid #c9e1f6; color:#15365e; font-size:13px; line-height:1.35;
 }
 .installTip strong{display:block;margin-bottom:3px}
+.budgetHero{padding:17px;margin:12px 0;background:linear-gradient(135deg,#173a78,#235ca6);color:white;border-radius:20px}
+.budgetHero .kicker{color:#d8e9ff}.budgetHero .big{font-size:31px}.budgetMeta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.budgetMini{background:#ffffff17;border:1px solid #ffffff24;border-radius:13px;padding:10px}.budgetMini b{display:block;font-size:16px;margin-top:3px}
+.recurringItem{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 13px;border-bottom:1px solid var(--line)}.recurringItem:last-child{border-bottom:0}
+.recName{font-size:14px;font-weight:800}.recMeta{font-size:11px;color:var(--muted);margin-top:3px}.recAmount{font-size:14px;font-weight:900;text-align:right}.recBtns{display:flex;gap:5px;justify-content:flex-end;margin-top:5px}.miniBtn{border:1px solid var(--line);background:white;border-radius:9px;padding:5px 7px;font-size:10px;font-weight:800;color:var(--accent)}.miniBtn.paid{background:#e6f6ee;color:#087049;border-color:#bde4d1}.warnText{color:#9a6500}.offText{color:#8b95a7;text-decoration:line-through}
+.infoStrip{padding:12px 13px;background:#fff7df;border:1px solid #f1dfad;border-radius:14px;font-size:12px;color:#6e5210;margin:9px 0}
 @media (display-mode: standalone){.installTip{display:none!important}}
 </style>
 </head>
@@ -156,6 +162,15 @@ main{max-width:850px;margin:auto;padding:16px}
       <button class="primary" onclick="openQuick()">＋ Spesa</button>
       <button class="photo" onclick="openModal('photoModal')">📸 Foto / screenshot</button>
     </div>
+    <div class="budgetHero">
+      <div class="kicker">QUANTO POSSO SPENDERE?</div>
+      <div class="big" id="freeToSpend">Imposta il saldo</div>
+      <div class="small" id="freeToSpendNote" style="color:#d8e9ff">Saldo − cuscinetto obiettivo − impegni fissi ancora da pagare</div>
+      <div class="budgetMeta">
+        <div class="budgetMini"><span class="small" style="color:#d8e9ff">Fissi ancora da pagare</span><b id="homeRemainingFixed">€ 0,00</b></div>
+        <div class="budgetMini"><span class="small" style="color:#d8e9ff">Fissi tipici / mese</span><b id="homeMonthlyFixed">€ 0,00</b></div>
+      </div>
+    </div>
 
     <div class="sectionTitle"><h2>Andamento del mese</h2><button class="linkbtn" onclick="switchView('stats')">Dettagli</button></div>
     <div class="card canvasWrap"><canvas id="chart"></canvas></div>
@@ -178,6 +193,24 @@ main{max-width:850px;margin:auto;padding:16px}
     <div class="card txList" id="verifyList"></div>
   </section>
 
+  <section id="budgetView" class="hidden">
+    <div class="sectionTitle"><h2>Il mio piano</h2><button class="linkbtn" onclick="openRecurring()">＋ Voce</button></div>
+    <div class="card sumcard">
+      <div class="kicker">Margine disponibile</div><div class="big" id="budgetFree"></div>
+      <div class="small" id="budgetFormula"></div>
+      <div class="goalbar" style="margin-top:12px"><i id="goalProgress" style="width:0%"></i></div>
+    </div>
+    <div class="summary" style="margin-top:10px">
+      <div class="card sumcard"><div class="kicker">Impegni del mese</div><div class="big red" id="dueThisMonth"></div><div class="small" id="dueCount"></div></div>
+      <div class="card sumcard"><div class="kicker">Ancora da pagare</div><div class="big" id="remainingThisMonth"></div><div class="small" id="paidCount"></div></div>
+    </div>
+    <div id="unknownNotice" class="infoStrip hidden"></div>
+    <div class="sectionTitle"><h2>Spese fisse e abbonamenti</h2><span class="small">Tocca per modificare</span></div>
+    <div class="card" id="recurringList"></div>
+    <div class="sectionTitle"><h2>Voci sospese</h2></div>
+    <div class="card" id="suspendedList"></div>
+  </section>
+
   <section id="dataView" class="hidden">
     <div class="sectionTitle"><h2>Dati & backup</h2></div>
     <div class="settingsGrid">
@@ -192,6 +225,7 @@ main{max-width:850px;margin:auto;padding:16px}
   <div class="nav">
     <button id="nav-home" class="active" onclick="switchView('home')"><span>⌂</span>Home</button>
     <button id="nav-movements" onclick="switchView('movements')"><span>≡</span>Movimenti</button>
+    <button id="nav-budget" onclick="switchView('budget')"><span>◎</span>Piano</button>
     <button id="nav-stats" onclick="switchView('stats')"><span>◔</span>Statistiche</button>
     <button id="nav-data" onclick="switchView('data')"><span>↥</span>Dati</button>
   </div>
@@ -252,6 +286,33 @@ main{max-width:850px;margin:auto;padding:16px}
  </div>
 </div>
 
+<!-- RECURRING -->
+<div class="modal" id="recurringModal" onclick="backdrop(event,this)">
+ <div class="sheet">
+  <div class="grab"></div><h2>Spesa fissa / abbonamento</h2>
+  <input type="hidden" id="rId">
+  <div class="field"><label>NOME</label><input id="rName" placeholder="Es. Netflix, palestra, finanziamento"></div>
+  <div class="grid2">
+    <div class="field"><label>IMPORTO</label><input id="rAmount" inputmode="decimal" placeholder="0,00"></div>
+    <div class="field"><label>FREQUENZA</label><select id="rCadence" onchange="toggleRecurringFields()"><option value="monthly">Mensile</option><option value="annual">Annuale</option></select></div>
+  </div>
+  <div class="grid2">
+    <div class="field"><label>CATEGORIA</label><select id="rCategory"></select></div>
+    <div class="field"><label>CONTO</label><select id="rAccount"><option>Conto principale</option><option>Conto condiviso</option><option>Carta</option><option>Contanti</option><option>Satispay</option></select></div>
+  </div>
+  <div class="grid2">
+    <div class="field" id="dueDayField"><label>GIORNO (FACOLTATIVO)</label><input id="rDueDay" inputmode="numeric" placeholder="es. 10"></div>
+    <div class="field hidden" id="dueMonthField"><label>MESE RINNOVO</label><select id="rDueMonth"><option value="0">Da impostare</option><option value="1">Gennaio</option><option value="2">Febbraio</option><option value="3">Marzo</option><option value="4">Aprile</option><option value="5">Maggio</option><option value="6">Giugno</option><option value="7">Luglio</option><option value="8">Agosto</option><option value="9">Settembre</option><option value="10">Ottobre</option><option value="11">Novembre</option><option value="12">Dicembre</option></select></div>
+    <div class="field"><label>FINE (FACOLTATIVA)</label><input id="rEndDate" type="date"></div>
+  </div>
+  <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;margin:7px 2px"><input type="checkbox" id="rActive" checked> Attiva</label>
+  <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;margin:7px 2px"><input type="checkbox" id="rUncertain"> Importo / dettaglio da verificare</label>
+  <button class="save" onclick="saveRecurring()">Salva voce</button>
+  <button id="deleteRecurringBtn" class="secondary dangerBtn hidden" onclick="deleteRecurring()">Elimina voce</button>
+  <button class="secondary" onclick="closeModal('recurringModal')">Annulla</button>
+ </div>
+</div>
+
 <!-- SETTINGS -->
 <div class="modal" id="settingsModal" onclick="backdrop(event,this)">
  <div class="sheet">
@@ -269,18 +330,23 @@ main{max-width:850px;margin:auto;padding:16px}
 <script>
 const CATEGORIES = [
   ['Alimentari','🛒'],['Ristoranti','🍴'],['Auto','🚗'],['Casa','🏠'],['Abbonamenti','🔁'],
-  ['Shopping','🛍️'],['Viaggi','✈️'],['Salute','⚕️'],['Sport','⚽'],['Associazione','🎪'],
-  ['Svago','🎟️'],['Altro','•']
+  ['Shopping','🛍️'],['Viaggi','✈️'],['Salute','⚕️'],['Sport','⚽'],['Risparmio','💰'],
+  ['Finanziamenti','🧾'],['Svago','🎟️'],['Altro','•']
 ];
 let state = JSON.parse(localStorage.getItem('spese_v1') || 'null');
 if(!state){
   state = {
     transactions: [],
-    rules:{'amazon':'Shopping','openai':'Abbonamenti','prime video':'Abbonamenti','burger king':'Ristoranti','autogrill':'Ristoranti','enipay':'Auto','eni':'Auto','pro loco':'Associazione','sumup *associazione':'Associazione','proloco':'Associazione'},
-    settings:{goal:6000,balance:'',defaultAccount:'Carta'}
+    rules:{'amazon':'Shopping','openai':'Abbonamenti','prime video':'Abbonamenti','burger king':'Ristoranti','autogrill':'Ristoranti','enipay':'Auto','eni':'Auto'},
+    settings:{goal:6000,balance:'',defaultAccount:'Carta'},
+    recurring:[], recurringPaid:{}
   };
   saveState();
 }
+if(!Array.isArray(state.recurring)) state.recurring=[];
+if(!state.recurringPaid || typeof state.recurringPaid!=='object') state.recurringPaid={};
+if(!state.settings) state.settings={goal:6000,balance:'',defaultAccount:'Carta'};
+delete state.rules?.['pro loco']; delete state.rules?.['sumup *associazione']; delete state.rules?.['proloco'];
 let selectedCategory='Altro', currentMonth='', photoMode='receipt';
 
 function saveState(){ localStorage.setItem('spese_v1',JSON.stringify(state)); }
@@ -316,7 +382,7 @@ function renderCats(){
  document.getElementById('quickCats').innerHTML=CATEGORIES.map(c=>`<button data-cat="${c[0]}" onclick="chooseCat('${c[0]}')" class="${selectedCategory===c[0]?'selected':''}">${c[1]} ${c[0]}</button>`).join('');
 }
 function chooseCat(c){selectedCategory=c;renderCats()}
-function fillCategorySelect(){document.getElementById('eCategory').innerHTML=CATEGORIES.map(c=>`<option>${c[0]}</option>`).join('')}
+function fillCategorySelect(){const opts=CATEGORIES.map(c=>`<option>${c[0]}</option>`).join('');document.getElementById('eCategory').innerHTML=opts;document.getElementById('rCategory').innerHTML=opts}
 
 function openQuick(){
  selectedCategory='Altro';renderCats();
@@ -358,6 +424,86 @@ function txHTML(list){
    <div class="amount">−${euro(t.amount)}</div>
  </div>`).join('');
 }
+
+function recurringApplies(r,month=currentMonth){
+ if(!r.active)return false;
+ if(r.endDate && month > r.endDate.slice(0,7))return false;
+ if(r.cadence==='annual'){
+   const m=Number(month.slice(5,7)); return Number(r.dueMonth||0)===m;
+ }
+ return true;
+}
+function paidSet(month=currentMonth){return new Set(state.recurringPaid[month]||[])}
+function monthlyEquivalent(){
+ return state.recurring.filter(r=>r.active && (!r.endDate || currentMonth<=r.endDate.slice(0,7))).reduce((sum,r)=>{
+   const a=Number(r.amount)||0; return sum+(r.cadence==='annual'?a/12:a);
+ },0);
+}
+function monthCommitments(month=currentMonth){
+ return state.recurring.filter(r=>recurringApplies(r,month));
+}
+function remainingCommitments(month=currentMonth){
+ const paid=paidSet(month);return monthCommitments(month).filter(r=>!paid.has(r.id));
+}
+function financialNumbers(){
+ const balance=parseAmount(state.settings.balance), goal=Number(state.settings.goal)||0;
+ const due=monthCommitments().reduce((s,r)=>s+(Number(r.amount)||0),0);
+ const remaining=remainingCommitments().reduce((s,r)=>s+(Number(r.amount)||0),0);
+ const free=balance?balance-goal-remaining:null;
+ return {balance,goal,due,remaining,free,monthly:monthlyEquivalent()};
+}
+function togglePaidRecurring(id){
+ const arr=new Set(state.recurringPaid[currentMonth]||[]);
+ if(arr.has(id))arr.delete(id);else arr.add(id);
+ state.recurringPaid[currentMonth]=[...arr];saveState();renderAll();
+}
+function openRecurring(id=''){
+ const r=id?state.recurring.find(x=>x.id===id):null;
+ rId.value=r?.id||'';rName.value=r?.name||'';rAmount.value=r?.amount?String(r.amount).replace('.',','):'';
+ rCadence.value=r?.cadence||'monthly';rCategory.value=r?.category||'Altro';rAccount.value=r?.account||'Conto principale';
+ rDueDay.value=r?.dueDay||'';rDueMonth.value=String(r?.dueMonth||0);rEndDate.value=r?.endDate||'';
+ rActive.checked=r?r.active!==false:true;rUncertain.checked=!!r?.uncertain;
+ deleteRecurringBtn.classList.toggle('hidden',!r);toggleRecurringFields();openModal('recurringModal');
+}
+function toggleRecurringFields(){
+ const annual=rCadence.value==='annual';dueMonthField.classList.toggle('hidden',!annual);dueDayField.classList.toggle('hidden',annual);
+}
+function saveRecurring(){
+ const name=rName.value.trim();if(!name){toast('Inserisci il nome');return}
+ const amount=parseAmount(rAmount.value),id=rId.value||'r'+Date.now();
+ const obj={id,name,amount,category:rCategory.value,account:rAccount.value,cadence:rCadence.value,dueDay:Number(rDueDay.value)||0,dueMonth:Number(rDueMonth.value)||0,endDate:rEndDate.value||'',active:rActive.checked,uncertain:rUncertain.checked};
+ const i=state.recurring.findIndex(x=>x.id===id);if(i>=0)state.recurring[i]=obj;else state.recurring.push(obj);
+ saveState();closeModal('recurringModal');renderAll();toast('Voce salvata ✓');
+}
+function deleteRecurring(){
+ const id=rId.value;if(!id||!confirm('Eliminare questa voce?'))return;
+ state.recurring=state.recurring.filter(x=>x.id!==id);Object.keys(state.recurringPaid).forEach(m=>state.recurringPaid[m]=(state.recurringPaid[m]||[]).filter(x=>x!==id));
+ saveState();closeModal('recurringModal');renderAll();toast('Voce eliminata');
+}
+function recurringHTML(list,allowPaid=true){
+ if(!list.length)return '<div class="empty">Nessuna voce</div>';
+ const paid=paidSet();
+ return list.map(r=>{
+  const isPaid=paid.has(r.id), a=Number(r.amount)||0;
+  const freq=r.cadence==='annual'?'annuale'+(r.dueMonth?' · mese '+r.dueMonth:' · mese da impostare'):'mensile'+(r.dueDay?' · giorno '+r.dueDay:'');
+  return `<div class="recurringItem"><div onclick="openRecurring('${r.id}')"><div class="recName ${!r.active?'offText':''}">${getIcon(r.category)} ${esc(r.name)} ${r.uncertain?'<span class="badge">DA VERIFICARE</span>':''}</div><div class="recMeta">${esc(r.category)} · ${freq}${r.endDate?' · fino al '+new Date(r.endDate+'T12:00').toLocaleDateString('it-IT'):''}</div></div><div><div class="recAmount">${a?euro(a):'<span class="warnText">da impostare</span>'}</div>${allowPaid&&r.active&&recurringApplies(r)?`<div class="recBtns"><button class="miniBtn ${isPaid?'paid':''}" onclick="event.stopPropagation();togglePaidRecurring('${r.id}')">${isPaid?'✓ Pagata':'Segna pagata'}</button></div>`:''}</div></div>`;
+ }).join('');
+}
+function renderBudget(){
+ const n=financialNumbers(), due=monthCommitments(), rem=remainingCommitments(), paid=paidSet();
+ budgetFree.textContent=n.free===null?'Imposta il saldo':euro(n.free);
+ budgetFree.classList.toggle('red',n.free!==null&&n.free<0);
+ budgetFormula.textContent=n.free===null?'Inserisci il saldo attuale in ⚙︎ Impostazioni per calcolare il margine.':`${euro(n.balance)} saldo − ${euro(n.goal)} obiettivo − ${euro(n.remaining)} fissi residui`;
+ dueThisMonth.textContent=euro(n.due);dueCount.textContent=due.length+' voci previste';
+ remainingThisMonth.textContent=euro(n.remaining);paidCount.textContent=due.filter(r=>paid.has(r.id)).length+' già segnate pagate';
+ const pct=n.balance?Math.max(0,Math.min(100,n.balance/n.goal*100)):0;goalProgress.style.width=pct+'%';
+ recurringList.innerHTML=recurringHTML(state.recurring.filter(r=>r.active).sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)));
+ suspendedList.innerHTML=recurringHTML(state.recurring.filter(r=>!r.active),false);
+ const unknown=state.recurring.filter(r=>r.active&&(r.uncertain||!Number(r.amount)||(r.cadence==='annual'&&!Number(r.dueMonth))));
+ unknownNotice.classList.toggle('hidden',!unknown.length);
+ unknownNotice.textContent=unknown.length?`⚠️ ${unknown.length} voci hanno importo o scadenza da verificare: il margine disponibile potrebbe cambiare.`:'';
+}
+
 function renderHome(){
  const nowKey=currentMonth;
  const txs=state.transactions.filter(t=>monthKey(t.date)===nowKey);
@@ -369,6 +515,8 @@ function renderHome(){
  const daysInMonth=new Date(+nowKey.slice(0,4),+nowKey.slice(5,7),0).getDate();
  document.getElementById('monthForecast').textContent='Stima mese '+euro(total/maxDay*daysInMonth);
  document.getElementById('recentList').innerHTML=txHTML([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,7));
+ const fn=financialNumbers();freeToSpend.textContent=fn.free===null?'Imposta il saldo':euro(fn.free);freeToSpend.style.color=fn.free!==null&&fn.free<0?'#ffd5dc':'white';
+ homeRemainingFixed.textContent=euro(fn.remaining);homeMonthlyFixed.textContent=euro(fn.monthly);
  drawChart(txs);
 }
 function drawChart(txs){
@@ -398,10 +546,10 @@ function renderStats(){
  <div style="margin:11px 0"><div style="display:flex;justify-content:space-between;font-weight:750;font-size:13px"><span>${getIcon(k)} ${k}</span><span>${euro(v)}</span></div><div class="goalbar"><i style="width:${total?Math.max(3,v/total*100):0}%"></i></div></div>`).join('')||'<div class="empty">Nessun dato</div>';
  verifyList.innerHTML=txHTML(state.transactions.filter(t=>!t.verified).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,20));
 }
-function renderAll(){headerMonth.textContent='Gestione personale · '+monthName(currentMonth);renderMonthFilters();renderHome();renderMovements();renderStats()}
+function renderAll(){headerMonth.textContent='Gestione personale · '+monthName(currentMonth);renderMonthFilters();renderHome();renderMovements();renderStats();renderBudget()}
 function switchView(v){
- ['home','movements','stats','data'].forEach(x=>{document.getElementById(x+'View').classList.toggle('hidden',x!==v);document.getElementById('nav-'+x).classList.toggle('active',x===v)});
- if(v==='stats')renderStats();if(v==='home')setTimeout(()=>renderHome(),20);window.scrollTo({top:0,behavior:'smooth'});
+ ['home','movements','budget','stats','data'].forEach(x=>{document.getElementById(x+'View').classList.toggle('hidden',x!==v);document.getElementById('nav-'+x).classList.toggle('active',x===v)});
+ if(v==='stats')renderStats();if(v==='budget')renderBudget();if(v==='home')setTimeout(()=>renderHome(),20);window.scrollTo({top:0,behavior:'smooth'});
 }
 
 // OCR
@@ -486,7 +634,10 @@ function download(name,content,type){
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)
 }
 function exportBackup(){download('spese-backup-'+today()+'.json',JSON.stringify(state,null,2),'application/json')}
-async function restoreBackup(file){try{const x=JSON.parse(await file.text());if(!x.transactions)throw 0;state=x;saveState();renderAll();toast('Backup ripristinato ✓')}catch(e){toast('Backup non valido')}}
+async function restoreBackup(file){try{const x=JSON.parse(await file.text());if(!Array.isArray(x.transactions))throw 0;
+ state=x;if(!state.rules)state.rules={};if(!state.settings)state.settings={goal:6000,balance:'',defaultAccount:'Carta'};if(!Array.isArray(state.recurring))state.recurring=[];if(!state.recurringPaid)state.recurringPaid={};
+ delete state.rules['pro loco'];delete state.rules['sumup *associazione'];delete state.rules['proloco'];
+ saveState();if(state.transactions.length)currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0].date);renderAll();toast('Backup ripristinato ✓')}catch(e){toast('Backup non valido')}}
 function exportCSV(){
  let s='Data;Descrizione;Importo;Categoria;Conto;Verificato;Da rimborsare\n'+state.transactions.sort((a,b)=>b.date.localeCompare(a.date)).map(t=>[t.date,`"${t.merchant.replace(/"/g,'""')}"`,String(t.amount).replace('.',','),t.category,t.account,t.verified?'Si':'No',t.reimb?'Si':'No'].join(';')).join('\n');
  download('movimenti-spese-'+today()+'.csv','\ufeff'+s,'text/csv;charset=utf-8')
