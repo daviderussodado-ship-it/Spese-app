@@ -167,7 +167,7 @@ main{max-width:850px;margin:auto;padding:16px}
 
 @media (display-mode: standalone){.installTip{display:none!important}}
 
-/* V17 — home semplificata, dettaglio categorie, impegni trasparenti */
+/* V18 — ricorrenze riconciliate con estratti, modifica/pagata immediata */
 .homeQuickTop{margin:8px 0 12px}.homeQuickTop .sectionTitle{margin:4px 4px 9px}.homeQuickTop .quick{margin:0}.homeQuickTop .cashMini{margin-top:8px}
 .remainingList .recurringItem{padding:11px 13px}.remainingList .recName{font-size:14px}.remainingList .recMeta{font-size:11px}.remainingStatus{font-size:11px;font-weight:850;color:var(--muted);margin-top:3px}
 .categoryTap{cursor:pointer}.categoryTap:active{transform:scale(.99);background:#f3f7fd}.categoryChevron{color:var(--blue);font-weight:950;margin-left:8px}
@@ -806,16 +806,43 @@ function syntheticCommitments(month=currentMonth){
 function monthCommitments(month=currentMonth){
  return [...state.recurring.filter(r=>recurringApplies(r,month)),...syntheticCommitments(month)];
 }
+function recurringTokens(r){
+ const generic=new Set(['accantonamento','risparmio','mensile','quota','annuale','versamento','rata','pagamento','abbonamento']);
+ return normMerchant(r.name||'').split(/\s+/).filter(x=>x.length>2&&!generic.has(x));
+}
+function directRecurringNameMatch(r,t){
+ const rn=normMerchant(r.name||''),tm=normMerchant(t.merchant||''),rt=recurringTokens(r);
+ if(r.matchText&&tm.includes(normMerchant(r.matchText)))return true;
+ if(rn&&tm&&(tm.includes(rn)||rn.includes(tm)))return true;
+ const hits=rt.filter(x=>tm.includes(x)).length;return !!(rt.length&&hits>=Math.min(2,rt.length));
+}
+function learnedRecurringMerchant(r,month=currentMonth){
+ const amount=Number(r.amount)||0;if(!amount)return '';
+ if(recurringKind(r)==='subscription')return ''; // per gli abbonamenti non imparare solo dall'importo: troppo rischioso
+ const before=state.transactions.filter(t=>t.date.slice(0,7)<month&&(!t.excluded||t.type==='transfer')&&t.type!=='income'&&Math.abs((Number(t.amount)||0)-amount)<.005);
+ const groups={};before.forEach(t=>{const k=normMerchant(t.merchant||'');if(!k)return;(groups[k]??=[]).push(t)});
+ const strong=Object.entries(groups).map(([k,v])=>({k,v,months:new Set(v.map(t=>t.date.slice(0,7))).size})).filter(x=>x.months>=3).sort((a,b)=>b.months-a.months);
+ if(strong.length===1 || (strong[0]&&(!strong[1]||strong[0].months>=strong[1].months+2)))return strong[0]?.k||'';
+ return '';
+}
+function recurringHistory(r,month=currentMonth){
+ const amount=Number(r.amount)||0,learned=learnedRecurringMerchant(r,month);
+ return state.transactions.filter(t=>t.date.slice(0,7)<month&&(!t.excluded||t.type==='transfer')&&t.type!=='income'&&Math.abs((Number(t.amount)||0)-amount)<.005&&(directRecurringNameMatch(r,t)||(learned&&normMerchant(t.merchant||'')===learned)));
+}
+function recurringEstimatedDay(r,month=currentMonth){
+ if(Number(r.dueDay))return Number(r.dueDay);
+ const h=recurringHistory(r,month);if(!h.length)return 0;
+ const days=h.map(t=>Number(t.date.slice(8,10))).sort((a,b)=>a-b);return days[Math.floor(days.length/2)]||0;
+}
 function recurringAutoMatch(r,month=currentMonth){
  const amount=Number(r.amount)||0;if(!amount)return null;
- const rn=normMerchant(r.name||'');
- const generic=new Set(['accantonamento','risparmio','mensile','quota','annuale','versamento','rata']);
- const rt=rn.split(/\s+/).filter(x=>x.length>2&&!generic.has(x));
- const monthTx=state.transactions.filter(t=>monthKey(t.date)===month);
- const nameMatch=t=>{const tm=normMerchant(t.merchant||'');if(rn&&(tm.includes(rn)||rn.includes(tm)))return true;const hits=rt.filter(x=>tm.includes(x)).length;return !!(rt.length&&hits>=Math.min(2,rt.length));};
- const named=monthTx.filter(nameMatch);if(named.length&&Math.abs(named.reduce((a,t)=>a+(Number(t.amount)||0),0)-amount)<=.011)return named[0];
+ const monthTx=state.transactions.filter(t=>monthKey(t.date)===month&&(!t.excluded||t.type==='transfer'));
+ const named=monthTx.filter(t=>directRecurringNameMatch(r,t));
+ if(named.length&&Math.abs(named.reduce((a,t)=>a+(Number(t.amount)||0),0)-amount)<=.011)return named[0];
+ const learned=learnedRecurringMerchant(r,month);
+ if(learned){const t=monthTx.find(t=>normMerchant(t.merchant||'')===learned&&Math.abs((Number(t.amount)||0)-amount)<=.011);if(t)return t;}
  const candidates=monthTx.filter(t=>Math.abs((Number(t.amount)||0)-amount)<=.011);
- return candidates.find(t=>nameMatch(t)||(r.category==='Finanziamenti'&&t.category==='Finanziamenti'))||null;
+ return candidates.find(t=>directRecurringNameMatch(r,t)||(r.category==='Finanziamenti'&&t.category==='Finanziamenti'))||null;
 }
 function recurringIsPaid(r,month=currentMonth){
  const auto=!!recurringAutoMatch(r,month);
@@ -863,8 +890,9 @@ function deleteRecurring(){
 }
 function recurringHTML(list,allowPaid=true){
  if(!list.length)return '<div class="empty">Nessuna voce</div>';const paid=paidSet();
- return list.map(r=>{const auto=!!recurringAutoMatch(r),isPaid=paid.has(r.id)||auto,a=Number(r.amount)||0,freq=r.cadence==='annual'?'annuale':'mensile',date=r.dueDay?nextOccurrenceFor(r):'',status=r.active?'<span class="badge ok">ATTIVO</span>':'<span class="badge">DISATTIVO</span>',click=r.virtual?'':"openRecurring('"+r.id+"')";
-  return `<div class="recurringItem"><div onclick="${click}"><div class="recName ${!r.active?'offText':''}">${getIcon(r.category)} ${esc(r.name)} ${status} ${r.uncertain?'<span class="badge">DA VERIFICARE</span>':''}</div><div class="recMeta">${freq} · ${date?new Date(date+'T12:00').toLocaleDateString('it-IT'):'data da impostare'}${r.endDate?' · fino al '+new Date(r.endDate+'T12:00').toLocaleDateString('it-IT'):''}${r.virtual?' · ricavato dai dati patrimonio':''}</div></div><div><div class="recAmount">${a?euro(a):'<span class="warnText">da impostare</span>'}</div>${allowPaid&&r.active&&recurringApplies(r)?`<div class="recBtns"><button class="miniBtn ${isPaid?'paid':''}" onclick="event.stopPropagation();togglePaidRecurring('${r.id}')">${isPaid?'✓ Pagata':'Segna pagata'}</button></div>`:''}</div></div>`;
+ return list.map(r=>{const match=recurringAutoMatch(r),auto=!!match,isPaid=paid.has(r.id)||auto,a=Number(r.amount)||0,freq=r.cadence==='annual'?'annuale':'mensile',est=recurringEstimatedDay(r),date=r.dueDay?nextOccurrenceFor(r):'',status=r.active?'<span class="badge ok">ATTIVO</span>':'<span class="badge">DISATTIVO</span>',click=r.virtual?'':"openRecurring('"+r.id+"')";
+  const when=date?new Date(date+'T12:00').toLocaleDateString('it-IT'):(est?'circa giorno '+est+' · stimato dagli estratti':'data da impostare');
+  return `<div class="recurringItem"><div onclick="${click}"><div class="recName ${!r.active?'offText':''}">${getIcon(r.category)} ${esc(r.name)} ${status} ${r.uncertain?'<span class="badge">DA VERIFICARE</span>':''}</div><div class="recMeta">${freq} · ${when}${match?' · ✓ rilevata: '+esc(match.merchant):''}${r.endDate?' · fino al '+new Date(r.endDate+'T12:00').toLocaleDateString('it-IT'):''}${r.virtual?' · ricavato dai dati patrimonio':''}</div></div><div><div class="recAmount">${a?euro(a):'<span class="warnText">da impostare</span>'}</div>${allowPaid&&r.active&&recurringApplies(r)?`<div class="recBtns"><button class="miniBtn ${isPaid?'paid':''}" onclick="event.stopPropagation();togglePaidRecurring('${r.id}')">${isPaid?'✓ Pagata':'Segna pagata'}</button><button class="miniBtn" onclick="event.stopPropagation();${click}">Modifica</button></div>`:''}</div></div>`;
  }).join('');
 }
 
@@ -958,13 +986,13 @@ function renderLearnedRules(){const el=document.getElementById('learnedRulesCoun
 
 function renderBudget(){const plb=document.getElementById('planLifeBudget');if(plb)plb.textContent=euro(Number(state.settings.lifeBudget)||0);
  renderAssets();const n=financialNumbers(), due=monthCommitments(), rem=remainingCommitments(), paid=paidSet();
- const paidAmount=Math.max(0,n.due-n.remaining);
+ const paidAmount=Math.max(0,n.due-n.remaining),dueValue=due.filter(r=>(Number(r.amount)||0)>0),remValue=rem.filter(r=>(Number(r.amount)||0)>0);
  budgetFree.textContent=n.free===null?'—':euro(Math.max(0,n.free));
  budgetFormula.textContent=n.free===null?'Inserisci il saldo attuale in ⚙︎ Impostazioni per calcolare il margine.':`${euro(n.balance)} saldo − ${euro(n.goal)} obiettivo − ${euro(n.remaining)} fissi residui`;
- dueThisMonth.textContent=euro(n.due);dueCount.textContent=due.length+' voci previste';
- remainingThisMonth.textContent=euro(n.remaining);paidCount.textContent=due.filter(r=>recurringIsPaid(r)).length+' già rilevate/pagate · '+rem.length+' ancora da sostenere';
+ dueThisMonth.textContent=euro(n.due);dueCount.textContent=dueValue.length+' voci con importo';
+ remainingThisMonth.textContent=euro(n.remaining);paidCount.textContent=dueValue.filter(r=>recurringIsPaid(r)).length+' già rilevate/pagate · '+remValue.length+' ancora da sostenere';
  const pit=document.getElementById('paidThisMonth');if(pit)pit.textContent=euro(paidAmount);
- const rcl=document.getElementById('remainingCommitmentList');if(rcl)rcl.innerHTML=rem.length?rem.slice().sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)).map(r=>`<div class="recurringItem"><div><div class="recName">${getIcon(r.category)} ${esc(r.name)}</div><div class="recMeta">${r.dueDay?'previsto giorno '+r.dueDay:'data da verificare'} · ${r.category}</div></div><div><div class="recAmount">${euro(r.amount)}</div><div class="remainingStatus">DA SOSTENERE</div></div></div>`).join(''):'<div class="empty">✓ Nessun altro impegno noto da sostenere nel mese.</div>';
+ const rcl=document.getElementById('remainingCommitmentList');if(rcl){const visibleRem=rem.filter(r=>(Number(r.amount)||0)>0);rcl.innerHTML=visibleRem.length?visibleRem.slice().sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)).map(r=>{const est=recurringEstimatedDay(r,month),click=r.virtual?'':"openRecurring('"+r.id+"')";return `<div class="recurringItem"><div onclick="${click}"><div class="recName">${getIcon(r.category)} ${esc(r.name)}</div><div class="recMeta">${r.dueDay?'previsto giorno '+r.dueDay:(est?'stimato dagli estratti: giorno '+est:'data da verificare')} · ${r.category}${r.virtual?' · ricavato automaticamente':''}</div></div><div><div class="recAmount">${euro(r.amount)}</div><div class="recBtns"><button class="miniBtn" onclick="event.stopPropagation();togglePaidRecurring('${r.id}')">✓ Segna pagata</button>${r.virtual?'':`<button class="miniBtn" onclick="event.stopPropagation();openRecurring('${r.id}')">Modifica</button>`}</div></div></div>`}).join(''):'<div class="empty">✓ Nessun altro impegno noto da sostenere nel mese.</div>';}
  const pct=n.balance&&n.goal?Math.max(0,Math.min(100,n.balance/n.goal*100)):0;goalProgress.style.width=pct+'%';
  const commits=state.recurring.filter(r=>recurringKind(r)==='commitment');
  paymentRecurringList.innerHTML=recurringHTML(commits.filter(r=>r.active).sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)));
