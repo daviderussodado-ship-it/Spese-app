@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#183b78">
-<title>Spese — Le mie finanze</title>
+<title>Spese — Le mie finanze V15</title>
 
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
@@ -146,6 +146,25 @@ main{max-width:850px;margin:auto;padding:16px}
 .nav{grid-template-columns:repeat(4,1fr)!important}
 .settingsShortcut{width:100%;border:1px solid var(--line);background:white;border-radius:14px;padding:12px;font-weight:800;text-align:left;margin-top:8px}
 .assetGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.assetCard{padding:13px}.assetCard .val{font-weight:900;font-size:20px;margin-top:4px}.assetList{padding:0 13px}.assetLine{display:grid;grid-template-columns:1fr auto;gap:8px;padding:11px 0;border-bottom:1px solid var(--line)}.assetLine:last-child{border-bottom:0}.assetName{font-weight:800;font-size:13px}.assetSub{font-size:10px;color:var(--muted);margin-top:3px}.debtVal{color:#d52643}.reserveVal{color:#7b5e00}
+
+/* V14 — previsione, anomalie, abbonamenti, scadenze e import unico */
+.smartGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:10px 0}
+.smartCard{padding:14px}.smartVal{font-size:21px;font-weight:950;margin-top:4px;letter-spacing:-.4px}.smartSub{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.35}
+.smartCard.good .smartVal{color:var(--ok)}.smartCard.warn .smartVal{color:#9a6500}.smartCard.bad .smartVal{color:var(--danger)}
+.attentionCard{padding:13px 14px;margin:10px 0;border-left:4px solid #e9a400}.attentionTitle{font-weight:900;font-size:14px}.attentionText{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4}
+.forecastFlow{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}.flowBox{background:#f7f9fc;border:1px solid var(--line);border-radius:13px;padding:10px}.flowBox b{display:block;font-size:14px;margin-top:3px}.flowBox span{font-size:10px;color:var(--muted)}
+.subscriptionSummary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.subscriptionSummary .card{padding:12px}.subscriptionSummary b{display:block;font-size:19px;margin-top:4px}
+.timelineItem{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;padding:12px 13px;border-bottom:1px solid var(--line)}.timelineItem:last-child{border-bottom:0}.dateBox{background:#eef3fa;border-radius:12px;text-align:center;padding:7px 3px;font-weight:900;font-size:16px}.dateBox small{display:block;font-size:9px;color:var(--muted);text-transform:uppercase}.timelineName{font-weight:850;font-size:13px}.timelineMeta{font-size:10px;color:var(--muted);margin-top:3px}.timelineAmount{font-weight:900;white-space:nowrap;font-size:13px}
+.importHero{background:linear-gradient(135deg,#f6fbff,#edf6ff);border:1px solid #cfe3f4}.syncReady{background:#f4f5f8;border:1px solid #dde1e8}.syncDot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#a5adba;margin-right:5px}
+.anomalyList .attentionCard{margin:0;border-left-width:3px;border-radius:0;box-shadow:none;border-top:0;border-right:0;border-bottom:1px solid var(--line)}.anomalyList .attentionCard:first-child{border-radius:18px 18px 0 0}.anomalyList .attentionCard:last-child{border-radius:0 0 18px 18px;border-bottom:0}.homeSmartLink{width:100%;border:0;background:transparent;padding:0;text-align:left;color:inherit}
+@media(max-width:520px){.forecastFlow{grid-template-columns:1fr 1fr 1fr}.smartVal{font-size:18px}.smartSub{font-size:10px}}
+
+
+/* V15 — spiegazione spese, calendario, scenari, obiettivi, storico e garanzie */
+.v15Btn{width:100%;border:1px solid var(--line);background:#fff;border-radius:15px;padding:13px 14px;text-align:left;font-weight:850;margin-top:8px;color:var(--text)}
+.v15Btn .small{display:block;margin-top:4px;font-weight:600}.moneyFlowRow{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.moneyFlowRow:last-child{border-bottom:0}.moneyFlowName{font-size:13px;font-weight:800}.moneyFlowSub{font-size:10px;color:var(--muted);margin-top:2px}.moneyFlowAmount{font-size:14px;font-weight:900}.trafficRow{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}.trafficRow:last-child{border-bottom:0}.trafficDot{width:12px;height:12px;border-radius:50%;margin:auto}.trafficDot.green{background:#18a36b}.trafficDot.yellow{background:#e5a500}.trafficDot.red{background:#dc354f}.trafficValue{font-weight:900;font-size:12px}.scenarioGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.scenarioResult{background:#f4f8fc;border:1px solid var(--line);border-radius:15px;padding:13px;margin-top:10px}.scenarioResult b{font-size:21px;display:block;margin-top:4px}.calendarHead{display:flex;align-items:center;justify-content:space-between;gap:8px}.calNav{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 10px;font-weight:900}.calList{margin-top:8px}.goalCard{padding:12px 13px;border-bottom:1px solid var(--line)}.goalCard:last-child{border-bottom:0}.goalTop{display:flex;justify-content:space-between;gap:8px;align-items:center}.goalName{font-weight:900;font-size:13px}.goalPct{font-weight:900;font-size:12px}.goalBar{height:7px;background:#e9edf3;border-radius:8px;overflow:hidden;margin:8px 0 4px}.goalBar i{display:block;height:100%;background:var(--accent);border-radius:8px}.monthClose{display:grid;grid-template-columns:58px 1fr auto;gap:9px;padding:11px 12px;border-bottom:1px solid var(--line);align-items:center}.monthClose:last-child{border-bottom:0}.monthCloseDate{font-size:11px;font-weight:900;text-transform:capitalize}.monthCloseMain{font-size:12px;font-weight:800}.monthCloseSub{font-size:10px;color:var(--muted);margin-top:2px}.warrantyThumb{width:44px;height:44px;border-radius:10px;background:#eef2f6;display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden}.warrantyThumb img{width:100%;height:100%;object-fit:cover}.warrantyRow{display:grid;grid-template-columns:44px 1fr auto;gap:9px;align-items:center;padding:11px 12px;border-bottom:1px solid var(--line)}.warrantyRow:last-child{border-bottom:0}.warrantyName{font-size:13px;font-weight:900}.warrantyMeta{font-size:10px;color:var(--muted);margin-top:3px}.learnStat{display:flex;justify-content:space-between;align-items:center;gap:10px}.learnStat b{font-size:20px}.nextPayHero{background:linear-gradient(135deg,#f7fbff,#eef7f4);border:1px solid #d5e7df}.nextPayNums{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:9px}.nextPayNums div{background:#fff;border:1px solid var(--line);border-radius:11px;padding:9px}.nextPayNums b{display:block;font-size:14px;margin-top:2px}.nextPayNums span{font-size:9px;color:var(--muted)}
+@media(max-width:520px){.scenarioGrid{grid-template-columns:1fr 1fr}.nextPayNums{grid-template-columns:1fr 1fr 1fr}}
+
 @media (display-mode: standalone){.installTip{display:none!important}}
 </style>
 </head>
@@ -167,13 +186,13 @@ main{max-width:850px;margin:auto;padding:16px}
     <div class="simpleHero">
       <div class="simpleHeroTop">
         <div>
-          <div class="kicker">CONTO MEDIOLANUM</div>
+          <div class="kicker">CONTO PRINCIPALE</div>
           <div class="simpleBalance" id="simplePrimaryBalance">€ 0,00</div>
           <div class="cleanNote" id="simpleBalanceDate">Saldo disponibile</div>
         </div>
         <div style="text-align:right">
           <div class="kicker">OBIETTIVO</div>
-          <div style="font-size:20px;font-weight:950">€ 6.000</div>
+          <div style="font-size:20px;font-weight:950" id="simpleGoalAmount">—</div>
         </div>
       </div>
       <div class="goalLine"><i id="simpleGoalBar" style="width:0%"></i></div>
@@ -185,10 +204,24 @@ main{max-width:850px;margin:auto;padding:16px}
       <div class="big" id="freeToSpend">€ 0,00</div>
       <div class="small" id="freeToSpendNote" style="color:#d8e9ff">Budget minimo per uscite e divertimento</div>
       <div class="budgetMeta">
-        <div class="budgetMini"><span class="small" style="color:#d8e9ff">Budget vita del mese</span><b id="lifeBudgetTotal">€ 200,00</b></div>
+        <div class="budgetMini"><span class="small" style="color:#d8e9ff">Budget vita del mese</span><b id="lifeBudgetTotal">—</b></div>
         <button class="budgetMini budgetTap" onclick="openLifeBudgetDetail()"><span class="small" style="color:#d8e9ff">Già usato · tocca per vedere</span><b id="lifeBudgetUsed">€ 0,00</b></button>
       </div>
     </div>
+
+    <div class="smartGrid">
+      <button class="card smartCard homeSmartLink" onclick="switchView('budget')">
+        <div class="kicker">FINE MESE · DOPO IMPEGNI NOTI</div><div class="smartVal" id="homeMonthForecast">—</div><div class="smartSub" id="homeMonthForecastNote">Calcolo previsione…</div>
+      </button>
+      <button class="card smartCard homeSmartLink" onclick="switchView('budget')">
+        <div class="kicker">OBIETTIVO PRINCIPALE</div><div class="smartVal" id="homeGoalEta">—</div><div class="smartSub" id="homeGoalEtaNote">Calcolo andamento…</div>
+      </button>
+    </div>
+    <button id="homeAttention" class="settingsShortcut hidden" onclick="switchView('budget')">⚠️ <span id="homeAttentionText">Da controllare</span><span style="float:right">›</span></button>
+    <button class="card smartCard homeSmartLink nextPayHero" onclick="switchView('budget')" style="margin:9px 0 0">
+      <div class="kicker">DA OGGI AL PROSSIMO STIPENDIO</div><div class="smartVal" id="homeNextPayAvailable">—</div><div class="smartSub" id="homeNextPayNote">Calcolo periodo…</div>
+    </button>
+    <button class="v15Btn" onclick="switchView('budget');setTimeout(()=>document.getElementById('moneyFlowTitle')?.scrollIntoView({behavior:'smooth'}),120)">📉 Dove sono finiti i soldi?<span class="small">Entrate, spese, accantonamenti e categorie del mese</span></button>
 
     <div class="quick">
       <button class="primary" onclick="openQuick()">＋ Spesa</button>
@@ -221,12 +254,16 @@ main{max-width:850px;margin:auto;padding:16px}
     <div class="assetGrid">
       <div class="card assetCard"><div class="kicker">Disponibile</div><div class="val" id="liquidTotal">€ 0,00</div><div class="small">conti + wallet</div></div>
       <div class="card assetCard"><div class="kicker">Salvadanai</div><div class="val reserveVal" id="reservedTotal">€ 0,00</div><div class="small">denaro accantonato</div></div>
+      <div class="card assetCard"><div class="kicker">Investimenti</div><div class="val" id="investmentTotal">€ 0,00</div><div class="small">valore registrato</div></div>
       <div class="card assetCard"><div class="kicker">Debiti residui</div><div class="val debtVal" id="debtTotal">€ 0,00</div><div class="small">finanziamenti noti</div></div>
       <div class="card assetCard"><div class="kicker">Netto noto</div><div class="val" id="knownNet">€ 0,00</div><div class="small">senza valore fondi</div></div>
     </div>
     <div class="sectionTitle"><h2>Conti e wallet</h2></div><div class="card assetList" id="accountsList"></div>
     <div class="sectionTitle"><h2>Salvadanai</h2></div><div class="card assetList" id="potsList"></div>
     <div class="sectionTitle"><h2>Finanziamenti</h2></div><div class="card assetList" id="debtsList"></div>
+    <div class="sectionTitle"><h2>Obiettivi</h2><button class="linkbtn" onclick="openGoal()">＋ Obiettivo</button></div><div class="card" id="goalsList"></div>
+    <div class="sectionTitle"><h2>Acquisti & garanzie</h2><button class="linkbtn" onclick="openWarranty()">＋ Aggiungi</button></div><div class="card" id="warrantyList"></div>
+    <div class="sectionTitle"><h2>Storico mensile</h2><span class="small">Chiusura automatica</span></div><div class="card" id="monthHistory"></div>
     <div class="sectionTitle"><h2>Anno <span id="annualYearLabel"></span></h2></div>
     <div class="card sumcard">
       <div class="summary">
@@ -244,7 +281,7 @@ main{max-width:850px;margin:auto;padding:16px}
   </section>
 
   <section id="budgetView" class="hidden">
-    <div class="sectionTitle"><h2>Piano mensile</h2><button class="linkbtn" onclick="openRecurring()">＋ Voce</button></div><div class="infoStrip">🎉 <b>Budget vita:</b> <span id="planLifeBudget">€ 200,00</span> al mese per uscite e divertimento. È una quota da vivere, non un obiettivo di risparmio.</div>
+    <div class="sectionTitle"><h2>Piano mensile</h2><button class="linkbtn" onclick="openRecurring()">＋ Voce</button></div><div class="infoStrip">🎉 <b>Budget vita:</b> <span id="planLifeBudget">—</span> al mese per uscite e divertimento. È una quota da vivere, non un obiettivo di risparmio.</div>
     <div class="card sumcard">
       <div class="kicker">Impegni ancora da sostenere</div>
       <div class="big" id="remainingThisMonth">€ 0,00</div>
@@ -256,6 +293,45 @@ main{max-width:850px;margin:auto;padding:16px}
     </div>
     <div class="hidden"><span id="budgetFormula"></span><div class="goalbar"><i id="goalProgress"></i></div></div>
     <div id="unknownNotice" class="infoStrip hidden"></div>
+
+    <div class="sectionTitle" id="moneyFlowTitle"><h2>Dove sono finiti i soldi?</h2><span class="small">Mese selezionato</span></div>
+    <div class="card" id="moneyFlow"></div>
+
+    <div class="sectionTitle"><h2>Andamento categorie</h2><span class="small">Rispetto agli ultimi mesi</span></div>
+    <div class="card" id="trafficCategories"></div>
+
+    <div class="sectionTitle"><h2>🧪 E se…?</h2><span class="small">Simulazione, non modifica i dati</span></div>
+    <div class="card sumcard">
+      <div class="scenarioGrid"><div class="field"><label>SPESA UNA TANTUM</label><input id="simOneOff" inputmode="decimal" placeholder="0,00" oninput="renderScenario()"></div><div class="field"><label>VARIAZIONE SPESE / MESE</label><input id="simMonthlyExpense" inputmode="decimal" placeholder="0,00" oninput="renderScenario()"></div><div class="field"><label>RISPARMIO IN PIÙ / MESE</label><input id="simMonthlySaving" inputmode="decimal" placeholder="0,00" oninput="renderScenario()"></div><div class="field"><label>ENTRATE IN PIÙ / MESE</label><input id="simMonthlyIncome" inputmode="decimal" placeholder="0,00" oninput="renderScenario()"></div></div>
+      <div class="scenarioResult"><div class="kicker">FINE MESE NELLO SCENARIO</div><b id="simProjected">—</b><div class="small" id="simEta">Inserisci uno scenario.</div></div>
+    </div>
+
+    <div class="sectionTitle"><h2>Calendario finanziario</h2><span class="small">Entrate e impegni</span></div>
+    <div class="card sumcard"><div class="calendarHead"><button class="calNav" onclick="shiftCalendar(-1)">‹</button><b id="calendarMonthLabel">—</b><button class="calNav" onclick="shiftCalendar(1)">›</button></div><div class="calList" id="financeCalendar"></div></div>
+
+    <div class="sectionTitle"><h2>Previsione fine mese</h2><span class="small">Dopo gli impegni noti</span></div>
+    <div class="card sumcard">
+      <div class="kicker">DISPONIBILITÀ PREVISTA</div><div class="big" id="forecastEndBalance">—</div><div class="small" id="forecastExplanation"></div>
+      <div class="forecastFlow">
+        <div class="flowBox"><span>Saldo oggi</span><b id="forecastStart">—</b></div>
+        <div class="flowBox"><span>Entrate attese</span><b class="green" id="forecastIncome">—</b></div>
+        <div class="flowBox"><span>Impegni residui</span><b class="red" id="forecastDue">—</b></div>
+      </div>
+    </div>
+
+    <div class="sectionTitle"><h2>Obiettivo principale</h2><span class="small">Stima dal trend recente</span></div>
+    <div class="card sumcard"><div class="big" id="goalEtaBig">—</div><div class="small" id="goalEtaDetail"></div></div>
+
+    <div class="sectionTitle"><h2>Segnali automatici</h2><span class="small">Possibili anomalie</span></div>
+    <div class="card anomalyList" id="anomalyList"></div>
+
+    <div class="sectionTitle"><h2>Abbonamenti</h2><span class="small">Costo reale</span></div>
+    <div class="subscriptionSummary"><div class="card"><div class="kicker">AL MESE</div><b id="subsMonthly">€ 0,00</b></div><div class="card"><div class="kicker">ALL'ANNO</div><b id="subsAnnual">€ 0,00</b></div></div>
+    <div class="card" id="subscriptionList"></div>
+
+    <div class="sectionTitle"><h2>Prossimi 90 giorni</h2><button class="linkbtn" onclick="openFutureExpense()">＋ Scadenza</button></div>
+    <div class="card" id="futureTimeline"></div>
+
     <div class="sectionTitle"><h2>Impegni, risparmi e abbonamenti</h2><span class="small">Tocca per modificare</span></div>
     <div class="card" id="recurringList"></div>
     <div class="sectionTitle"><h2>Sospesi</h2></div>
@@ -264,6 +340,12 @@ main{max-width:850px;margin:auto;padding:16px}
 
   <section id="dataView" class="hidden">
     <div class="sectionTitle"><h2>Dati & backup</h2></div>
+    <div class="card settingCard importHero" style="margin-bottom:10px"><h3>✨ Aggiorna i miei conti</h3><p>Un solo punto di ingresso. Riconosce aggiornamenti JSON, CSV, immagini/screenshot e prova a leggere anche PDF testuali. Prima di conteggiare controlla trasferimenti e possibili doppioni.</p>
+      <div class="field"><label>PROVENIENZA</label><select id="unifiedSource"><option value="Conto principale">Conto principale</option><option value="Carta di credito">Nexi / carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option><option value="Carta">Altro / riconosci dopo</option></select></div>
+      <input class="hidden" type="file" id="unifiedFile" accept=".csv,.json,.pdf,image/*" onchange="handleUnifiedImport(this.files[0])">
+      <button class="save" onclick="document.getElementById('unifiedFile').click()">Scegli file / screenshot</button>
+      <div class="sourceNote">I dati importati restano nell'app sul dispositivo. I PDF vengono solo letti localmente nel browser; i candidati vanno confermati.</div>
+    </div>
     <div class="settingsGrid">
       <div class="card settingCard"><h3>📥 Importa estratto conto</h3><p>Prima indica da dove arriva. Tutti i movimenti passano dal controllo anti-duplicati e trasferimenti.</p>
 <div class="field"><label>PROVENIENZA</label><select id="importSource"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
@@ -272,6 +354,9 @@ main{max-width:850px;margin:auto;padding:16px}
       <div class="card settingCard"><h3>🔐 Unisci aggiornamento personale</h3><p>Aggiunge conti, salvadanai, debiti e nuovi movimenti senza cancellare quelli già presenti. I duplicati vengono saltati o messi da controllare.</p><input type="file" id="mergeFile" accept=".json" onchange="mergeFinancialPatch(this.files[0])"></div>
       <div class="card settingCard"><h3>💾 Backup completo</h3><p>Esporta tutti i movimenti e le regole apprese in un file JSON.</p><button class="secondary" onclick="exportBackup()">Esporta backup</button><input class="hidden" type="file" id="backupFile" accept=".json" onchange="restoreBackup(this.files[0])"><button class="secondary" onclick="document.getElementById('backupFile').click()">Ripristina backup</button></div>
       <div class="card settingCard"><h3>🧹 Movimenti da controllare</h3><p id="importHealth">Nessun problema rilevato.</p><button class="secondary" onclick="switchView('stats')">Apri “Da verificare”</button></div>
+      <div class="card settingCard"><h3>🧠 Categorie imparate</h3><div class="learnStat"><p>L'app riutilizza automaticamente le correzioni fatte agli esercenti.</p><b id="learnedRulesCount">0</b></div><button class="secondary" onclick="cleanLearnedRules()">Pulisci regole inutili</button></div>
+      <div class="card settingCard"><h3>🔁 Riconciliazione automatica</h3><p>Ricontrolla i movimenti ancora dubbi e riconosce trasferimenti interni, regolamenti Nexi, ricariche Satispay, prelievi e possibili doppioni.</p><button class="secondary" onclick="autoReconcileAll()">Controlla adesso</button></div>
+      <div class="card settingCard syncReady"><h3>☁️ Sincronizzazione multi-dispositivo</h3><p><span class="syncDot"></span><b>Predisposta, non attiva.</b> La V15 separa già dati e interfaccia in modo compatibile con un archivio privato. Per attivarla servirà configurare il servizio privato quando sei a casa; nessuna chiave o dato personale viene inserito nel repository pubblico.</p></div>
       <div class="card settingCard"><h3>📊 Excel / CSV</h3><p>Esporta i movimenti in un formato apribile con Excel.</p><button class="secondary" onclick="exportCSV()">Esporta CSV</button></div>
     </div>
   </section>
@@ -388,6 +473,26 @@ main{max-width:850px;margin:auto;padding:16px}
  </div>
 </div>
 
+<!-- GOAL -->
+<div class="modal" id="goalModal" onclick="backdrop(event,this)"><div class="sheet"><div class="grab"></div><h2>🎯 Obiettivo</h2><input type="hidden" id="gId"><div class="field"><label>NOME</label><input id="gName" placeholder="Es. auto, vacanza, fondo emergenze"></div><div class="grid2"><div class="field"><label>OBIETTIVO €</label><input id="gTarget" inputmode="decimal"></div><div class="field"><label>GIÀ ACCANTONATO €</label><input id="gCurrent" inputmode="decimal"></div></div><div class="field"><label>VERSAMENTO PREVISTO / MESE</label><input id="gMonthly" inputmode="decimal" placeholder="0,00"></div><button class="save" onclick="saveGoal()">Salva</button><button id="deleteGoalBtn" class="secondary dangerBtn hidden" onclick="deleteGoal()">Elimina</button><button class="secondary" onclick="closeModal('goalModal')">Annulla</button></div></div>
+
+<!-- WARRANTY -->
+<div class="modal" id="warrantyModal" onclick="backdrop(event,this)"><div class="sheet"><div class="grab"></div><h2>🧾 Acquisto & garanzia</h2><input type="hidden" id="wId"><div class="field"><label>OGGETTO</label><input id="wName" placeholder="Es. tester, telefono, elettrodomestico…"></div><div class="grid2"><div class="field"><label>DATA ACQUISTO</label><input id="wDate" type="date"></div><div class="field"><label>PREZZO</label><input id="wAmount" inputmode="decimal" placeholder="0,00"></div></div><div class="field"><label>GARANZIA FINO AL</label><input id="wEnd" type="date"></div><div class="field"><label>NOTE / NEGOZIO</label><input id="wNote" placeholder="Dove acquistato, numero ordine…"></div><div class="field"><label>FOTO SCONTRINO / FATTURA</label><input id="wPhoto" type="file" accept="image/*"></div><div id="wPhotoPreview" class="hidden" style="margin:8px 0"><img id="wPhotoImg" style="max-width:100%;max-height:260px;border-radius:14px"></div><div class="sourceNote">La foto resta nell'archivio locale del dispositivo e non entra nel backup JSON.</div><button class="save" onclick="saveWarranty()">Salva</button><button id="deleteWarrantyBtn" class="secondary dangerBtn hidden" onclick="deleteWarranty()">Elimina</button><button class="secondary" onclick="closeModal('warrantyModal')">Annulla</button></div></div>
+
+<!-- FUTURE EXPENSE -->
+<div class="modal" id="futureExpenseModal" onclick="backdrop(event,this)">
+ <div class="sheet">
+  <div class="grab"></div><h2>📅 Scadenza futura</h2>
+  <input type="hidden" id="fId">
+  <div class="field"><label>NOME</label><input id="fName" placeholder="Es. assicurazione, bollo, manutenzione…"></div>
+  <div class="grid2"><div class="field"><label>IMPORTO PREVISTO</label><input id="fAmount" inputmode="decimal" placeholder="0,00"></div><div class="field"><label>DATA</label><input id="fDate" type="date"></div></div>
+  <div class="field"><label>CATEGORIA</label><select id="fCategory"></select></div>
+  <button class="save" onclick="saveFutureExpense()">Salva scadenza</button>
+  <button id="deleteFutureBtn" class="secondary dangerBtn hidden" onclick="deleteFutureExpense()">Elimina scadenza</button>
+  <button class="secondary" onclick="closeModal('futureExpenseModal')">Annulla</button>
+ </div>
+</div>
+
 <!-- SETTINGS -->
 <div class="modal" id="settingsModal" onclick="backdrop(event,this)">
  <div class="sheet">
@@ -400,7 +505,7 @@ main{max-width:850px;margin:auto;padding:16px}
   </div>
   <button class="secondary" onclick="carryPreviousBalance()">↳ Usa saldo finale anno precedente</button>
   <div class="field"><label>SALDO DISPONIBILE ATTUALE (€)</label><input id="sBalance" inputmode="decimal" placeholder="Serve per “Quanto posso spendere?”"></div>
-  <div class="field"><label>OBIETTIVO SALDO MINIMO (€)</label><input id="sGoal" inputmode="decimal"></div><div class="field"><label>BUDGET USCITE E DIVERTIMENTO / MESE (€)</label><input id="sLifeBudget" inputmode="decimal" placeholder="200,00"></div>
+  <div class="field"><label>OBIETTIVO SALDO MINIMO (€)</label><input id="sGoal" inputmode="decimal"></div><div class="field"><label>BUDGET USCITE E DIVERTIMENTO / MESE (€)</label><input id="sLifeBudget" inputmode="decimal" placeholder="0,00"></div>
   <div class="field"><label>CONTO PREDEFINITO</label><select id="sDefaultAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
   <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p>
   <button class="save" onclick="saveSettings()">Salva impostazioni</button>
@@ -434,26 +539,31 @@ let state = JSON.parse(localStorage.getItem('spese_v1') || 'null');
 if(!state){
   state = {
     transactions: [],
-    rules:{'amazon':'Shopping','openai':'Abbonamenti','prime video':'Abbonamenti','burger king':'Ristoranti','autogrill':'Ristoranti','enipay':'Auto','eni':'Auto'},
-    settings:{goal:6000,balance:'',defaultAccount:'Carta'},
+    rules:{},
+    settings:{goal:0,balance:'',defaultAccount:'Carta'},
     recurring:[], recurringPaid:{}
   };
   saveState();
 }
 if(!Array.isArray(state.recurring)) state.recurring=[];
 if(!state.recurringPaid || typeof state.recurringPaid!=='object') state.recurringPaid={};
-if(!state.settings) state.settings={goal:6000,balance:'',defaultAccount:'Carta',startDate:'2026-01-01'};
+if(!state.settings) state.settings={goal:0,balance:'',defaultAccount:'Carta',startDate:'2026-01-01'};
 if(!state.settings.startDate) state.settings.startDate='2026-01-01';
 if(!state.annualProfiles || typeof state.annualProfiles!=='object') state.annualProfiles={};
 if(!Array.isArray(state.accounts))state.accounts=[];
 if(!Array.isArray(state.savingsPots))state.savingsPots=[];
 if(!Array.isArray(state.debts))state.debts=[];
+if(!Array.isArray(state.futureExpenses))state.futureExpenses=[];
+if(!state.rules||typeof state.rules!=='object')state.rules={};
+if(!state.syncConfig || typeof state.syncConfig!=='object')state.syncConfig={enabled:false,provider:'',ready:false};
+if(!Array.isArray(state.goals))state.goals=[];
+if(!Array.isArray(state.warranties))state.warranties=[];
 
 state.recurring.forEach(r=>{if(!r.startDate)r.startDate='2026-01-01';});
 delete state.rules?.['pro loco']; delete state.rules?.['sumup *associazione']; delete state.rules?.['proloco'];
 state.transactions.forEach(t=>{if(!t.type)t.type='expense';if(typeof t.excluded!=='boolean')t.excluded=false;if(!t.origin)t.origin='legacy';if(!t.reviewReason)t.reviewReason='';});
-if(!Number(state.settings.lifeBudget))state.settings.lifeBudget=200;
-let selectedCategory='Altro', currentMonth='', selectedYear=new Date().getFullYear(), photoMode='receipt';
+if(state.settings.lifeBudget===undefined)state.settings.lifeBudget=0;
+let selectedCategory='Altro', currentMonth='', selectedYear=new Date().getFullYear(), photoMode='receipt', calendarMonth='';
 
 function saveState(){ localStorage.setItem('spese_v1',JSON.stringify(state)); }
 function euro(n){return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(Number(n)||0)}
@@ -489,7 +599,7 @@ function merchantSimilarity(a,b){
  return common/Math.min(A.size,B.size);
 }
 function isTransferDescription(m){
- return /\b(giroconto|trasferimento tra|ricarica satispay|satispay ricarica|satispay.*ricari|ricarica paypal|saldo carta|pagamento carta di credito|addebito carta di credito|pagamento nexi|verso la banca|dalla banca|deposito risparmi|prelievo risparmi|deposito investimento|prelievo investimento)\b/i.test(m||'');
+ return /\b(giroconto|trasferimento tra|ricarica satispay|satispay ricarica|satispay.*ricari|ricarica paypal|saldo carta|pagamento carta di credito|addebito carta di credito|addebito spese carta di credito|pagamento nexi|nexi.*addebito spese carta|regolamento carta|verso la banca|dalla banca|deposito risparmi|prelievo risparmi|deposito investimento|prelievo investimento|prelievo contanti)\b/i.test(m||'');
 }
 function isRefundDescription(m){return /\b(rimborso|storno|refund|rettifica|reso)\b/i.test(m||'')}
 function isIncomeDescription(m){return /\b(stipendio|bonifico ricevuto|accredito stipendio|interessi attivi|premio|cashback)\b/i.test(m||'')}
@@ -555,6 +665,7 @@ function backdrop(e,el){if(e.target===el) el.classList.remove('show')}
 
 function init(){
  currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0]?.date || today());
+ calendarMonth=monthKey(today());
  document.getElementById('qDate').value=today();
  document.getElementById('qAccount').value=state.settings.defaultAccount||'Carta';document.getElementById('photoSource').value=state.settings.defaultAccount||'Carta';document.getElementById('importSource').value=state.settings.defaultAccount||'Carta';
  document.getElementById('headerMonth').textContent='Gestione personale · '+monthName(currentMonth);
@@ -566,7 +677,7 @@ function renderCats(){
  document.getElementById('quickCats').innerHTML=CATEGORIES.map(c=>`<button data-cat="${c[0]}" onclick="chooseCat('${c[0]}')" class="${selectedCategory===c[0]?'selected':''}">${c[1]} ${c[0]}</button>`).join('');
 }
 function chooseCat(c){selectedCategory=c;renderCats()}
-function fillCategorySelect(){const opts=CATEGORIES.map(c=>`<option>${c[0]}</option>`).join('');document.getElementById('eCategory').innerHTML=opts;document.getElementById('rCategory').innerHTML=opts}
+function fillCategorySelect(){const opts=CATEGORIES.map(c=>`<option>${c[0]}</option>`).join('');document.getElementById('eCategory').innerHTML=opts;document.getElementById('rCategory').innerHTML=opts;document.getElementById('fCategory').innerHTML=opts}
 
 function cashAccount(){
  let a=state.accounts.find(x=>x.id==='cash-wallet'||/portafoglio|contanti/i.test(x.name||''));
@@ -607,7 +718,7 @@ function openQuick(){
  setTimeout(()=>qAmount.focus(),250);
 }
 function autoCategory(){
- const m=qMerchant.value.toLowerCase();
+ const m=normMerchant(qMerchant.value);
  const keys=Object.keys(state.rules).sort((a,b)=>b.length-a.length);
  const key=keys.find(k=>m.includes(k));
  if(key) chooseCat(state.rules[key]);
@@ -619,7 +730,7 @@ function saveQuick(){
  const tx={id:'t'+Date.now(),date:qDate.value||today(),merchant,amount,category:selectedCategory,account:qAccount.value,verified:true,reimb:qReimb.checked,origin:'manual',type:'expense',excluded:false,reviewReason:''};
  ingestTransaction(tx);
  if(qAccount.value==='Contanti')setCashBalance(cashBalance()-amount);
- if(merchant!=='Spesa') state.rules[merchant.toLowerCase()]=selectedCategory;
+ if(merchant!=='Spesa') state.rules[normMerchant(merchant)||merchant.toLowerCase()]=selectedCategory;
  saveState();closeModal('quickModal');currentMonth=monthKey(tx.date);renderAll();toast(qAccount.value==='Contanti'?'Spesa contanti salvata · restano '+euro(cashBalance()):'Spesa salvata ✓');
 }
 function openEdit(id){
@@ -629,7 +740,7 @@ function openEdit(id){
 function saveEdit(){
  const t=state.transactions.find(x=>x.id===eId.value); if(!t)return;
  t.merchant=eMerchant.value.trim()||'Spesa';t.amount=parseAmount(eAmount.value);t.date=eDate.value;t.category=eCategory.value;t.account=eAccount.value;t.reimb=eReimb.checked;t.type=eType.value;t.excluded=eExcluded.checked;
- state.rules[t.merchant.toLowerCase()]=t.category;saveState();closeModal('editModal');renderAll();toast('Modifica salvata');
+ state.rules[normMerchant(t.merchant)||t.merchant.toLowerCase()]=t.category;saveState();closeModal('editModal');renderAll();toast('Modifica salvata');
 }
 function markVerified(){const t=state.transactions.find(x=>x.id===eId.value);if(t){t.verified=true;t.reviewReason='';saveState();closeModal('editModal');renderAll();toast('Movimento verificato ✓')}}
 function includeTx(){const t=state.transactions.find(x=>x.id===eId.value);if(!t)return;t.type='expense';t.excluded=false;t.reviewReason='';t.verified=true;saveState();closeModal('editModal');renderAll();toast('Conteggiato come spesa ✓')}
@@ -726,7 +837,77 @@ function recurringHTML(list,allowPaid=true){
   return `<div class="recurringItem"><div onclick="openRecurring('${r.id}')"><div class="recName ${!r.active?'offText':''}">${getIcon(r.category)} ${esc(r.name)} ${r.uncertain?'<span class="badge">DA VERIFICARE</span>':''}</div><div class="recMeta">${esc(r.category)} · ${freq}${r.endDate?' · fino al '+new Date(r.endDate+'T12:00').toLocaleDateString('it-IT'):''}</div></div><div><div class="recAmount">${a?euro(a):'<span class="warnText">da impostare</span>'}</div>${allowPaid&&r.active&&recurringApplies(r)?`<div class="recBtns"><button class="miniBtn ${isPaid?'paid':''}" onclick="event.stopPropagation();togglePaidRecurring('${r.id}')">${isPaid?'✓ Pagata':'Segna pagata'}</button></div>`:''}</div></div>`;
  }).join('');
 }
-function renderBudget(){const plb=document.getElementById('planLifeBudget');if(plb)plb.textContent=euro(Number(state.settings.lifeBudget)||200);
+
+function median(values){const a=values.filter(Number.isFinite).sort((x,y)=>x-y);if(!a.length)return 0;const m=Math.floor(a.length/2);return a.length%2?a[m]:(a[m-1]+a[m])/2}
+function addMonthsKey(month,delta){const [y,m]=month.split('-').map(Number),d=new Date(y,m-1+delta,1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
+function daysInMonthKey(month){const [y,m]=month.split('-').map(Number);return new Date(y,m,0).getDate()}
+function recentCompleteMonths(n=3){const base=monthKey(today());let out=[];for(let i=1;i<=n;i++)out.push(addMonthsKey(base,-i));return out}
+function monthNet(month){return incomeForMonth(month)-state.transactions.filter(t=>monthKey(t.date)===month&&countable(t)).reduce((a,t)=>a+spendImpact(t),0)-realSavingsForMonth(month)}
+function forecastInfo(){
+ const balance=primaryAccountBalance(), goal=Number(state.settings.goal)||0, month=currentMonth;
+ const incomeNow=incomeForMonth(month);
+ const lastIncome=[...state.transactions].filter(t=>t.type==='income'&&t.date.slice(0,7)<month&&/stipendio|salary|paga/i.test(t.merchant||'')).sort((a,b)=>b.date.localeCompare(a.date))[0];
+ const fallbackIncome=[...state.transactions].filter(t=>t.type==='income'&&t.date.slice(0,7)<month).sort((a,b)=>b.date.localeCompare(a.date))[0];
+ const typicalIncome=Number((lastIncome||fallbackIncome)?.amount)||0;
+ const expectedIncome=incomeNow>0?0:typicalIncome;
+ const commitments=remainingCommitments(month).reduce((s,r)=>s+(Number(r.amount)||0),0);
+ const projected=balance+expectedIncome-commitments;
+ const nets=recentCompleteMonths(3).map(monthNet);const trend=median(nets);const gap=Math.max(0,goal-balance);
+ let eta=null;if(gap<=0)eta={reached:true};else if(trend>0){const months=Math.ceil(gap/trend);const d=new Date();d.setDate(1);d.setMonth(d.getMonth()+months);eta={months,date:d,trend};}else eta={months:null,trend};
+ return {balance,goal,expectedIncome,commitments,projected,trend,eta,typicalIncome};
+}
+function formatMonthYear(d){return new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'}).format(d).replace(/^./,c=>c.toUpperCase())}
+function categorySpend(month,cat,dayLimit=99){return state.transactions.filter(t=>monthKey(t.date)===month&&countable(t)&&t.category===cat&&Number(t.date.slice(8,10))<=dayLimit).reduce((a,t)=>a+spendImpact(t),0)}
+function detectAnomalies(){
+ const out=[],cur=currentMonth,isCurrent=cur===monthKey(today()),day=isCurrent?Number(today().slice(8,10)):daysInMonthKey(cur),prev=[1,2,3].map(i=>addMonthsKey(cur,-i));
+ const cats=[...new Set(state.transactions.filter(t=>monthKey(t.date)===cur&&countable(t)).map(t=>t.category))];
+ cats.forEach(cat=>{const now=categorySpend(cur,cat,day),vals=prev.map(m=>categorySpend(m,cat,Math.min(day,daysInMonthKey(m)))).filter(v=>v>0);const avg=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;if(avg>=20&&now>=avg*1.35&&now-avg>=20)out.push({level:'warn',title:`${getIcon(cat)} ${cat} sopra il solito`,text:`${euro(now)} finora contro circa ${euro(avg)} nello stesso periodo dei mesi precedenti.`})});
+ const dup=state.transactions.filter(t=>t.reviewReason&&/duplic|doppio conteggio/i.test(t.reviewReason)).length;if(dup)out.push({level:'bad',title:'Possibili doppioni',text:`${dup} movimenti sembrano duplicati o presenti in più fonti e aspettano una verifica.`});
+ const unverified=state.transactions.filter(t=>!t.verified&&!t.reviewReason&&monthKey(t.date)===cur).length;if(unverified)out.push({level:'warn',title:'Movimenti non verificati',text:`${unverified} movimenti di ${monthName(cur)} non sono ancora confermati.`});
+ const recent=state.transactions.filter(t=>monthKey(t.date)===cur&&countable(t)&&Number(t.amount)>=150).sort((a,b)=>Number(b.amount)-Number(a.amount))[0];if(recent)out.push({level:'info',title:'Spesa importante del mese',text:`${esc(recent.merchant)}: ${euro(recent.amount)} il ${new Date(recent.date+'T12:00').toLocaleDateString('it-IT')}.`});
+ return out.slice(0,4);
+}
+function renderAnomalies(){const a=detectAnomalies();anomalyList.innerHTML=a.length?a.map(x=>`<div class="attentionCard"><div class="attentionTitle">${x.level==='bad'?'🚨':x.level==='warn'?'⚠️':'ℹ️'} ${x.title}</div><div class="attentionText">${x.text}</div></div>`).join(''):'<div class="empty">✓ Nessuna anomalia evidente nei dati attuali</div>';const h=document.getElementById('homeAttention'),ht=document.getElementById('homeAttentionText');if(h&&ht){h.classList.toggle('hidden',!a.length);ht.textContent=a.length?`${a.length} ${a.length===1?'segnale da guardare':'segnali da guardare'}`:''}}
+function renderSubscriptions(){const subs=state.recurring.filter(r=>r.active&&r.category==='Abbonamenti');const monthly=subs.reduce((a,r)=>a+(r.cadence==='annual'?(Number(r.amount)||0)/12:(Number(r.amount)||0)),0),annual=subs.reduce((a,r)=>a+(r.cadence==='annual'?(Number(r.amount)||0):(Number(r.amount)||0)*12),0);subsMonthly.textContent=euro(monthly);subsAnnual.textContent=euro(annual);subscriptionList.innerHTML=subs.length?subs.sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)).map(r=>{const yearly=r.cadence==='annual'?(Number(r.amount)||0):(Number(r.amount)||0)*12;return `<div class="recurringItem" onclick="openRecurring('${r.id}')"><div><div class="recName">🔁 ${esc(r.name)}</div><div class="recMeta">${r.cadence==='annual'?'Annuale':'Mensile'} · ${euro(yearly)}/anno</div></div><div class="recAmount">${euro(r.amount)}${r.cadence==='monthly'?'<div class="recMeta">/mese</div>':'<div class="recMeta">/anno</div>'}</div></div>`}).join(''):'<div class="empty">Nessun abbonamento attivo</div>'}
+function occurrenceDate(r,month){const [y,m]=month.split('-').map(Number),day=Math.max(1,Math.min(Number(r.dueDay)||1,new Date(y,m,0).getDate()));return `${month}-${String(day).padStart(2,'0')}`}
+function upcomingItems(days=90){const start=new Date(today()+'T12:00'),end=new Date(start);end.setDate(end.getDate()+days);let out=[];state.recurring.filter(r=>r.active).forEach(r=>{for(let i=0;i<5;i++){const mk=addMonthsKey(monthKey(today()),i);if(!recurringApplies(r,mk))continue;const date=r.cadence==='annual'?`${mk}-${String(Math.max(1,Number(r.dueDay)||1)).padStart(2,'0')}`:occurrenceDate(r,mk);const d=new Date(date+'T12:00');if(d>=start&&d<=end)out.push({id:'r:'+r.id,date,name:r.name,amount:Number(r.amount)||0,category:r.category,kind:'recurring',uncertain:!r.dueDay});}});(state.futureExpenses||[]).filter(x=>x.active!==false).forEach(x=>{const d=new Date(x.date+'T12:00');if(d>=start&&d<=end)out.push({id:'f:'+x.id,...x,kind:'future'});});return out.sort((a,b)=>a.date.localeCompare(b.date)).slice(0,25)}
+function renderFutureTimeline(){const items=upcomingItems(90);futureTimeline.innerHTML=items.length?items.map(x=>{const d=new Date(x.date+'T12:00'),mon=new Intl.DateTimeFormat('it-IT',{month:'short'}).format(d),day=d.getDate();return `<div class="timelineItem" ${x.kind==='future'?`onclick="openFutureExpense('${x.id.slice(2)}')"`:''}><div class="dateBox">${day}<small>${mon}</small></div><div><div class="timelineName">${getIcon(x.category)} ${esc(x.name)}</div><div class="timelineMeta">${x.kind==='future'?'Scadenza inserita':'Ricorrente'}${x.uncertain?' · giorno indicativo':''}</div></div><div class="timelineAmount">${x.amount?euro(x.amount):'—'}</div></div>`}).join(''):'<div class="empty">Nessuna scadenza nota nei prossimi 90 giorni</div>'}
+function openFutureExpense(id=''){const x=id?(state.futureExpenses||[]).find(v=>v.id===id):null;fId.value=x?.id||'';fName.value=x?.name||'';fAmount.value=x?.amount?String(x.amount).replace('.',','):'';fDate.value=x?.date||today();fCategory.value=x?.category||'Altro';deleteFutureBtn.classList.toggle('hidden',!x);openModal('futureExpenseModal')}
+function saveFutureExpense(){const name=fName.value.trim(),amount=parseAmount(fAmount.value),date=fDate.value;if(!name||!date){toast('Inserisci nome e data');return}const id=fId.value||'future'+Date.now(),obj={id,name,amount,date,category:fCategory.value,active:true};const i=state.futureExpenses.findIndex(x=>x.id===id);if(i>=0)state.futureExpenses[i]=obj;else state.futureExpenses.push(obj);saveState();closeModal('futureExpenseModal');renderAll();toast('Scadenza salvata ✓')}
+function deleteFutureExpense(){const id=fId.value;if(!id||!confirm('Eliminare questa scadenza?'))return;state.futureExpenses=state.futureExpenses.filter(x=>x.id!==id);saveState();closeModal('futureExpenseModal');renderAll();toast('Scadenza eliminata')}
+function renderForecast(){const f=forecastInfo();forecastStart.textContent=euro(f.balance);forecastIncome.textContent='+'+euro(f.expectedIncome);forecastDue.textContent='−'+euro(f.commitments);forecastEndBalance.textContent=euro(f.projected);forecastEndBalance.classList.toggle('red',f.projected<f.goal);forecastExplanation.textContent=`Saldo attuale + entrate ancora attese − impegni conosciuti. Le spese variabili future non sono inventate né stimate.`;homeMonthForecast.textContent=euro(f.projected);homeMonthForecastNote.textContent=f.expectedIncome?`Include circa ${euro(f.expectedIncome)} di entrate ancora attese`:`Entrate principali del mese già rilevate`;if(f.eta?.reached){goalEtaBig.textContent='✓ Obiettivo raggiunto';goalEtaDetail.textContent='Il saldo principale è già almeno pari all’obiettivo.';homeGoalEta.textContent='Raggiunto ✓';homeGoalEtaNote.textContent='Saldo sopra l’obiettivo';}else if(f.eta?.months){const txt=formatMonthYear(f.eta.date);goalEtaBig.textContent=txt;goalEtaDetail.textContent=`Stima usando il trend netto mediano degli ultimi 3 mesi completi: ${euro(f.eta.trend)}/mese. È una proiezione, non una garanzia.`;homeGoalEta.textContent=txt;homeGoalEtaNote.textContent=`Trend recente ${euro(f.eta.trend)}/mese`;}else{goalEtaBig.textContent='Nessuna data attendibile';goalEtaDetail.textContent=`Il trend netto mediano degli ultimi 3 mesi è ${euro(f.trend)}/mese: al momento non sta avvicinando il saldo ai ${euro(f.goal)}. La data comparirà automaticamente quando il trend torna positivo.`;homeGoalEta.textContent='Trend da invertire';homeGoalEtaNote.textContent=`Ultimi mesi: ${euro(f.trend)}/mese`;}}
+
+
+function actualSavingsForMonth(month=currentMonth){return realSavingsForMonth(month)}
+function monthIncomeTotal(month=currentMonth){return state.transactions.filter(t=>monthKey(t.date)===month&&t.type==='income').reduce((a,t)=>a+(Number(t.amount)||0),0)}
+function categoryTotals(month=currentMonth,dayLimit=99){const out={};state.transactions.filter(t=>monthKey(t.date)===month&&countable(t)&&Number(t.date.slice(8,10))<=dayLimit).forEach(t=>out[t.category]=(out[t.category]||0)+spendImpact(t));return out}
+function renderMoneyFlow(){const inc=monthIncomeTotal(currentMonth),sp=state.transactions.filter(t=>monthKey(t.date)===currentMonth&&countable(t)).reduce((a,t)=>a+spendImpact(t),0),sav=actualSavingsForMonth(currentMonth),cats=Object.entries(categoryTotals(currentMonth)).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,5);moneyFlow.innerHTML=`<div class="moneyFlowRow"><div><div class="moneyFlowName">💶 Entrate registrate</div><div class="moneyFlowSub">Accrediti riconosciuti nel mese</div></div><div class="moneyFlowAmount green">+${euro(inc)}</div></div><div class="moneyFlowRow"><div><div class="moneyFlowName">🧾 Spese di consumo</div><div class="moneyFlowSub">Esclusi trasferimenti interni e regolamenti già conteggiati</div></div><div class="moneyFlowAmount red">−${euro(sp)}</div></div><div class="moneyFlowRow"><div><div class="moneyFlowName">💰 Accantonamenti / risparmio rilevati</div><div class="moneyFlowSub">Spostamenti classificati come risparmio, non consumo</div></div><div class="moneyFlowAmount amber">${euro(sav)}</div></div>${cats.map(([c,v])=>`<div class="moneyFlowRow"><div><div class="moneyFlowName">${getIcon(c)} ${esc(c)}</div><div class="moneyFlowSub">${sp?Math.round(v/sp*100):0}% delle spese di consumo</div></div><div class="moneyFlowAmount">${euro(v)}</div></div>`).join('')}<div class="cleanNote" style="padding:10px 0 2px">Questa vista spiega entrate, consumi e accantonamenti. I trasferimenti tra tuoi strumenti non vengono trattati come denaro perso.</div>`}
+function previousMonthKeys(month,n=3){const [y,m]=month.split('-').map(Number),arr=[];for(let i=1;i<=n;i++){const d=new Date(y,m-1-i,1);arr.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`)}return arr}
+function renderTraffic(){const day=currentMonth===monthKey(today())?Number(today().slice(8,10)):daysInMonthKey(currentMonth),cur=categoryTotals(currentMonth,day),prev=previousMonthKeys(currentMonth,3),cats=new Set([...Object.keys(cur),...prev.flatMap(m=>Object.keys(categoryTotals(m,Math.min(day,daysInMonthKey(m)))))]),rows=[];cats.forEach(c=>{const now=cur[c]||0,vals=prev.map(m=>categoryTotals(m,Math.min(day,daysInMonthKey(m)))[c]||0),active=vals.filter(v=>v>0);if(!now&&!active.length)return;const avg=active.length?active.reduce((a,b)=>a+b,0)/active.length:0;let color='green',label='nella norma';if(avg>0&&now>avg*1.25){color='red';label='sopra media'}else if(avg>0&&now>avg*1.05){color='yellow';label='leggermente sopra'}else if(avg===0&&now>0){color='yellow';label='nuova questo mese'}rows.push({c,now,avg,color,label})});rows.sort((a,b)=>b.now-a.now);trafficCategories.innerHTML=rows.length?rows.slice(0,10).map(x=>`<div class="trafficRow"><div class="trafficDot ${x.color}"></div><div><div class="moneyFlowName">${getIcon(x.c)} ${esc(x.c)}</div><div class="moneyFlowSub">${x.avg?`media ultimi mesi ${euro(x.avg)}`:'nessuna base storica'}</div></div><div class="trafficValue">${euro(x.now)}<div class="moneyFlowSub">${x.label}</div></div></div>`).join(''):'<div class="empty">Non ci sono ancora abbastanza dati per il confronto.</div>'}
+function signedInput(id){const el=document.getElementById(id);if(!el)return 0;let s=String(el.value||'').trim().replace(/[€\s]/g,'').replace(',','.');return parseFloat(s)||0}
+function renderScenario(){const f=forecastInfo(),one=Math.max(0,signedInput('simOneOff')),exp=signedInput('simMonthlyExpense'),sav=signedInput('simMonthlySaving'),inc=signedInput('simMonthlyIncome'),project=f.projected-one-exp-sav+inc;simProjected.textContent=euro(project);let tr=(Number(f.trend)||0)-exp-sav+inc;if(project>=f.goal){simEta.textContent='In questo scenario il saldo previsto è già sopra l’obiettivo.'}else if(tr>0){const months=Math.ceil((f.goal-project)/tr),d=new Date();d.setMonth(d.getMonth()+months);simEta.textContent=`Con un trend mensile di circa ${euro(tr)}, l'obiettivo verrebbe raggiunto indicativamente ${formatMonthYear(d)}.`}else{simEta.textContent=`Trend stimato ${euro(tr)}/mese: in questo scenario non emerge ancora una data attendibile per i ${euro(f.goal)}.`}}
+function shiftCalendar(n){calendarMonth=addMonthsKey(calendarMonth||monthKey(today()),n);renderFinanceCalendar()}
+function renderFinanceCalendar(){if(!calendarMonth)calendarMonth=monthKey(today());calendarMonthLabel.textContent=monthName(calendarMonth).replace(/^\w/,c=>c.toUpperCase());let rows=[];state.transactions.filter(t=>monthKey(t.date)===calendarMonth&&t.type==='income').forEach(t=>rows.push({date:t.date,name:t.merchant,amount:t.amount,kind:'income',cat:t.category}));state.recurring.filter(r=>recurringApplies(r,calendarMonth)).forEach(r=>rows.push({date:occurrenceDate(r,calendarMonth),name:r.name,amount:r.amount,kind:'due',cat:r.category}));(state.futureExpenses||[]).filter(x=>x.active!==false&&monthKey(x.date)===calendarMonth).forEach(x=>rows.push({date:x.date,name:x.name,amount:x.amount,kind:'future',cat:x.category}));rows.sort((a,b)=>a.date.localeCompare(b.date));financeCalendar.innerHTML=rows.length?rows.map(x=>`<div class="timelineItem"><div class="dateBox">${Number(x.date.slice(8,10))}<small>${x.kind==='income'?'ENTRA':x.kind==='future'?'EXTRA':'ESCE'}</small></div><div><div class="timelineName">${x.kind==='income'?'💶':getIcon(x.cat)} ${esc(x.name)}</div><div class="timelineMeta">${x.kind==='income'?'Entrata rilevata':x.kind==='future'?'Scadenza inserita':'Impegno ricorrente'}</div></div><div class="timelineAmount ${x.kind==='income'?'green':''}">${x.kind==='income'?'+':'−'}${euro(x.amount)}</div></div>`).join(''):'<div class="empty">Nessuna voce nota in questo mese</div>'}
+function nextSalaryInfo(){const salaries=state.transactions.filter(t=>t.type==='income'&&/stipendio|salary|paga/i.test(t.merchant||'')).sort((a,b)=>b.date.localeCompare(a.date));const last=salaries[0];if(!last)return null;const now=new Date(today()+'T12:00'),day=Number(last.date.slice(8,10))||10;let d=new Date(now.getFullYear(),now.getMonth(),day,12);if(d<=now)d=new Date(now.getFullYear(),now.getMonth()+1,day,12);const next=d.toISOString().slice(0,10),days=Math.max(1,Math.ceil((d-now)/86400000));const items=upcomingItems(Math.min(90,days+1)).filter(x=>x.date<next),commit=items.reduce((a,x)=>a+(Number(x.amount)||0),0);const life=Number(state.settings.lifeBudget)||0,used=Math.max(0,lifeSpendingForMonth(monthKey(today()))),rem=Math.max(0,life-used),cross=monthKey(next)!==monthKey(today()),extra=cross?life*(Math.max(0,Number(next.slice(8,10))-1)/new Date(Number(next.slice(0,4)),Number(next.slice(5,7)),0).getDate()):0;const fn=financialNumbers(),structural=Math.max(0,(fn.balance||0)-(fn.goal||0)-commit),available=Math.max(rem+extra,structural);return {date:next,days,commit,available,daily:available/days,amount:last.amount}}
+function renderNextSalary(){const x=nextSalaryInfo();if(!x){homeNextPayAvailable.textContent='—';homeNextPayNote.textContent='Stipendio non riconosciuto nello storico';return}homeNextPayAvailable.textContent=euro(x.available);homeNextPayNote.textContent=`${x.days} giorni · circa ${euro(x.daily)}/giorno di quota libera indicativa · prossimo accredito stimato ${new Date(x.date+'T12:00').toLocaleDateString('it-IT')}`}
+function openGoal(id=''){const x=id?state.goals.find(g=>g.id===id):null;gId.value=x?.id||'';gName.value=x?.name||'';gTarget.value=x?.target?String(x.target).replace('.',','):'';gCurrent.value=x?.current?String(x.current).replace('.',','):'';gMonthly.value=x?.monthly?String(x.monthly).replace('.',','):'';deleteGoalBtn.classList.toggle('hidden',!x);openModal('goalModal')}
+function saveGoal(){const name=gName.value.trim(),target=parseAmount(gTarget.value),current=parseAmount(gCurrent.value),monthly=parseAmount(gMonthly.value);if(!name||!target){toast('Inserisci nome e obiettivo');return}const id=gId.value||'goal'+Date.now(),o={id,name,target,current,monthly};const i=state.goals.findIndex(x=>x.id===id);if(i>=0)state.goals[i]=o;else state.goals.push(o);saveState();closeModal('goalModal');renderAll();toast('Obiettivo salvato ✓')}
+function deleteGoal(){if(!gId.value||!confirm('Eliminare questo obiettivo?'))return;state.goals=state.goals.filter(x=>x.id!==gId.value);saveState();closeModal('goalModal');renderAll()}
+function renderGoals(){const auto=state.savingsPots.filter(x=>x.target&&!x.closed).map(x=>({id:'pot:'+x.id,name:x.name,target:Number(x.target)||0,current:Number(x.balance)||0,monthly:Number(x.contribution)||0,auto:true})),all=[...auto,...state.goals];goalsList.innerHTML=all.length?all.map(g=>{const pct=g.target?Math.max(0,Math.min(100,g.current/g.target*100)):0,remain=Math.max(0,g.target-g.current),months=g.monthly>0?Math.ceil(remain/g.monthly):0;return `<div class="goalCard" ${g.auto?'':`onclick="openGoal('${g.id}')"`}><div class="goalTop"><div class="goalName">🎯 ${esc(g.name)}${g.auto?' <span class="badge ok">AUTO</span>':''}</div><div class="goalPct">${Math.round(pct)}%</div></div><div class="goalBar"><i style="width:${pct}%"></i></div><div class="moneyFlowSub">${euro(g.current)} su ${euro(g.target)}${months?` · circa ${months} mesi al ritmo impostato`:''}</div></div>`}).join(''):'<div class="empty">Nessun obiettivo. Puoi aggiungerne uno senza modificare il budget mensile.</div>'}
+function renderMonthHistory(){const months=[...new Set(state.transactions.map(t=>monthKey(t.date)))].sort().reverse().slice(0,12);monthHistory.innerHTML=months.length?months.map(m=>{const inc=monthIncomeTotal(m),sp=state.transactions.filter(t=>monthKey(t.date)===m&&countable(t)).reduce((a,t)=>a+spendImpact(t),0),sav=actualSavingsForMonth(m);return `<div class="monthClose"><div class="monthCloseDate">${monthName(m).split(' ')[0]}</div><div><div class="monthCloseMain">Spese ${euro(sp)} · entrate ${euro(inc)}</div><div class="monthCloseSub">Accantonamenti rilevati ${euro(sav)}</div></div><b class="${inc-sp-sav>=0?'green':'red'}">${inc-sp-sav>=0?'+':'−'}${euro(Math.abs(inc-sp-sav))}</b></div>`}).join(''):'<div class="empty">Nessuno storico disponibile</div>'}
+function openWarrantyDB(){return new Promise((res,rej)=>{const q=indexedDB.open('spese_docs_v1',1);q.onupgradeneeded=()=>{if(!q.result.objectStoreNames.contains('warrantyPhotos'))q.result.createObjectStore('warrantyPhotos')};q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
+async function warrantyPhotoGet(id){try{const db=await openWarrantyDB();return await new Promise((res,rej)=>{const q=db.transaction('warrantyPhotos').objectStore('warrantyPhotos').get(id);q.onsuccess=()=>res(q.result||'');q.onerror=()=>rej(q.error)})}catch(e){return ''}}
+async function warrantyPhotoPut(id,data){const db=await openWarrantyDB();return new Promise((res,rej)=>{const q=db.transaction('warrantyPhotos','readwrite').objectStore('warrantyPhotos').put(data,id);q.onsuccess=()=>res();q.onerror=()=>rej(q.error)})}
+async function warrantyPhotoDelete(id){try{const db=await openWarrantyDB();db.transaction('warrantyPhotos','readwrite').objectStore('warrantyPhotos').delete(id)}catch(e){}}
+async function imageToSmallData(file){return await new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const max=1000,scale=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*scale);c.height=Math.round(im.height*scale);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.72))};im.onerror=rej;im.src=fr.result};fr.onerror=rej;fr.readAsDataURL(file)})}
+async function openWarranty(id=''){const x=id?state.warranties.find(v=>v.id===id):null;wId.value=x?.id||'';wName.value=x?.name||'';wDate.value=x?.date||today();wAmount.value=x?.amount?String(x.amount).replace('.',','):'';wEnd.value=x?.endDate||'';wNote.value=x?.note||'';wPhoto.value='';deleteWarrantyBtn.classList.toggle('hidden',!x);wPhotoPreview.classList.add('hidden');if(x){const img=await warrantyPhotoGet(x.id);if(img){wPhotoImg.src=img;wPhotoPreview.classList.remove('hidden')}}openModal('warrantyModal')}
+async function saveWarranty(){const name=wName.value.trim();if(!name){toast('Inserisci cosa hai acquistato');return}const id=wId.value||'war'+Date.now(),o={id,name,date:wDate.value||today(),amount:parseAmount(wAmount.value),endDate:wEnd.value||'',note:wNote.value.trim()};const i=state.warranties.findIndex(x=>x.id===id);if(i>=0)state.warranties[i]=o;else state.warranties.push(o);const f=wPhoto.files[0];if(f){try{await warrantyPhotoPut(id,await imageToSmallData(f))}catch(e){console.error(e);toast('Dati salvati, ma non la foto')}}saveState();closeModal('warrantyModal');renderAll();toast('Acquisto salvato ✓')}
+async function deleteWarranty(){if(!wId.value||!confirm('Eliminare questa scheda e la foto locale?'))return;const id=wId.value;state.warranties=state.warranties.filter(x=>x.id!==id);await warrantyPhotoDelete(id);saveState();closeModal('warrantyModal');renderAll()}
+function renderWarranties(){warrantyList.innerHTML=state.warranties.length?state.warranties.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(x=>{let status='Nessuna scadenza';if(x.endDate){const days=Math.ceil((new Date(x.endDate+'T12:00')-new Date(today()+'T12:00'))/86400000);status=days>=0?`garanzia: ${days} giorni rimanenti`:'garanzia scaduta'}return `<div class="warrantyRow" onclick="openWarranty('${x.id}')"><div class="warrantyThumb">🧾</div><div><div class="warrantyName">${esc(x.name)}</div><div class="warrantyMeta">${new Date(x.date+'T12:00').toLocaleDateString('it-IT')} · ${status}${x.note?' · '+esc(x.note):''}</div></div><b>${x.amount?euro(x.amount):'›'}</b></div>`}).join(''):'<div class="empty">Nessun acquisto archiviato</div>'}
+function cleanLearnedRules(){let changed=0;Object.keys(state.rules).forEach(k=>{if(k.length<3||!CATEGORIES.some(c=>c[0]===state.rules[k])){delete state.rules[k];changed++}});saveState();renderLearnedRules();toast(changed?`${changed} regole rimosse`:'Le regole sono già pulite')}
+function renderLearnedRules(){const el=document.getElementById('learnedRulesCount');if(el)el.textContent=Object.keys(state.rules||{}).length}
+
+function renderBudget(){const plb=document.getElementById('planLifeBudget');if(plb)plb.textContent=euro(Number(state.settings.lifeBudget)||0);
  renderAssets();const n=financialNumbers(), due=monthCommitments(), rem=remainingCommitments(), paid=paidSet();
  budgetFree.textContent=n.free===null?'—':euro(Math.max(0,n.free));
  budgetFree.classList.toggle('red',n.free!==null&&n.free<0);
@@ -739,6 +920,7 @@ function renderBudget(){const plb=document.getElementById('planLifeBudget');if(p
  const unknown=state.recurring.filter(r=>r.active&&(r.uncertain||!Number(r.amount)||(r.cadence==='annual'&&!Number(r.dueMonth))));
  unknownNotice.classList.toggle('hidden',!unknown.length);
  unknownNotice.textContent=unknown.length?`⚠️ ${unknown.length} voci hanno importo o scadenza da verificare: il margine disponibile potrebbe cambiare.`:'';
+ renderMoneyFlow();renderTraffic();renderScenario();renderFinanceCalendar();renderForecast();renderAnomalies();renderSubscriptions();renderFutureTimeline();
 }
 
 
@@ -753,11 +935,12 @@ function latestSpendableBalance(){
  return state.accounts.length?state.accounts.filter(a=>a.spendable!==false).reduce((sum,a)=>sum+(Number(a.balance)||0),0):parseAmount(state.settings.balance);
 }
 function renderAssets(){
- const liquid=latestSpendableBalance(),reserved=state.savingsPots.reduce((a,x)=>a+(Number(x.balance)||0),0),debt=state.debts.reduce((a,x)=>a+(Number(x.residual)||0),0);
- liquidTotal.textContent=euro(liquid);reservedTotal.textContent=euro(reserved);debtTotal.textContent=euro(debt);knownNet.textContent=euro(liquid+reserved-debt);
+ const investAccounts=state.accounts.filter(a=>/invest|fondo|titoli|etf/i.test((a.kind||'')+' '+(a.name||''))),investments=investAccounts.reduce((s,a)=>s+(Number(a.balance)||0),0),liquid=state.accounts.length?state.accounts.filter(a=>a.spendable!==false&&!/invest|fondo|titoli|etf/i.test((a.kind||'')+' '+(a.name||''))).reduce((sum,a)=>sum+(Number(a.balance)||0),0):parseAmount(state.settings.balance),reserved=state.savingsPots.reduce((a,x)=>a+(Number(x.balance)||0),0),debt=state.debts.reduce((a,x)=>a+(Number(x.residual)||0),0);
+ liquidTotal.textContent=euro(liquid);reservedTotal.textContent=euro(reserved);investmentTotal.textContent=investAccounts.length?euro(investments):'—';debtTotal.textContent=euro(debt);knownNet.textContent=euro(liquid+reserved+investments-debt);
  accountsList.innerHTML=state.accounts.length?state.accounts.map(a=>`<div class="assetLine"><div><div class="assetName">${esc(a.name)}</div><div class="assetSub">${esc(a.kind||'Conto')}${a.instrument?' · '+esc(a.instrument):''}${a.snapshotDate?' · aggiornato '+new Date(a.snapshotDate+'T12:00').toLocaleDateString('it-IT'):''}${a.opening2026?' · 01/01/26 '+euro(a.opening2026):''}</div></div><b>${euro(a.balance)}</b></div>`).join(''):'<div class="empty">Nessun conto registrato</div>';
  potsList.innerHTML=state.savingsPots.length?state.savingsPots.map(x=>`<div class="assetLine"><div><div class="assetName">${esc(x.name)}</div><div class="assetSub">${x.contribution?euro(x.contribution)+' al mese'+(x.dueDay?' · giorno '+x.dueDay:''):''}${x.progressPct&&!x.target?' · obiettivo da verificare':''}</div></div><b>${euro(x.balance)}${x.target?'<div class="assetSub">su '+euro(x.target)+'</div>':(x.progressPct?'<div class="assetSub">'+x.progressPct+'%</div>':'')}</b></div>`).join(''):'<div class="empty">Nessun salvadanaio</div>';
  debtsList.innerHTML=state.debts.length?state.debts.map(d=>`<div class="assetLine"><div><div class="assetName">${esc(d.name)}</div><div class="assetSub">${d.installment?euro(d.installment)+' / mese':''}${d.dueDay?' · giorno '+d.dueDay:''}${d.endDate?' · fine '+new Date(d.endDate+'T12:00').toLocaleDateString('it-IT'):''}</div></div><b class="debtVal">${euro(d.residual)}</b></div>`).join(''):'<div class="empty">Nessun finanziamento registrato</div>';
+ renderGoals();renderMonthHistory();renderWarranties();
 }
 async function mergeFinancialPatch(file){
  if(!file)return;
@@ -766,6 +949,10 @@ async function mergeFinancialPatch(file){
   (x.accounts||[]).forEach(o=>upsertById(state.accounts,o));
   (x.savingsPots||[]).forEach(o=>upsertById(state.savingsPots,o));
   (x.debts||[]).forEach(o=>upsertById(state.debts,o));
+  (x.futureExpenses||[]).forEach(o=>upsertById(state.futureExpenses,o));
+  (x.goals||[]).forEach(o=>upsertById(state.goals,o));
+  (x.warranties||[]).forEach(o=>upsertById(state.warranties,o));
+  if(x.settingsUpdates&&typeof x.settingsUpdates==='object')state.settings={...state.settings,...x.settingsUpdates};
   if(x.annualProfiles && typeof x.annualProfiles==='object'){
     state.annualProfiles=state.annualProfiles||{};
     Object.entries(x.annualProfiles).forEach(([y,p])=>state.annualProfiles[y]={...(state.annualProfiles[y]||{}),...p});
@@ -779,6 +966,7 @@ async function mergeFinancialPatch(file){
   for(const t0 of (x.transactions||[])){
     const t={...t0};
     if(t.externalKey && state.transactions.some(a=>a.externalKey===t.externalKey)){skipped++;continue}
+    if(t.id && state.transactions.some(a=>a.id===t.id)){skipped++;continue}
     if(!t.id)t.id='patch'+Date.now()+Math.random().toString(36).slice(2,7);
     ingestTransaction(t);added++;
   }
@@ -829,9 +1017,14 @@ function carryPreviousBalance(){
 function realSavingsForMonth(month=currentMonth){
  return state.transactions.filter(t=>{
    if(monthKey(t.date)!==month || t.excluded!==true || t.type!=='transfer')return false;
-   const x=normMerchant((t.merchant||'')+' '+(t.category||''));
-   if(/ricarica satispay|verso la banca|dalla banca|regolamento carta|nexi|prelievo contanti/.test(x))return false;
-   return /fond|pellet|spese macchina|invest|deposito|risparm/.test(x);
+   const x=normMerchant((t.merchant||'')+' '+(t.category||'')),a=Number(t.amount)||0;
+   if(/ricarica satispay|verso la banca|dalla banca|regolamento carta|nexi|prelievo contanti|prelievo risparmi|prelievo investimento|trasferimento satispay/.test(x))return false;
+   if(/spese macchina/.test(x))return a<=150;
+   if(/pellet/.test(x))return a<=150;
+   if(/salvadanaio investito|investimento/.test(x))return a<=60;
+   if(/quattordicesima|crociera/.test(x))return a<=350;
+   if(/fond/.test(x))return a<=500;
+   return /deposito|versamento|risparm/.test(x) && a<=500;
  }).reduce((a,t)=>a+(Number(t.amount)||0),0);
 }
 function lifeSpendingForMonth(month=currentMonth){
@@ -850,7 +1043,7 @@ function lifeBudgetTransactions(month=currentMonth){
 }
 function openLifeBudgetDetail(){
  const list=lifeBudgetTransactions(currentMonth);
- const budget=Number(state.settings.lifeBudget)||200;
+ const budget=Number(state.settings.lifeBudget)||0;
  const used=Math.max(0,list.reduce((sum,t)=>sum+spendImpact(t),0));
  const remaining=Math.max(0,budget-used);
  lifeBudgetDetailMonth.textContent=monthName(currentMonth)+' · budget mensile '+euro(budget);
@@ -873,13 +1066,14 @@ function renderHome(){
  const income=incomeForMonth(currentMonth),savings=realSavingsForMonth(currentMonth);
  const fn=financialNumbers();
  const main=state.accounts.find(a=>a.primary===true)||state.accounts.find(a=>a.id==='mediolanum-main');
- const balance=fn.balance||0,goal=fn.goal||6000,gap=Math.max(0,goal-balance);
+ const balance=fn.balance||0,goal=fn.goal||0,gap=Math.max(0,goal-balance);
  simplePrimaryBalance.textContent=euro(balance);
  simpleBalanceDate.textContent=main?.snapshotDate?'Aggiornato al '+new Date(main.snapshotDate+'T12:00').toLocaleDateString('it-IT'):'Saldo disponibile';
- simpleGoalBar.style.width=Math.max(0,Math.min(100,balance/goal*100))+'%';
- simpleGoalText.textContent=gap>0?'Manca per arrivare a '+euro(goal):'Obiettivo raggiunto';
- simpleGoalGap.textContent=gap>0?euro(gap):'✓';
- const lifeBudget=Number(state.settings.lifeBudget)||200;
+ simpleGoalAmount.textContent=goal?euro(goal):'—';
+ simpleGoalBar.style.width=goal?Math.max(0,Math.min(100,balance/goal*100))+'%':'0%';
+ simpleGoalText.textContent=!goal?'Imposta il tuo obiettivo':(gap>0?'Manca per arrivare a '+euro(goal):'Obiettivo raggiunto');
+ simpleGoalGap.textContent=!goal?'—':(gap>0?euro(gap):'✓');
+ const lifeBudget=Number(state.settings.lifeBudget)||0;
  const lifeUsed=Math.max(0,lifeSpendingForMonth(currentMonth));
  const lifeRemaining=Math.max(0,lifeBudget-lifeUsed);
  const extraFree=Math.max(0,fn.free===null?0:fn.free);
@@ -900,6 +1094,7 @@ function renderHome(){
  simpleSavings.textContent=euro(savings);
  const chb=document.getElementById('cashHomeBalance');if(chb)chb.textContent=euro(cashBalance());
  recentList.innerHTML=txHTML([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5));
+ renderForecast();renderAnomalies();renderNextSalary();
 }
 function drawChart(txs){
  const c=document.getElementById('chart'), rect=c.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
@@ -930,7 +1125,7 @@ function renderStats(){renderAssets();renderAnnual();
 }
 function renderAll(){
  headerMonth.textContent=monthName(currentMonth);
- renderYearFilters();renderMonthFilters();renderHome();renderMovements();renderStats();renderBudget();
+ renderYearFilters();renderMonthFilters();renderHome();renderMovements();renderStats();renderBudget();renderLearnedRules();
  const q=state.transactions.filter(t=>t.reviewReason).length,e=state.transactions.filter(t=>t.excluded).length;
  const ih=document.getElementById('importHealth');
  if(ih)ih.textContent=q?`${q} movimenti da controllare · ${e} non conteggiati come spese.`:`Nessun movimento dubbio · ${e} spostamenti non conteggiati come spese.`;
@@ -1007,11 +1202,37 @@ async function handlePhoto(file){
 }
 function saveOCRReceipt(){
  const merchant=ocrM.value.trim()||'Scontrino',amount=parseAmount(ocrA.value);if(!amount){toast('Controlla il totale');return}
- const cat=ocrC.value;ingestTransaction({id:'ocr'+Date.now(),date:ocrD.value||today(),merchant,amount,category:cat,account:photoSource.value||state.settings.defaultAccount||'Carta',verified:true,reimb:false,origin:'receipt',type:'expense',excluded:false,reviewReason:''});state.rules[merchant.toLowerCase()]=cat;saveState();closeModal('photoModal');currentMonth=monthKey(ocrD.value||today());renderAll();toast('Scontrino registrato ✓')
+ const cat=ocrC.value;ingestTransaction({id:'ocr'+Date.now(),date:ocrD.value||today(),merchant,amount,category:cat,account:photoSource.value||state.settings.defaultAccount||'Carta',verified:true,reimb:false,origin:'receipt',type:'expense',excluded:false,reviewReason:''});state.rules[normMerchant(merchant)||merchant.toLowerCase()]=cat;saveState();closeModal('photoModal');currentMonth=monthKey(ocrD.value||today());renderAll();toast('Scontrino registrato ✓')
 }
 function saveBankOCR(){
- let added=0;document.querySelectorAll('.brCheck').forEach((ck,i)=>{if(!ck.checked)return;const wrap=ck.closest('div[style*="border-bottom"]');const merchant=wrap.querySelector('.brM').value.trim()||'Movimento',amount=parseAmount(wrap.querySelector('.brA').value),date=wrap.querySelector('.brD').value||today();if(!amount)return;let lower=merchant.toLowerCase(),key=Object.keys(state.rules).find(k=>lower.includes(k));ingestTransaction({id:'bank'+Date.now()+i,date,merchant,amount,category:key?state.rules[key]:'Altro',account:photoSource.value||state.settings.defaultAccount||'Carta',verified:false,reimb:false,origin:'statement-photo',type:'expense',excluded:false,reviewReason:''});added++});saveState();closeModal('photoModal');renderAll();toast(added+' movimenti importati')
+ let added=0;document.querySelectorAll('.brCheck').forEach((ck,i)=>{if(!ck.checked)return;const wrap=ck.closest('div[style*="border-bottom"]');const merchant=wrap.querySelector('.brM').value.trim()||'Movimento',amount=parseAmount(wrap.querySelector('.brA').value),date=wrap.querySelector('.brD').value||today();if(!amount)return;let lower=merchant.toLowerCase(),key=Object.keys(state.rules).find(k=>lower.includes(k));ingestTransaction({id:'bank'+Date.now()+i,date,merchant,amount,category:key?state.rules[key]:'Altro',account:photoSource.value||state.settings.defaultAccount||'Carta',verified:false,reimb:false,origin:(window._bankOrigin||'statement-photo'),type:'expense',excluded:false,reviewReason:''});added++});window._bankOrigin='statement-photo';saveState();closeModal('photoModal');renderAll();toast(added+' movimenti importati')
 }
+
+// Import unico, PDF testuali e riconciliazione
+async function handleUnifiedImport(file){
+ if(!file)return;const name=(file.name||'').toLowerCase(),source=document.getElementById('unifiedSource')?.value||state.settings.defaultAccount||'Carta';
+ try{
+  if(name.endsWith('.json')||file.type.includes('json')){const x=JSON.parse(await file.text());if(x.kind==='spese-financial-patch'){await mergeFinancialPatch(file)}else if(Array.isArray(x.transactions)){let added=0,skipped=0;(x.transactions||[]).forEach(t0=>{const t={...t0};if(t.externalKey&&state.transactions.some(a=>a.externalKey===t.externalKey)){skipped++;return}if(t.id&&state.transactions.some(a=>a.id===t.id)){skipped++;return}ingestTransaction(t);added++});(x.accounts||[]).forEach(o=>upsertById(state.accounts,o));(x.savingsPots||[]).forEach(o=>upsertById(state.savingsPots,o));(x.debts||[]).forEach(o=>upsertById(state.debts,o));(x.futureExpenses||[]).forEach(o=>upsertById(state.futureExpenses,o));saveState();renderAll();toast(`JSON unito: ${added} nuovi, ${skipped} già presenti`)}else toast('JSON non riconosciuto');return}
+  if(name.endsWith('.csv')||/csv/.test(file.type)){document.getElementById('importSource').value=source;await importCSV(file);return}
+  if(name.endsWith('.pdf')||file.type==='application/pdf'){await importPDFPreview(file,source);return}
+  if((file.type||'').startsWith('image/')){photoSource.value=source;setPhotoMode('bank');openModal('photoModal');await handlePhoto(file);return}
+  toast('Formato non riconosciuto');
+ }catch(e){console.error(e);toast('Non riesco a leggere questo file')}
+ finally{document.getElementById('unifiedFile').value=''}
+}
+async function loadPdfJS(){if(window.pdfjsLib)return window.pdfjsLib;await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs';s.type='module';s.onload=res;s.onerror=rej;document.head.appendChild(s)}).catch(()=>{});if(window.pdfjsLib)return window.pdfjsLib;return null}
+async function pdfText(file){
+ // Compatibilità iPhone: usa la build UMD se la build module non espone il globale.
+ if(!window.pdfjsLib){await new Promise((res,rej)=>{let s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s)});pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'}
+ const data=new Uint8Array(await file.arrayBuffer()),pdf=await pdfjsLib.getDocument({data}).promise;let pages=[];for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i),tc=await pg.getTextContent();pages.push(tc.items.map(x=>x.str).join(' '))}return pages.join('\n')
+}
+function detectTextStatement(text){
+ const lines=text.split(/\n+/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean),out=[];
+ for(const line of lines){const dm=line.match(/\b([0-3]?\d)[\/\-.]([01]?\d)[\/\-.](20\d{2}|\d{2})\b/);if(!dm)continue;const am=[...line.matchAll(/[-−]?\s*(\d{1,3}(?:\.\d{3})*[,.]\d{2}|\d+[,.]\d{2})\s*€?/g)];if(!am.length)continue;const raw=am[am.length-1][0],amount=parseAmount(am[am.length-1][1]);if(!amount)continue;let merchant=line.replace(dm[0],' ').replace(raw,' ').replace(/\s+/g,' ').trim();if(merchant.length<2)merchant='Movimento';out.push({merchant:merchant.slice(0,90),amount,date:detectDate(dm[0])});}
+ if(out.length)return out.slice(0,120);return detectBank(text).slice(0,120)
+}
+async function importPDFPreview(file,source){ocrStatus.style.display='block';ocrStatus.textContent='Leggo il testo del PDF…';ocrResult.innerHTML='';photoSource.value=source;setPhotoMode('bank');openModal('photoModal');try{const text=await pdfText(file),rows=detectTextStatement(text);window._bankOCR=rows;window._bankOrigin='statement-pdf';ocrStatus.textContent=rows.length?`PDF letto: ${rows.length} possibili movimenti. Controllali prima di importarli.`:'PDF letto, ma non ho trovato movimenti abbastanza chiari. Prova con CSV o screenshot.';ocrResult.innerHTML=rows.length?`<div class="card settingCard" style="margin-top:10px"><div id="bankRows">${rows.map((r,i)=>`<div style="border-bottom:1px solid var(--line);padding:8px 0"><label style="font-size:11px;font-weight:800;color:var(--muted)"><input type="checkbox" class="brCheck" data-i="${i}" checked> MOVIMENTO ${i+1}</label><div class="importedRow"><input class="brM" value="${esc(r.merchant)}"><input class="brA" value="${String(r.amount).replace('.',',')}"></div><input class="brD" type="date" value="${r.date}"></div>`).join('')}</div><button class="save" onclick="saveBankOCR()">Importa selezionati</button></div>`:''}catch(e){console.error(e);ocrStatus.textContent='Non riesco a leggere direttamente questo PDF. Usa CSV oppure uno screenshot delle pagine.'}}
+function autoReconcileAll(){let changed=0;state.transactions.forEach(t=>{const before=JSON.stringify([t.type,t.excluded,t.reviewReason,t.duplicateOf]);if(!t.verified||t.reviewReason||isTransferDescription(t.merchant))analyzeIncoming(t);const after=JSON.stringify([t.type,t.excluded,t.reviewReason,t.duplicateOf]);if(before!==after)changed++});saveState();renderAll();toast(changed?`${changed} movimenti riclassificati/aggiornati`:'Nessuna nuova riconciliazione necessaria')}
 
 // CSV & backup
 function splitCSVLine(line,sep){let out=[],cur='',q=false;for(let i=0;i<line.length;i++){let ch=line[i];if(ch==='"'){q=!q;continue}if(ch===sep&&!q){out.push(cur);cur='';}else cur+=ch}out.push(cur);return out}
@@ -1029,7 +1250,7 @@ function download(name,content,type){
 }
 function exportBackup(){download('spese-backup-'+today()+'.json',JSON.stringify(state,null,2),'application/json')}
 async function restoreBackup(file){try{const x=JSON.parse(await file.text());if(!Array.isArray(x.transactions))throw 0;
- state=x;if(!state.rules)state.rules={};if(!state.settings)state.settings={goal:6000,balance:'',defaultAccount:'Carta',startDate:'2026-01-01'};if(!state.settings.startDate)state.settings.startDate='2026-01-01';if(!Array.isArray(state.recurring))state.recurring=[];if(!state.recurringPaid)state.recurringPaid={};if(!state.annualProfiles)state.annualProfiles={};if(!Array.isArray(state.accounts))state.accounts=[];if(!Array.isArray(state.savingsPots))state.savingsPots=[];if(!Array.isArray(state.debts))state.debts=[];state.recurring.forEach(r=>{if(!r.startDate)r.startDate='2026-01-01';});state.transactions.forEach(t=>{if(!t.type)t.type='expense';if(typeof t.excluded!=='boolean')t.excluded=false;if(!t.origin)t.origin='backup';if(!t.reviewReason)t.reviewReason='';});
+ state=x;if(!state.rules)state.rules={};if(!state.settings)state.settings={goal:0,balance:'',defaultAccount:'Carta',startDate:'2026-01-01'};if(!state.settings.startDate)state.settings.startDate='2026-01-01';if(!Array.isArray(state.recurring))state.recurring=[];if(!state.recurringPaid)state.recurringPaid={};if(!state.annualProfiles)state.annualProfiles={};if(!Array.isArray(state.accounts))state.accounts=[];if(!Array.isArray(state.savingsPots))state.savingsPots=[];if(!Array.isArray(state.debts))state.debts=[];if(!Array.isArray(state.futureExpenses))state.futureExpenses=[];if(!Array.isArray(state.goals))state.goals=[];if(!Array.isArray(state.warranties))state.warranties=[];if(!state.syncConfig)state.syncConfig={enabled:false,provider:'',ready:false};state.recurring.forEach(r=>{if(!r.startDate)r.startDate='2026-01-01';});state.transactions.forEach(t=>{if(!t.type)t.type='expense';if(typeof t.excluded!=='boolean')t.excluded=false;if(!t.origin)t.origin='backup';if(!t.reviewReason)t.reviewReason='';});
  delete state.rules['pro loco'];delete state.rules['sumup *associazione'];delete state.rules['proloco'];
  saveState();if(state.transactions.length)currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0].date);renderAll();toast('Backup ripristinato ✓')}catch(e){toast('Backup non valido')}}
 function exportCSV(){
@@ -1039,11 +1260,11 @@ function exportCSV(){
 function saveSettings(){
  const y=Number(sYear.value)||selectedYear,p=yearProfile(y);
  p.openingBalance=sOpeningBalance.value;p.closingBalance=sClosingBalance.value;
- state.settings.goal=parseAmount(sGoal.value)||6000;state.settings.lifeBudget=parseAmount(sLifeBudget.value)||200;state.settings.balance=sBalance.value;state.settings.defaultAccount=sDefaultAccount.value;
+ state.settings.goal=parseAmount(sGoal.value)||0;state.settings.lifeBudget=parseAmount(sLifeBudget.value)||0;state.settings.balance=sBalance.value;state.settings.defaultAccount=sDefaultAccount.value;
  saveState();closeModal('settingsModal');renderAll();toast('Impostazioni salvate');
 }
 settingsModal.addEventListener('click',()=>{
- sGoal.value=state.settings.goal||6000;sLifeBudget.value=state.settings.lifeBudget||200;sBalance.value=state.settings.balance||'';sDefaultAccount.value=state.settings.defaultAccount||'Carta';
+ sGoal.value=state.settings.goal||'';sLifeBudget.value=state.settings.lifeBudget||'';sBalance.value=state.settings.balance||'';sDefaultAccount.value=state.settings.defaultAccount||'Carta';
  sYear.innerHTML=availableYears().map(y=>`<option value="${y}">${y}</option>`).join('');sYear.value=String(selectedYear);loadYearSettings();
 },{once:false});
 
