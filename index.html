@@ -500,7 +500,7 @@ main{max-width:850px;margin:auto;padding:16px}
   <div class="field"><label>SALDO DISPONIBILE ATTUALE (€)</label><input id="sBalance" inputmode="decimal" placeholder="Serve per “Quanto posso spendere?”"></div>
   <div class="field"><label>OBIETTIVO SALDO MINIMO (€)</label><input id="sGoal" inputmode="decimal"></div><div class="field"><label>BUDGET USCITE E DIVERTIMENTO / MESE (€)</label><input id="sLifeBudget" inputmode="decimal" placeholder="0,00"></div>
   <div class="field"><label>CONTO PREDEFINITO</label><select id="sDefaultAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
-  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p>
+  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V18.2</b></p>
   <button class="save" onclick="saveSettings()">Salva impostazioni</button>
   <button class="settingsShortcut" onclick="closeModal('settingsModal');switchView('data')">⚙️ Dati, importazioni e backup</button>
  </div>
@@ -926,6 +926,23 @@ function detectAnomalies(){
  return out.slice(0,4);
 }
 function renderAnomalies(){const a=detectAnomalies();anomalyList.innerHTML=a.length?a.map(x=>`<div class="attentionCard"><div class="attentionTitle">${x.level==='bad'?'🚨':x.level==='warn'?'⚠️':'ℹ️'} ${x.title}</div><div class="attentionText">${x.text}</div></div>`).join(''):'<div class="empty">✓ Nessuna anomalia evidente nei dati attuali</div>';const h=document.getElementById('homeAttention'),ht=document.getElementById('homeAttentionText');if(h&&ht){h.classList.toggle('hidden',!a.length);ht.textContent=a.length?`${a.length} ${a.length===1?'segnale da guardare':'segnali da guardare'}`:''}}
+function renderRecurringPanelsSafe(){
+ try{
+  const all=Array.isArray(state.recurring)?state.recurring:[];
+  const subs=all.filter(r=>recurringKind(r)==='subscription'), activeSubs=subs.filter(r=>r.active!==false), inactiveSubs=subs.filter(r=>r.active===false);
+  const monthly=activeSubs.reduce((a,r)=>a+(r.cadence==='annual'?(Number(r.amount)||0)/12:(Number(r.amount)||0)),0);
+  const annual=activeSubs.reduce((a,r)=>a+(r.cadence==='annual'?(Number(r.amount)||0):(Number(r.amount)||0)*12),0);
+  const sm=document.getElementById('subsMonthly'),sa=document.getElementById('subsAnnual'),sl=document.getElementById('subscriptionList'),sil=document.getElementById('subscriptionInactiveList');
+  if(sm)sm.textContent=euro(monthly);if(sa)sa.textContent=euro(annual);
+  const simpleSubs=list=>list.length?list.slice().sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)).map(r=>{const a=Number(r.amount)||0,yr=r.cadence==='annual'?a:a*12;return `<div class="recurringItem" onclick="openRecurring('${r.id}')"><div><div class="recName">🔁 ${esc(r.name)} ${r.active!==false?'<span class="badge ok">ATTIVO</span>':'<span class="badge">DISATTIVO</span>'}${r.uncertain?'<span class="badge">DA VERIFICARE</span>':''}</div><div class="recMeta">${r.cadence==='annual'?'Annuale':'Mensile'} · ${r.dueDay?'giorno '+r.dueDay:'data modificabile'} · ${euro(yr)}/anno</div></div><div class="recAmount">${a?euro(a):'<span class="warnText">da impostare</span>'}${r.cadence==='monthly'?'<div class="recMeta">/mese</div>':'<div class="recMeta">/anno</div>'}</div></div>`}).join(''):'<div class="empty">Nessuna voce</div>';
+  if(sl)sl.innerHTML=simpleSubs(activeSubs);if(sil)sil.innerHTML=simpleSubs(inactiveSubs);
+
+  const commits=all.filter(r=>recurringKind(r)==='commitment'),active=commits.filter(r=>r.active!==false),inactive=commits.filter(r=>r.active===false);
+  const pl=document.getElementById('paymentRecurringList'),ps=document.getElementById('paymentSuspendedList');
+  const simpleCommits=(list,buttons=true)=>list.length?list.slice().sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)).map(r=>{let paid=false;try{paid=recurringIsPaid(r,currentMonth)}catch(e){}const a=Number(r.amount)||0;return `<div class="recurringItem"><div onclick="openRecurring('${r.id}')"><div class="recName">${getIcon(r.category)} ${esc(r.name)} ${r.active!==false?'<span class="badge ok">ATTIVO</span>':'<span class="badge">DISATTIVO</span>'}</div><div class="recMeta">${r.cadence==='annual'?'annuale':'mensile'} · ${r.dueDay?'giorno '+r.dueDay:'data modificabile'}${paid?' · ✓ già rilevata/pagata':''}</div></div><div><div class="recAmount">${a?euro(a):'<span class="warnText">da impostare</span>'}</div>${buttons&&r.active!==false?`<div class="recBtns"><button class="miniBtn ${paid?'paid':''}" onclick="event.stopPropagation();togglePaidRecurring('${r.id}')">${paid?'✓ Pagata':'Segna pagata'}</button><button class="miniBtn" onclick="event.stopPropagation();openRecurring('${r.id}')">Modifica</button></div>`:''}</div></div>`}).join(''):'<div class="empty">Nessuna voce</div>';
+  if(pl)pl.innerHTML=simpleCommits(active,true);if(ps)ps.innerHTML=simpleCommits(inactive,false);
+ }catch(e){console.error('renderRecurringPanelsSafe',e)}
+}
 function renderSubscriptions(){
  const subs=state.recurring.filter(r=>recurringKind(r)==='subscription'),active=subs.filter(r=>r.active),inactive=subs.filter(r=>!r.active);
  const monthly=active.reduce((a,r)=>a+(r.cadence==='annual'?(Number(r.amount)||0)/12:(Number(r.amount)||0)),0),annual=active.reduce((a,r)=>a+(r.cadence==='annual'?(Number(r.amount)||0):(Number(r.amount)||0)*12),0);
@@ -984,7 +1001,7 @@ function renderWarranties(){warrantyList.innerHTML=state.warranties.length?state
 function cleanLearnedRules(){let changed=0;Object.keys(state.rules).forEach(k=>{if(k.length<3||!CATEGORIES.some(c=>c[0]===state.rules[k])){delete state.rules[k];changed++}});saveState();renderLearnedRules();toast(changed?`${changed} regole rimosse`:'Le regole sono già pulite')}
 function renderLearnedRules(){const el=document.getElementById('learnedRulesCount');if(el)el.textContent=Object.keys(state.rules||{}).length}
 
-function renderBudget(){const plb=document.getElementById('planLifeBudget');if(plb)plb.textContent=euro(Number(state.settings.lifeBudget)||0);
+function renderBudget(){renderRecurringPanelsSafe();const plb=document.getElementById('planLifeBudget');if(plb)plb.textContent=euro(Number(state.settings.lifeBudget)||0);
  renderAssets();const n=financialNumbers(), due=monthCommitments(), rem=remainingCommitments(), paid=paidSet();
  const paidAmount=Math.max(0,n.due-n.remaining),dueValue=due.filter(r=>(Number(r.amount)||0)>0),remValue=rem.filter(r=>(Number(r.amount)||0)>0);
  budgetFree.textContent=n.free===null?'—':euro(Math.max(0,n.free));
@@ -1000,7 +1017,7 @@ function renderBudget(){const plb=document.getElementById('planLifeBudget');if(p
  const unknown=state.recurring.filter(r=>r.active&&(r.uncertain||!Number(r.amount)||(r.cadence==='annual'&&!Number(r.dueMonth))));
  unknownNotice.classList.toggle('hidden',!unknown.length);
  unknownNotice.textContent=unknown.length?`⚠️ ${unknown.length} voci hanno importo o scadenza da verificare.`:'';
- renderMoneyFlow();renderTraffic();renderScenario();renderFinanceCalendar();renderForecast();renderAnomalies();renderSubscriptions();renderFutureTimeline();
+ renderMoneyFlow();renderTraffic();renderScenario();renderFinanceCalendar();renderForecast();renderAnomalies();renderRecurringPanelsSafe();renderFutureTimeline();
 }
 
 
@@ -1211,7 +1228,7 @@ function renderStats(){renderAssets();renderAnnual();
 }
 function renderAll(){
  headerMonth.textContent=monthName(currentMonth);
- renderYearFilters();renderMonthFilters();renderHome();renderMovements();renderStats();renderBudget();renderLearnedRules();
+ renderYearFilters();renderMonthFilters();renderHome();renderMovements();renderStats();renderRecurringPanelsSafe();renderBudget();renderLearnedRules();
  const q=state.transactions.filter(t=>t.reviewReason).length,e=state.transactions.filter(t=>t.excluded).length;
  const ih=document.getElementById('importHealth');
  if(ih)ih.textContent=q?`${q} movimenti da controllare · ${e} non conteggiati come spese.`:`Nessun movimento dubbio · ${e} spostamenti non conteggiati come spese.`;
