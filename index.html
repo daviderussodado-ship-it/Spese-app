@@ -102,6 +102,7 @@ main{max-width:850px;margin:auto;padding:16px}
 .drop{border:2px dashed #b9c6d7;background:#fff;border-radius:18px;padding:22px;text-align:center;color:var(--muted)}
 .drop strong{display:block;color:var(--ink);font-size:17px;margin-bottom:5px}
 .ocrStatus{background:#fff;border-radius:14px;padding:12px;margin-top:10px;font-size:13px;display:none}
+.budgetChoice{display:flex;align-items:flex-start;gap:10px;background:#eef5ff;border:1px solid #c9daf4;border-radius:14px;padding:12px 13px;margin:8px 0 12px;font-size:13px;font-weight:800;color:#17345f}.budgetChoice input{width:20px;height:20px;margin-top:1px;flex:0 0 auto}.budgetChoice small{display:block;color:var(--muted);font-weight:600;margin-top:3px;line-height:1.3}.budgetBadge{display:inline-block;margin-top:4px;padding:3px 7px;border-radius:999px;background:#e8f1ff;color:var(--blue);font-size:10px;font-weight:900}
 .importedRow{display:grid;grid-template-columns:1fr 100px;gap:8px;margin:8px 0}
 .importedRow input{width:100%;border:1px solid #d9e0eb;border-radius:10px;padding:9px}
 .canvasWrap{height:155px;padding:14px}
@@ -375,6 +376,7 @@ main{max-width:850px;margin:auto;padding:16px}
     <div class="field"><label>DATA</label><input id="qDate" type="date"></div>
     <div class="field"><label>CONTO</label><select id="qAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
   </div>
+  <label class="budgetChoice"><input type="checkbox" id="qLifeBudget"><span>💰 Scala dal budget vita <b id="qLifeBudgetLabel">mensile</b><small>Attivalo quando questa spesa deve diminuire i 200 € disponibili.</small></span></label>
   <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;margin:5px 2px 10px"><input type="checkbox" id="qReimb"> Da rimborsare</label>
   <button class="save" onclick="saveQuick()">Salva ✓</button>
   <button class="secondary" onclick="closeModal('quickModal')">Annulla</button>
@@ -404,6 +406,7 @@ main{max-width:850px;margin:auto;padding:16px}
   </div>
   <div class="field"><label>CATEGORIA</label><select id="eCategory"></select></div>
   <div class="field"><label>PROVENIENZA</label><select id="eAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
+  <label class="budgetChoice"><input type="checkbox" id="eLifeBudget"><span>💰 Scala dal budget vita<small>Puoi aggiungere o togliere questa spesa dal budget anche dopo averla salvata.</small></span></label>
   <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;margin:6px 2px"><input type="checkbox" id="eReimb"> Da rimborsare</label>
   <div class="grid2">
     <div class="field"><label>TIPO</label><select id="eType"><option value="expense">Spesa</option><option value="refund">Rimborso / storno</option><option value="transfer">Spostamento di denaro</option><option value="income">Entrata</option></select></div>
@@ -500,7 +503,7 @@ main{max-width:850px;margin:auto;padding:16px}
   <div class="field"><label>SALDO DISPONIBILE ATTUALE (€)</label><input id="sBalance" inputmode="decimal" placeholder="Serve per “Quanto posso spendere?”"></div>
   <div class="field"><label>OBIETTIVO SALDO MINIMO (€)</label><input id="sGoal" inputmode="decimal"></div><div class="field"><label>BUDGET USCITE E DIVERTIMENTO / MESE (€)</label><input id="sLifeBudget" inputmode="decimal" placeholder="0,00"></div>
   <div class="field"><label>CONTO PREDEFINITO</label><select id="sDefaultAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
-  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V18.2</b></p>
+  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V18.3</b></p>
   <button class="save" onclick="saveSettings()">Salva impostazioni</button>
   <button class="settingsShortcut" onclick="closeModal('settingsModal');switchView('data')">⚙️ Dati, importazioni e backup</button>
  </div>
@@ -536,7 +539,7 @@ main{max-width:850px;margin:auto;padding:16px}
 const CATEGORIES = [
   ['Alimentari','🛒'],['Ristoranti','🍴'],['Auto','🚗'],['Casa','🏠'],['Abbonamenti','🔁'],
   ['Shopping','🛍️'],['Spesa alimentare','🛒'],['Viaggi','✈️'],['Salute','⚕️'],['Sport','⚽'],['Risparmio','💰'],
-  ['Finanziamenti','🧾'],['Commissioni','🏦'],['Svago','🎟️'],['Altro','•']
+  ['Finanziamenti','🧾'],['Commissioni','🏦'],['Svago','🎟️'],['Giochi / lotterie','🎰'],['Altro','•']
 ];
 let state = JSON.parse(localStorage.getItem('spese_v1') || 'null');
 if(!state){
@@ -558,6 +561,8 @@ if(!Array.isArray(state.savingsPots))state.savingsPots=[];
 if(!Array.isArray(state.debts))state.debts=[];
 if(!Array.isArray(state.futureExpenses))state.futureExpenses=[];
 if(!state.rules||typeof state.rules!=='object')state.rules={};
+if(!state.budgetRules||typeof state.budgetRules!=='object')state.budgetRules={};
+if(!state.ocrRules||typeof state.ocrRules!=='object')state.ocrRules={};
 if(!state.syncConfig || typeof state.syncConfig!=='object')state.syncConfig={enabled:false,provider:'',ready:false};
 if(!Array.isArray(state.goals))state.goals=[];
 if(!Array.isArray(state.warranties))state.warranties=[];
@@ -613,6 +618,12 @@ function spendImpact(t){
  return 0;
 }
 function countable(t){return !t.excluded && ['expense','refund'].includes(t.type||'expense')}
+function usesLifeBudget(t){
+ if(t.lifeBudget===true)return true;
+ if(t.lifeBudget===false)return false;
+ // Compatibilità con i movimenti creati prima della V18.
+ return ['Ristoranti','Svago'].includes(t.category);
+}
 function analyzeIncoming(t){
  t.type=t.type||'expense';t.excluded=!!t.excluded;t.reviewReason=t.reviewReason||'';
  if(isTransferDescription(t.merchant)){
@@ -724,7 +735,7 @@ function saveCashWithdrawal(){
 
 function openQuick(){
  selectedCategory='Altro';renderCats();
- qAmount.value='';qMerchant.value='';qDate.value=today();qAccount.value=state.settings.defaultAccount||'Carta';qReimb.checked=false;
+ qAmount.value='';qMerchant.value='';qDate.value=today();qAccount.value=state.settings.defaultAccount||'Carta';qReimb.checked=false;qLifeBudget.checked=false;qLifeBudgetLabel.textContent=euro(Number(state.settings.lifeBudget)||0);
  openModal('quickModal');
  setTimeout(()=>qAmount.focus(),250);
 }
@@ -732,26 +743,26 @@ function autoCategory(){
  const m=normMerchant(qMerchant.value);
  const keys=Object.keys(state.rules).sort((a,b)=>b.length-a.length);
  const key=keys.find(k=>m.includes(k));
- if(key) chooseCat(state.rules[key]);
+ if(key){chooseCat(state.rules[key]);if(Object.prototype.hasOwnProperty.call(state.budgetRules,key))qLifeBudget.checked=!!state.budgetRules[key];}
 }
 function saveQuick(){
  const amount=parseAmount(qAmount.value); if(!amount){toast('Inserisci un importo');qAmount.focus();return}
  const merchant=qMerchant.value.trim()||'Spesa';
  if(qAccount.value==='Contanti' && amount>cashBalance()){toast('Nel portafoglio risultano '+euro(cashBalance()));return}
- const tx={id:'t'+Date.now(),date:qDate.value||today(),merchant,amount,category:selectedCategory,account:qAccount.value,verified:true,reimb:qReimb.checked,origin:'manual',type:'expense',excluded:false,reviewReason:''};
+ const tx={id:'t'+Date.now(),date:qDate.value||today(),merchant,amount,category:selectedCategory,account:qAccount.value,verified:true,reimb:qReimb.checked,origin:'manual',type:'expense',excluded:false,reviewReason:'',lifeBudget:qLifeBudget.checked};
  ingestTransaction(tx);
  if(qAccount.value==='Contanti')setCashBalance(cashBalance()-amount);
- if(merchant!=='Spesa') state.rules[normMerchant(merchant)||merchant.toLowerCase()]=selectedCategory;
+ if(merchant!=='Spesa'){const rk=normMerchant(merchant)||merchant.toLowerCase();state.rules[rk]=selectedCategory;state.budgetRules[rk]=qLifeBudget.checked;}
  saveState();closeModal('quickModal');currentMonth=monthKey(tx.date);renderAll();toast(qAccount.value==='Contanti'?'Spesa contanti salvata · restano '+euro(cashBalance()):'Spesa salvata ✓');
 }
 function openEdit(id){
  const t=state.transactions.find(x=>x.id===id); if(!t)return;
- eId.value=t.id;eMerchant.value=t.merchant;eAmount.value=String(t.amount).replace('.',',');eDate.value=t.date;eCategory.value=t.category;eAccount.value=t.account||'Carta';eReimb.checked=!!t.reimb;eType.value=t.type||'expense';eExcluded.checked=!!t.excluded;eOrigin.value=t.origin||'legacy';eReviewBox.classList.toggle('hidden',!t.reviewReason);eReviewActions.classList.toggle('hidden',!t.reviewReason);eReviewBox.textContent=t.reviewReason||'';openModal('editModal')
+ eId.value=t.id;eMerchant.value=t.merchant;eAmount.value=String(t.amount).replace('.',',');eDate.value=t.date;eCategory.value=t.category;eAccount.value=t.account||'Carta';eLifeBudget.checked=usesLifeBudget(t);eReimb.checked=!!t.reimb;eType.value=t.type||'expense';eExcluded.checked=!!t.excluded;eOrigin.value=t.origin||'legacy';eReviewBox.classList.toggle('hidden',!t.reviewReason);eReviewActions.classList.toggle('hidden',!t.reviewReason);eReviewBox.textContent=t.reviewReason||'';openModal('editModal')
 }
 function saveEdit(){
  const t=state.transactions.find(x=>x.id===eId.value); if(!t)return;
- t.merchant=eMerchant.value.trim()||'Spesa';t.amount=parseAmount(eAmount.value);t.date=eDate.value;t.category=eCategory.value;t.account=eAccount.value;t.reimb=eReimb.checked;t.type=eType.value;t.excluded=eExcluded.checked;
- state.rules[normMerchant(t.merchant)||t.merchant.toLowerCase()]=t.category;saveState();closeModal('editModal');renderAll();toast('Modifica salvata');
+ t.merchant=eMerchant.value.trim()||'Spesa';t.amount=parseAmount(eAmount.value);t.date=eDate.value;t.category=eCategory.value;t.account=eAccount.value;t.lifeBudget=eLifeBudget.checked;t.reimb=eReimb.checked;t.type=eType.value;t.excluded=eExcluded.checked;
+ const rk=normMerchant(t.merchant)||t.merchant.toLowerCase();state.rules[rk]=t.category;state.budgetRules[rk]=t.lifeBudget;saveState();closeModal('editModal');renderAll();toast('Modifica salvata');
 }
 function markVerified(){const t=state.transactions.find(x=>x.id===eId.value);if(t){t.verified=true;t.reviewReason='';saveState();closeModal('editModal');renderAll();toast('Movimento verificato ✓')}}
 function includeTx(){const t=state.transactions.find(x=>x.id===eId.value);if(!t)return;t.type='expense';t.excluded=false;t.reviewReason='';t.verified=true;saveState();closeModal('editModal');renderAll();toast('Conteggiato come spesa ✓')}
@@ -762,7 +773,7 @@ function txHTML(list){
  if(!list.length)return '<div class="empty">Nessun movimento</div>';
  return list.map(t=>`<div class="tx" onclick="openEdit('${t.id}')">
    <div class="catIcon">${getIcon(t.category)}</div>
-   <div><div class="txname">${esc(t.merchant)}</div><div class="txmeta">${new Date(t.date+'T12:00').toLocaleDateString('it-IT')} · ${esc(t.category)}${t.reimb?' · da rimborsare':''}</div>${t.verified?'<span class="badge ok">VERIFICATO</span>':'<span class="badge">DA VERIFICARE</span>'}</div>
+   <div><div class="txname">${esc(t.merchant)}</div><div class="txmeta">${new Date(t.date+'T12:00').toLocaleDateString('it-IT')} · ${esc(t.category)}${t.reimb?' · da rimborsare':''}</div>${t.verified?'<span class="badge ok">VERIFICATO</span>':'<span class="badge">DA VERIFICARE</span>'}${usesLifeBudget(t)?'<span class="budgetBadge">BUDGET VITA</span>':''}</div>
    <div class="amount">−${euro(t.amount)}</div>
  </div>`).join('');
 }
@@ -1131,7 +1142,7 @@ function realSavingsForMonth(month=currentMonth){
  }).reduce((a,t)=>a+(Number(t.amount)||0),0);
 }
 function lifeSpendingForMonth(month=currentMonth){
- return state.transactions.filter(t=>monthKey(t.date)===month && countable(t) && ['Ristoranti','Svago'].includes(t.category))
+ return state.transactions.filter(t=>monthKey(t.date)===month && countable(t) && usesLifeBudget(t))
    .reduce((sum,t)=>sum+spendImpact(t),0);
 }
 function incomeForMonth(month=currentMonth){
@@ -1141,7 +1152,7 @@ function incomeForMonth(month=currentMonth){
 
 function lifeBudgetTransactions(month=currentMonth){
  return state.transactions.filter(t=>
-   monthKey(t.date)===month && countable(t) && ['Ristoranti','Svago'].includes(t.category)
+   monthKey(t.date)===month && countable(t) && usesLifeBudget(t)
  ).sort((a,b)=>b.date.localeCompare(a.date));
 }
 function openLifeBudgetDetail(){
@@ -1154,8 +1165,8 @@ function openLifeBudgetDetail(){
  lifeDetailRemaining.textContent=euro(remaining);
  lifeBudgetDetailList.innerHTML=list.length?list.map(t=>{
    const impact=spendImpact(t);
-   return `<div class="lifeRow">
-     <div><div class="lifeMerchant">${esc(t.merchant||'Spesa')}</div><div class="lifeDate">${new Date(t.date+'T12:00').toLocaleDateString('it-IT')} · ${esc(t.category)}</div></div>
+   return `<div class="lifeRow" onclick="closeModal('lifeBudgetModal');openEdit('${t.id}')" style="cursor:pointer">
+     <div><div class="lifeMerchant">${esc(t.merchant||'Spesa')}</div><div class="lifeDate">${new Date(t.date+'T12:00').toLocaleDateString('it-IT')} · ${esc(t.category)} · tocca per modificare</div></div>
      <div class="lifeAmount">${impact<0?'+':'−'}${euro(Math.abs(impact))}</div>
    </div>`;
  }).join(''):'<div class="empty">Non hai ancora usato il budget vita questo mese.</div>';
@@ -1257,12 +1268,28 @@ function detectDate(text){
 }
 function detectReceipt(text){
  const lines=text.split(/\n/).map(x=>x.trim()).filter(Boolean);
- const totalLine=lines.find(x=>/totale|total|importo\s+tot|da pagare/i.test(x));
- const source=totalLine||lines.slice().reverse().find(x=>/[€]\s*\d|\d+[,.]\d{2}\s*€?/.test(x))||'';
- const nums=[...source.matchAll(/(\d{1,5}[,.]\d{2})/g)].map(m=>parseAmount(m[1]));
- const amount=nums.length?nums[nums.length-1]:0;
- const merchant=lines.find(x=>x.length>2 && x.length<45 && !/scontrino|documento|partita|iva|www\.|tel\.|data/i.test(x))||'Scontrino';
- return {merchant,amount,date:detectDate(text)};
+ const lower=text.toLowerCase();
+ const amounts=[...text.matchAll(/(?:€\s*)?(\d{1,5}[,.]\d{2})(?:\s*€)?/g)].map(m=>parseAmount(m[1])).filter(Boolean);
+ const totalLine=lines.find(x=>/totale|total|importo\s+tot|da pagare|pagato|ordine/i.test(x));
+ const totalNums=totalLine?[...totalLine.matchAll(/(\d{1,5}[,.]\d{2})/g)].map(m=>parseAmount(m[1])).filter(Boolean):[];
+ let amount=totalNums.length?totalNums[totalNums.length-1]:(amounts.length?Math.max(...amounts):0);
+ let merchant='',category='Altro',lifeBudget=false,confidence='media',reason='';
+ // Prima capisce il contesto della schermata: il metodo di pagamento non è il negozio.
+ if(/\bsisal\b|torna\s+al\s+sito\s+di\s+sisal/i.test(text)){
+   merchant='Sisal';category='Giochi / lotterie';lifeBudget=true;confidence='alta';reason='Riconosciuto Sisal nella schermata.';
+ }else if(/amazon/i.test(text)){merchant='Amazon';category='Shopping';confidence='alta';reason='Riconosciuto Amazon.';}
+ else if(/satispay/i.test(text) && /pagamento|pagato|acquisto/i.test(text)){merchant='Satispay - acquisto';confidence='media';reason='Schermata di pagamento Satispay.';}
+ if(!merchant){
+   merchant=lines.find(x=>x.length>2 && x.length<45 && !/scontrino|documento|partita|iva|www\.|tel\.|data|ricarica|paypal|pagamento|carta|conto corrente|riserva|rivedi ordine/i.test(x))||'Scontrino';
+ }
+ const rk=normMerchant(merchant)||merchant.toLowerCase();
+ if(state.ocrRules[rk]){
+   const learned=state.ocrRules[rk];category=learned.category||category;lifeBudget=!!learned.lifeBudget;confidence='alta';reason='Applicata una tua correzione precedente.';
+ }else{
+   const keys=Object.keys(state.rules).sort((a,b)=>b.length-a.length), key=keys.find(k=>rk.includes(k));
+   if(key){category=state.rules[key]||category;if(Object.prototype.hasOwnProperty.call(state.budgetRules,key))lifeBudget=!!state.budgetRules[key];reason=reason||'Applicata una regola già imparata.';}
+ }
+ return {merchant,amount,date:detectDate(text),category,lifeBudget,confidence,reason};
 }
 function detectBank(text){
  const clean=text.replace(/\r/g,'');
@@ -1294,8 +1321,11 @@ async function handlePhoto(file){
        <div class="field"><label>NEGOZIO</label><input id="ocrM" value="${esc(r.merchant)}"></div>
        <div class="grid2"><div class="field"><label>TOTALE</label><input id="ocrA" inputmode="decimal" value="${r.amount?String(r.amount).replace('.',','):''}"></div><div class="field"><label>DATA</label><input id="ocrD" type="date" value="${r.date}"></div></div>
        <div class="field"><label>CATEGORIA</label><select id="ocrC">${CATEGORIES.map(c=>`<option>${c[0]}</option>`).join('')}</select></div>
+       <label class="budgetChoice"><input type="checkbox" id="ocrLifeBudget"><span>💰 Scala dal budget vita<small>Puoi correggerlo: la scelta verrà ricordata per le prossime volte.</small></span></label>
+       <div class="sourceNote">${esc(r.reason||'Controlla i dati prima di salvare.')} Affidabilità: <b>${esc(r.confidence||'media')}</b>.</div>
        <button class="save" onclick="saveOCRReceipt()">Salva spesa ✓</button></div>`;
-     setTimeout(()=>{let lower=r.merchant.toLowerCase();let k=Object.keys(state.rules).find(x=>lower.includes(x));if(k)ocrC.value=state.rules[k]},0);
+     window._lastOCRContext={rawText:text,detectedMerchant:r.merchant,source:photoSource.value||''};
+     setTimeout(()=>{ocrC.value=r.category||'Altro';ocrLifeBudget.checked=!!r.lifeBudget},0);
    } else {
      const rows=detectBank(text);ocrStatus.textContent=rows.length?`Ho individuato ${rows.length} movimenti. Controlla prima di importarli.`:'Non ho riconosciuto movimenti con sufficiente sicurezza.';
      ocrResult.innerHTML=rows.length?`<div class="card settingCard" style="margin-top:10px"><div id="bankRows">${rows.map((r,i)=>`<div style="border-bottom:1px solid var(--line);padding:8px 0"><label style="font-size:11px;font-weight:800;color:var(--muted)"><input type="checkbox" class="brCheck" data-i="${i}" checked> MOVIMENTO ${i+1}</label><div class="importedRow"><input class="brM" value="${esc(r.merchant)}"><input class="brA" value="${String(r.amount).replace('.',',')}"></div><input class="brD" type="date" value="${r.date}"></div>`).join('')}</div><button class="save" onclick="saveBankOCR()">Importa selezionati</button></div>`:'';
@@ -1305,10 +1335,13 @@ async function handlePhoto(file){
 }
 function saveOCRReceipt(){
  const merchant=ocrM.value.trim()||'Scontrino',amount=parseAmount(ocrA.value);if(!amount){toast('Controlla il totale');return}
- const cat=ocrC.value;ingestTransaction({id:'ocr'+Date.now(),date:ocrD.value||today(),merchant,amount,category:cat,account:photoSource.value||state.settings.defaultAccount||'Carta',verified:true,reimb:false,origin:'receipt',type:'expense',excluded:false,reviewReason:''});state.rules[normMerchant(merchant)||merchant.toLowerCase()]=cat;saveState();closeModal('photoModal');currentMonth=monthKey(ocrD.value||today());renderAll();toast('Scontrino registrato ✓')
+ const cat=ocrC.value,lifeBudget=!!document.getElementById('ocrLifeBudget')?.checked;
+ const tx=ingestTransaction({id:'ocr'+Date.now(),date:ocrD.value||today(),merchant,amount,category:cat,account:photoSource.value||state.settings.defaultAccount||'Carta',verified:true,reimb:false,origin:'receipt',type:'expense',excluded:false,reviewReason:'',lifeBudget});
+ const rk=normMerchant(merchant)||merchant.toLowerCase();state.rules[rk]=cat;state.budgetRules[rk]=lifeBudget;state.ocrRules[rk]={category:cat,lifeBudget,source:photoSource.value||'',updatedAt:today()};
+ saveState();closeModal('photoModal');currentMonth=monthKey(ocrD.value||today());renderAll();toast('Spesa registrata · correzione imparata ✓')
 }
 function saveBankOCR(){
- let added=0;document.querySelectorAll('.brCheck').forEach((ck,i)=>{if(!ck.checked)return;const wrap=ck.closest('div[style*="border-bottom"]');const merchant=wrap.querySelector('.brM').value.trim()||'Movimento',amount=parseAmount(wrap.querySelector('.brA').value),date=wrap.querySelector('.brD').value||today();if(!amount)return;let lower=merchant.toLowerCase(),key=Object.keys(state.rules).find(k=>lower.includes(k));ingestTransaction({id:'bank'+Date.now()+i,date,merchant,amount,category:key?state.rules[key]:'Altro',account:photoSource.value||state.settings.defaultAccount||'Carta',verified:false,reimb:false,origin:(window._bankOrigin||'statement-photo'),type:'expense',excluded:false,reviewReason:''});added++});window._bankOrigin='statement-photo';saveState();closeModal('photoModal');renderAll();toast(added+' movimenti importati')
+ let added=0;document.querySelectorAll('.brCheck').forEach((ck,i)=>{if(!ck.checked)return;const wrap=ck.closest('div[style*="border-bottom"]');const merchant=wrap.querySelector('.brM').value.trim()||'Movimento',amount=parseAmount(wrap.querySelector('.brA').value),date=wrap.querySelector('.brD').value||today();if(!amount)return;let lower=normMerchant(merchant),key=Object.keys(state.rules).sort((a,b)=>b.length-a.length).find(k=>lower.includes(k));let lifeBudget=key&&Object.prototype.hasOwnProperty.call(state.budgetRules,key)?!!state.budgetRules[key]:undefined;ingestTransaction({id:'bank'+Date.now()+i,date,merchant,amount,category:key?state.rules[key]:'Altro',account:photoSource.value||state.settings.defaultAccount||'Carta',verified:false,reimb:false,origin:(window._bankOrigin||'statement-photo'),type:'expense',excluded:false,reviewReason:'',lifeBudget});added++});window._bankOrigin='statement-photo';saveState();closeModal('photoModal');renderAll();toast(added+' movimenti importati')
 }
 
 // Import unico, PDF testuali e riconciliazione
@@ -1345,7 +1378,7 @@ async function importCSV(file){
  const h=splitCSVLine(lines[0],sep).map(x=>x.toLowerCase().trim());
  const di=h.findIndex(x=>/data|date/.test(x)), mi=h.findIndex(x=>/descr|causale|merchant|esercente|operaz/.test(x)), ai=h.findIndex(x=>/importo|amount|valore/.test(x));
  if(di<0||ai<0){toast('Non riconosco le colonne del CSV');return}
- let n=0;const source=(document.getElementById('importSource')?.value)||state.settings.defaultAccount||'Carta';for(let i=1;i<lines.length;i++){let r=splitCSVLine(lines[i],sep);let rawd=r[di]||'', dm=rawd.match(/([0-3]?\d)[\/\-.]([01]?\d)[\/\-.](20\d{2}|\d{2})/);let date=dm?detectDate(dm[0]):today();let signed=parseSignedAmount(r[ai]),amount=Math.abs(signed);if(!amount)continue;let merchant=(mi>=0?r[mi]:'Movimento').trim(),lower=merchant.toLowerCase(),key=Object.keys(state.rules).find(k=>lower.includes(k));let type=isRefundDescription(merchant)?'refund':(isIncomeDescription(merchant)?'income':'expense');ingestTransaction({id:'csv'+Date.now()+i,date,merchant,amount,category:key?state.rules[key]:'Altro',account:source,verified:false,reimb:false,origin:'statement-csv',type,excluded:false,reviewReason:''});n++}
+ let n=0;const source=(document.getElementById('importSource')?.value)||state.settings.defaultAccount||'Carta';for(let i=1;i<lines.length;i++){let r=splitCSVLine(lines[i],sep);let rawd=r[di]||'', dm=rawd.match(/([0-3]?\d)[\/\-.]([01]?\d)[\/\-.](20\d{2}|\d{2})/);let date=dm?detectDate(dm[0]):today();let signed=parseSignedAmount(r[ai]),amount=Math.abs(signed);if(!amount)continue;let merchant=(mi>=0?r[mi]:'Movimento').trim(),lower=normMerchant(merchant),key=Object.keys(state.rules).sort((a,b)=>b.length-a.length).find(k=>lower.includes(k));let type=isRefundDescription(merchant)?'refund':(isIncomeDescription(merchant)?'income':'expense');let lifeBudget=key&&Object.prototype.hasOwnProperty.call(state.budgetRules,key)?!!state.budgetRules[key]:undefined;ingestTransaction({id:'csv'+Date.now()+i,date,merchant,amount,category:key?state.rules[key]:'Altro',account:source,verified:false,reimb:false,origin:'statement-csv',type,excluded:false,reviewReason:'',lifeBudget});n++}
  saveState();renderAll();toast(n+' movimenti importati');
 }
 function download(name,content,type){
@@ -1353,11 +1386,11 @@ function download(name,content,type){
 }
 function exportBackup(){download('spese-backup-'+today()+'.json',JSON.stringify(state,null,2),'application/json')}
 async function restoreBackup(file){try{const x=JSON.parse(await file.text());if(!Array.isArray(x.transactions))throw 0;
- state=x;if(!state.rules)state.rules={};if(!state.settings)state.settings={goal:0,balance:'',defaultAccount:'Carta',startDate:'2026-01-01'};if(!state.settings.startDate)state.settings.startDate='2026-01-01';if(!Array.isArray(state.recurring))state.recurring=[];if(!state.recurringPaid)state.recurringPaid={};if(!state.annualProfiles)state.annualProfiles={};if(!Array.isArray(state.accounts))state.accounts=[];if(!Array.isArray(state.savingsPots))state.savingsPots=[];if(!Array.isArray(state.debts))state.debts=[];if(!Array.isArray(state.futureExpenses))state.futureExpenses=[];if(!Array.isArray(state.goals))state.goals=[];if(!Array.isArray(state.warranties))state.warranties=[];if(!state.syncConfig)state.syncConfig={enabled:false,provider:'',ready:false};state.recurring.forEach(r=>{if(!r.startDate)r.startDate='2026-01-01';if(!r.kind)r.kind=r.category==='Abbonamenti'?'subscription':'commitment';});state.transactions.forEach(t=>{if(!t.type)t.type='expense';if(typeof t.excluded!=='boolean')t.excluded=false;if(!t.origin)t.origin='backup';if(!t.reviewReason)t.reviewReason='';});
+ state=x;if(!state.rules)state.rules={};if(!state.budgetRules)state.budgetRules={};if(!state.ocrRules)state.ocrRules={};if(!state.settings)state.settings={goal:0,balance:'',defaultAccount:'Carta',startDate:'2026-01-01'};if(!state.settings.startDate)state.settings.startDate='2026-01-01';if(!Array.isArray(state.recurring))state.recurring=[];if(!state.recurringPaid)state.recurringPaid={};if(!state.annualProfiles)state.annualProfiles={};if(!Array.isArray(state.accounts))state.accounts=[];if(!Array.isArray(state.savingsPots))state.savingsPots=[];if(!Array.isArray(state.debts))state.debts=[];if(!Array.isArray(state.futureExpenses))state.futureExpenses=[];if(!Array.isArray(state.goals))state.goals=[];if(!Array.isArray(state.warranties))state.warranties=[];if(!state.syncConfig)state.syncConfig={enabled:false,provider:'',ready:false};state.recurring.forEach(r=>{if(!r.startDate)r.startDate='2026-01-01';if(!r.kind)r.kind=r.category==='Abbonamenti'?'subscription':'commitment';});state.transactions.forEach(t=>{if(!t.type)t.type='expense';if(typeof t.excluded!=='boolean')t.excluded=false;if(!t.origin)t.origin='backup';if(!t.reviewReason)t.reviewReason='';});
  delete state.rules['pro loco'];delete state.rules['sumup *associazione'];delete state.rules['proloco'];
  saveState();if(state.transactions.length)currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0].date);renderAll();toast('Backup ripristinato ✓')}catch(e){toast('Backup non valido')}}
 function exportCSV(){
- let s='Data;Descrizione;Importo;Categoria;Provenienza;Tipo;Origine;Escluso;Verificato;Da rimborsare\n'+state.transactions.sort((a,b)=>b.date.localeCompare(a.date)).map(t=>[t.date,`"${t.merchant.replace(/"/g,'""')}"`,String(t.amount).replace('.',','),t.category,t.account,t.type||'expense',t.origin||'',t.excluded?'Si':'No',t.verified?'Si':'No',t.reimb?'Si':'No'].join(';')).join('\n');
+ let s='Data;Descrizione;Importo;Categoria;Provenienza;Tipo;Origine;Escluso;Verificato;Da rimborsare;Budget vita\n'+state.transactions.sort((a,b)=>b.date.localeCompare(a.date)).map(t=>[t.date,`"${t.merchant.replace(/"/g,'""')}"`,String(t.amount).replace('.',','),t.category,t.account,t.type||'expense',t.origin||'',t.excluded?'Si':'No',t.verified?'Si':'No',t.reimb?'Si':'No',usesLifeBudget(t)?'Si':'No'].join(';')).join('\n');
  download('movimenti-spese-'+today()+'.csv','\ufeff'+s,'text/csv;charset=utf-8')
 }
 function saveSettings(){
