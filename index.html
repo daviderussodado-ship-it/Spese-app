@@ -503,7 +503,7 @@ main{max-width:850px;margin:auto;padding:16px}
   <div class="field"><label>SALDO DISPONIBILE ATTUALE (€)</label><input id="sBalance" inputmode="decimal" placeholder="Serve per “Quanto posso spendere?”"></div>
   <div class="field"><label>OBIETTIVO SALDO MINIMO (€)</label><input id="sGoal" inputmode="decimal"></div><div class="field"><label>BUDGET USCITE E DIVERTIMENTO / MESE (€)</label><input id="sLifeBudget" inputmode="decimal" placeholder="0,00"></div>
   <div class="field"><label>CONTO PREDEFINITO</label><select id="sDefaultAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
-  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V18.3</b></p>
+  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V18.5</b></p>
   <button class="save" onclick="saveSettings()">Salva impostazioni</button>
   <button class="settingsShortcut" onclick="closeModal('settingsModal');switchView('data')">⚙️ Dati, importazioni e backup</button>
  </div>
@@ -623,6 +623,20 @@ function usesLifeBudget(t){
  if(t.lifeBudget===false)return false;
  // Compatibilità con i movimenti creati prima della V18.
  return ['Ristoranti','Svago'].includes(t.category);
+}
+function lifeBudgetCountable(t){
+ const type=t.type||'expense';
+ // Se l'utente ha scelto esplicitamente Budget vita, questa scelta è indipendente
+ // da "Escludi dai totali", che riguarda solo i totali generali.
+ if(t.lifeBudget===true)return ['expense','refund'].includes(type);
+ if(t.lifeBudget===false)return false;
+ // Per i vecchi movimenti manteniamo il comportamento storico.
+ return countable(t) && ['Ristoranti','Svago'].includes(t.category);
+}
+function lifeBudgetImpact(t){
+ if(!lifeBudgetCountable(t))return 0;
+ const a=Number(t.amount)||0;
+ return (t.type||'expense')==='refund' ? -a : a;
 }
 function analyzeIncoming(t){
  t.type=t.type||'expense';t.excluded=!!t.excluded;t.reviewReason=t.reviewReason||'';
@@ -1142,8 +1156,8 @@ function realSavingsForMonth(month=currentMonth){
  }).reduce((a,t)=>a+(Number(t.amount)||0),0);
 }
 function lifeSpendingForMonth(month=currentMonth){
- return state.transactions.filter(t=>monthKey(t.date)===month && countable(t) && usesLifeBudget(t))
-   .reduce((sum,t)=>sum+spendImpact(t),0);
+ return state.transactions.filter(t=>monthKey(t.date)===month && lifeBudgetCountable(t))
+   .reduce((sum,t)=>sum+lifeBudgetImpact(t),0);
 }
 function incomeForMonth(month=currentMonth){
  return state.transactions.filter(t=>monthKey(t.date)===month && t.type==='income')
@@ -1152,7 +1166,7 @@ function incomeForMonth(month=currentMonth){
 
 function lifeBudgetTransactions(month=currentMonth){
  return state.transactions.filter(t=>
-   monthKey(t.date)===month && countable(t) && usesLifeBudget(t)
+   monthKey(t.date)===month && lifeBudgetCountable(t)
  ).sort((a,b)=>b.date.localeCompare(a.date));
 }
 function openLifeBudgetDetail(){
@@ -1164,7 +1178,7 @@ function openLifeBudgetDetail(){
  lifeDetailUsed.textContent=euro(used);
  lifeDetailRemaining.textContent=euro(remaining);
  lifeBudgetDetailList.innerHTML=list.length?list.map(t=>{
-   const impact=spendImpact(t);
+   const impact=lifeBudgetImpact(t);
    return `<div class="lifeRow" onclick="closeModal('lifeBudgetModal');openEdit('${t.id}')" style="cursor:pointer">
      <div><div class="lifeMerchant">${esc(t.merchant||'Spesa')}</div><div class="lifeDate">${new Date(t.date+'T12:00').toLocaleDateString('it-IT')} · ${esc(t.category)} · tocca per modificare</div></div>
      <div class="lifeAmount">${impact<0?'+':'−'}${euro(Math.abs(impact))}</div>
@@ -1266,12 +1280,23 @@ function detectDate(text){
  let m=text.match(/\b([0-3]?\d)[\/\-.]([01]?\d)[\/\-.](20\d{2}|\d{2})\b/);
  if(!m)return today();let y=m[3];if(y.length===2)y='20'+y;return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
 }
+function normalizeOCRAmounts(text){
+ return String(text||'')
+   .replace(/(\d{1,5})\s*([,.])\s*(\d)[oO](?=\s*€|\b)/g,'$1$2$30')
+   .replace(/(\d{1,5})\s*([,.])\s*[oO](\d)(?=\s*€|\b)/g,'$1$20$3')
+   .replace(/(\d{1,5})\s*([,.])\s*(\d{2})/g,'$1$2$3');
+}
+function receiptAmounts(text){
+ const clean=normalizeOCRAmounts(text);
+ return [...clean.matchAll(/(?:€\s*)?(\d{1,5}[,.]\d{2})(?:\s*€)?/g)].map(m=>parseAmount(m[1])).filter(n=>n>0&&n<100000);
+}
 function detectReceipt(text){
+ const cleanAmountsText=normalizeOCRAmounts(text);
  const lines=text.split(/\n/).map(x=>x.trim()).filter(Boolean);
  const lower=text.toLowerCase();
- const amounts=[...text.matchAll(/(?:€\s*)?(\d{1,5}[,.]\d{2})(?:\s*€)?/g)].map(m=>parseAmount(m[1])).filter(Boolean);
- const totalLine=lines.find(x=>/totale|total|importo\s+tot|da pagare|pagato|ordine/i.test(x));
- const totalNums=totalLine?[...totalLine.matchAll(/(\d{1,5}[,.]\d{2})/g)].map(m=>parseAmount(m[1])).filter(Boolean):[];
+ const amounts=receiptAmounts(cleanAmountsText);
+ const totalLine=lines.find(x=>/totale|total|importo\s+tot|da pagare|pagato|ordine|acquisto/i.test(x));
+ const totalNums=totalLine?receiptAmounts(totalLine):[];
  let amount=totalNums.length?totalNums[totalNums.length-1]:(amounts.length?Math.max(...amounts):0);
  let merchant='',category='Altro',lifeBudget=false,confidence='media',reason='';
  // Prima capisce il contesto della schermata: il metodo di pagamento non è il negozio.
@@ -1291,6 +1316,25 @@ function detectReceipt(text){
  }
  return {merchant,amount,date:detectDate(text),category,lifeBudget,confidence,reason};
 }
+async function enhancedAmountOCR(file,contextText=''){
+ // Secondo passaggio solo se il totale non è stato trovato: ingrandisce e contrasta la parte centrale.
+ const bmp=await createImageBitmap(file);
+ try{
+   const paypal=/paypal/i.test(contextText), y0=paypal?0.18:0.08, y1=paypal?0.72:0.88;
+   const sx=0, sy=Math.round(bmp.height*y0), sw=bmp.width, sh=Math.max(1,Math.round(bmp.height*(y1-y0)));
+   const targetW=Math.min(1800,Math.max(sw,Math.round(sw*1.8))), scale=targetW/sw, targetH=Math.max(1,Math.round(sh*scale));
+   const c=document.createElement('canvas');c.width=targetW;c.height=targetH;
+   const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(bmp,sx,sy,sw,sh,0,0,targetW,targetH);
+   const im=ctx.getImageData(0,0,c.width,c.height),d=im.data;
+   for(let i=0;i<d.length;i+=4){const g=.299*d[i]+.587*d[i+1]+.114*d[i+2];const v=g<205?Math.max(0,(g-128)*1.65+128):255;d[i]=d[i+1]=d[i+2]=v;}
+   ctx.putImageData(im,0,0);
+   const blob=await new Promise(res=>c.toBlob(res,'image/png'));
+   if(!blob)return '';
+   const rr=await Tesseract.recognize(blob,'eng',{logger:m=>{if(m.status==='recognizing text')ocrStatus.textContent='Ricerco l’importo… '+Math.round((m.progress||0)*100)+'%'}});
+   return rr?.data?.text||'';
+ }finally{if(bmp.close)bmp.close();}
+}
+
 function detectBank(text){
  const clean=text.replace(/\r/g,'');
  const dateRe=/\b([0-3]?\d)[\/\-.]([01]?\d)[\/\-.](20\d{2}|\d{2})\b/g;
@@ -1314,9 +1358,17 @@ async function handlePhoto(file){
    await loadTesseract();
    ocrStatus.textContent='Leggo l’immagine… 0%';
    const result=await Tesseract.recognize(file,'ita+eng',{logger:m=>{if(m.status==='recognizing text')ocrStatus.textContent='Leggo l’immagine… '+Math.round((m.progress||0)*100)+'%'}});
-   const text=result.data.text||'';
+   let text=result.data.text||'';
    if(photoMode==='receipt'){
-     const r=detectReceipt(text);ocrStatus.textContent='Ho trovato questi dati. Controllali e salva.';
+     let r=detectReceipt(text);
+     if(!r.amount){
+       try{
+         ocrStatus.textContent='Il totale non è chiaro: rileggo la zona dell’importo…';
+         const extra=await enhancedAmountOCR(file,text);
+         if(extra){text+='\n'+extra;r=detectReceipt(text);}
+       }catch(extraErr){console.warn('Secondo passaggio OCR importo non riuscito',extraErr);}
+     }
+     ocrStatus.textContent=r.amount?'Ho trovato questi dati. Controllali e salva.':'Ho riconosciuto la schermata, ma non il totale: inseriscilo manualmente.';
      ocrResult.innerHTML=`<div class="card settingCard" style="margin-top:10px">
        <div class="field"><label>NEGOZIO</label><input id="ocrM" value="${esc(r.merchant)}"></div>
        <div class="grid2"><div class="field"><label>TOTALE</label><input id="ocrA" inputmode="decimal" value="${r.amount?String(r.amount).replace('.',','):''}"></div><div class="field"><label>DATA</label><input id="ocrD" type="date" value="${r.date}"></div></div>
