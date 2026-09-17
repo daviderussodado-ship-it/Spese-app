@@ -166,6 +166,12 @@ main{max-width:850px;margin:auto;padding:16px}
 @media(max-width:520px){.scenarioGrid{grid-template-columns:1fr 1fr}.nextPayNums{grid-template-columns:1fr 1fr 1fr}}
 
 @media (display-mode: standalone){.installTip{display:none!important}}
+
+/* V17 — home semplificata, dettaglio categorie, impegni trasparenti */
+.homeQuickTop{margin:8px 0 12px}.homeQuickTop .sectionTitle{margin:4px 4px 9px}.homeQuickTop .quick{margin:0}.homeQuickTop .cashMini{margin-top:8px}
+.remainingList .recurringItem{padding:11px 13px}.remainingList .recName{font-size:14px}.remainingList .recMeta{font-size:11px}.remainingStatus{font-size:11px;font-weight:850;color:var(--muted);margin-top:3px}
+.categoryTap{cursor:pointer}.categoryTap:active{transform:scale(.99);background:#f3f7fd}.categoryChevron{color:var(--blue);font-weight:950;margin-left:8px}
+.categoryDetailTotal{font-size:28px;font-weight:950;margin:5px 0 12px}.homeCats{margin-top:9px}.homeCats .moneyFlowRow{padding:11px 2px}
 </style>
 </head>
 <body>
@@ -183,6 +189,15 @@ main{max-width:850px;margin:auto;padding:16px}
   </div>
 
   <section id="homeView">
+    <div class="homeQuickTop">
+      <div class="sectionTitle"><h2>Nuovo movimento</h2><span class="small">Registralo subito</span></div>
+      <div class="quick">
+      <button class="primary" onclick="openQuick()">＋ Spesa</button>
+      <button class="photo" onclick="openModal('photoModal')">📸 Foto / screenshot</button>
+      </div>
+      <button class="settingsShortcut" onclick="openCashSpend()" style="margin-bottom:5px">💵 Portafoglio <b id="cashHomeBalance" style="float:right">€ 0,00</b><div class="small" style="margin-top:4px;font-weight:600">Tocca per registrare una spesa in contanti</div></button>
+      <button class="settingsShortcut" onclick="openCashWithdrawal()" style="margin-top:5px">🏧 Ho prelevato contanti</button>
+    </div>
     <div class="simpleHero">
       <div class="simpleHeroTop">
         <div>
@@ -209,18 +224,8 @@ main{max-width:850px;margin:auto;padding:16px}
       </div>
     </div>
 
-    <button class="card smartCard homeSmartLink" onclick="switchView('budget')" style="width:100%;margin-top:9px;text-align:left">
-      <div class="kicker">OBIETTIVO PRINCIPALE</div><div class="smartVal" id="homeGoalEta">—</div><div class="smartSub" id="homeGoalEtaNote">Calcolo andamento…</div>
-    </button>
-    <button id="homeAttention" class="settingsShortcut hidden" onclick="switchView('budget')">⚠️ <span id="homeAttentionText">Da controllare</span><span style="float:right">›</span></button>
-    <button class="v15Btn" onclick="switchView('budget');setTimeout(()=>document.getElementById('moneyFlowTitle')?.scrollIntoView({behavior:'smooth'}),120)">📉 Dove sono finiti i soldi?<span class="small">Entrate, spese, accantonamenti e categorie del mese</span></button>
+    <div class="hidden"><span id="homeGoalEta"></span><span id="homeGoalEtaNote"></span><button id="homeAttention"><span id="homeAttentionText"></span></button></div>
 
-    <div class="quick">
-      <button class="primary" onclick="openQuick()">＋ Spesa</button>
-      <button class="photo" onclick="openModal('photoModal')">📸 Foto / screenshot</button>
-    </div>
-    <button class="settingsShortcut" onclick="openCashSpend()" style="margin-bottom:5px">💵 Portafoglio <b id="cashHomeBalance" style="float:right">€ 0,00</b><div class="small" style="margin-top:4px;font-weight:600">Tocca per registrare una spesa in contanti</div></button>
-    <button class="settingsShortcut" onclick="openCashWithdrawal()" style="margin-top:5px">🏧 Ho prelevato contanti</button>
 
     <div class="sectionTitle"><h2>Questo mese</h2><span class="small" id="simpleMonthName"></span></div>
     <div class="monthSimple">
@@ -228,6 +233,8 @@ main{max-width:850px;margin:auto;padding:16px}
       <div class="card"><div class="kicker">Spese</div><div class="v red" id="simpleExpense">€ 0</div></div>
       <div class="card"><div class="kicker">Risparmio</div><div class="v amber" id="simpleSavings">€ 0</div></div>
     </div>
+    <div class="sectionTitle"><h2>Categorie</h2><span class="small">Tocca per vedere le spese</span></div>
+    <div class="card homeCats" id="homeCategories"></div>
 
     <div class="sectionTitle"><h2>Ultimi movimenti</h2><button class="linkbtn" onclick="switchView('movements')">Vedi tutti</button></div>
     <div class="card txList" id="recentList"></div>
@@ -275,14 +282,16 @@ main{max-width:850px;margin:auto;padding:16px}
   <section id="budgetView" class="hidden">
     <div class="sectionTitle"><h2>Piano mensile</h2><button class="linkbtn" onclick="openRecurring()">＋ Voce</button></div><div class="infoStrip">🎉 <b>Budget vita:</b> <span id="planLifeBudget">—</span> al mese per uscite e divertimento. È una quota da vivere, non un obiettivo di risparmio.</div>
     <div class="card sumcard">
-      <div class="kicker">Impegni ancora da sostenere</div>
+      <div class="kicker">ANCORA DA SOSTENERE QUESTO MESE</div>
       <div class="big" id="remainingThisMonth">€ 0,00</div>
       <div class="small" id="paidCount"></div>
+      <div class="remainingList" id="remainingCommitmentList" style="margin-top:10px;border-top:1px solid var(--line)"></div>
     </div>
     <div class="summary" style="margin-top:10px">
-      <div class="card sumcard"><div class="kicker">Previsti nel mese</div><div class="big" id="dueThisMonth"></div><div class="small" id="dueCount"></div></div>
-      <div class="card sumcard"><div class="kicker">Margine libero</div><div class="big" id="budgetFree"></div><div class="small">dopo obiettivo e impegni</div></div>
+      <div class="card sumcard"><div class="kicker">TOTALE IMPEGNI DEL MESE</div><div class="big" id="dueThisMonth"></div><div class="small" id="dueCount"></div></div>
+      <div class="card sumcard"><div class="kicker">GIÀ RILEVATI / PAGATI</div><div class="big" id="paidThisMonth">€ 0,00</div><div class="small">non vengono sottratti di nuovo</div></div>
     </div>
+    <div class="hidden"><span id="budgetFree"></span></div>
     <div class="hidden"><span id="budgetFormula"></span><div class="goalbar"><i id="goalProgress"></i></div></div>
     <div id="unknownNotice" class="infoStrip hidden"></div>
 
@@ -508,6 +517,16 @@ main{max-width:850px;margin:auto;padding:16px}
   </div>
   <div class="card" id="lifeBudgetDetailList"></div>
   <button class="secondary" onclick="closeModal('lifeBudgetModal')">Chiudi</button>
+ </div>
+</div>
+
+<div class="modal" id="categoryDetailModal" onclick="backdrop(event,this)">
+ <div class="sheet">
+  <div class="grab"></div><h2 id="categoryDetailTitle">Categoria</h2>
+  <div class="small" id="categoryDetailMonth"></div>
+  <div class="categoryDetailTotal" id="categoryDetailTotal">€ 0,00</div>
+  <div class="card txList" id="categoryDetailList"></div>
+  <button class="secondary" onclick="closeModal('categoryDetailModal')">Chiudi</button>
  </div>
 </div>
 
@@ -798,7 +817,12 @@ function recurringAutoMatch(r,month=currentMonth){
  const candidates=monthTx.filter(t=>Math.abs((Number(t.amount)||0)-amount)<=.011);
  return candidates.find(t=>nameMatch(t)||(r.category==='Finanziamenti'&&t.category==='Finanziamenti'))||null;
 }
-function recurringIsPaid(r,month=currentMonth){return paidSet(month).has(r.id)||!!recurringAutoMatch(r,month)}
+function recurringIsPaid(r,month=currentMonth){
+ const auto=!!recurringAutoMatch(r,month);
+ if(auto)return true;
+ if(r.forceUnpaidMonth===month)return false;
+ return paidSet(month).has(r.id);
+}
 function remainingCommitments(month=currentMonth){return monthCommitments(month).filter(r=>!recurringIsPaid(r,month))}
 function financialNumbers(){
  const balance=primaryAccountBalance(), goal=Number(state.settings.goal)||0;
@@ -899,9 +923,17 @@ function renderForecast(){const f=forecastInfo();
 function actualSavingsForMonth(month=currentMonth){return realSavingsForMonth(month)}
 function monthIncomeTotal(month=currentMonth){return state.transactions.filter(t=>monthKey(t.date)===month&&t.type==='income').reduce((a,t)=>a+(Number(t.amount)||0),0)}
 function categoryTotals(month=currentMonth,dayLimit=99){const out={};state.transactions.filter(t=>monthKey(t.date)===month&&countable(t)&&Number(t.date.slice(8,10))<=dayLimit).forEach(t=>out[t.category]=(out[t.category]||0)+spendImpact(t));return out}
-function renderMoneyFlow(){const inc=monthIncomeTotal(currentMonth),sp=state.transactions.filter(t=>monthKey(t.date)===currentMonth&&countable(t)).reduce((a,t)=>a+spendImpact(t),0),sav=actualSavingsForMonth(currentMonth),cats=Object.entries(categoryTotals(currentMonth)).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,5);moneyFlow.innerHTML=`<div class="moneyFlowRow"><div><div class="moneyFlowName">💶 Entrate registrate</div><div class="moneyFlowSub">Accrediti riconosciuti nel mese</div></div><div class="moneyFlowAmount green">+${euro(inc)}</div></div><div class="moneyFlowRow"><div><div class="moneyFlowName">🧾 Spese di consumo</div><div class="moneyFlowSub">Esclusi trasferimenti interni e regolamenti già conteggiati</div></div><div class="moneyFlowAmount red">−${euro(sp)}</div></div><div class="moneyFlowRow"><div><div class="moneyFlowName">💰 Accantonamenti / risparmio rilevati</div><div class="moneyFlowSub">Spostamenti classificati come risparmio, non consumo</div></div><div class="moneyFlowAmount amber">${euro(sav)}</div></div>${cats.map(([c,v])=>`<div class="moneyFlowRow"><div><div class="moneyFlowName">${getIcon(c)} ${esc(c)}</div><div class="moneyFlowSub">${sp?Math.round(v/sp*100):0}% delle spese di consumo</div></div><div class="moneyFlowAmount">${euro(v)}</div></div>`).join('')}<div class="cleanNote" style="padding:10px 0 2px">Questa vista spiega entrate, consumi e accantonamenti. I trasferimenti tra tuoi strumenti non vengono trattati come denaro perso.</div>`}
+function categoryTransactions(cat,month=currentMonth){return state.transactions.filter(t=>monthKey(t.date)===month&&countable(t)&&t.category===cat).sort((a,b)=>b.date.localeCompare(a.date))}
+function openCategoryDetail(cat,month=currentMonth){
+ const list=categoryTransactions(cat,month),total=list.reduce((a,t)=>a+spendImpact(t),0);
+ categoryDetailTitle.textContent=getIcon(cat)+' '+cat;categoryDetailMonth.textContent=monthName(month);categoryDetailTotal.textContent=euro(total);
+ categoryDetailList.innerHTML=list.length?txHTML(list):'<div class="empty">Nessuna spesa in questa categoria.</div>';openModal('categoryDetailModal');
+}
+function renderHomeCategories(){const el=document.getElementById('homeCategories');if(!el)return;const rows=Object.entries(categoryTotals(currentMonth)).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);el.innerHTML=rows.length?rows.slice(0,8).map(([c,v])=>`<div class="moneyFlowRow categoryTap" onclick="openCategoryDetail('${c.replace(/'/g,"\\'")}')"><div><div class="moneyFlowName">${getIcon(c)} ${esc(c)}</div><div class="moneyFlowSub">Tocca per vedere i movimenti</div></div><div class="moneyFlowAmount">${euro(v)} <span class="categoryChevron">›</span></div></div>`).join(''):'<div class="empty">Nessuna spesa nel mese.</div>'}
+
+function renderMoneyFlow(){const inc=monthIncomeTotal(currentMonth),sp=state.transactions.filter(t=>monthKey(t.date)===currentMonth&&countable(t)).reduce((a,t)=>a+spendImpact(t),0),sav=actualSavingsForMonth(currentMonth),cats=Object.entries(categoryTotals(currentMonth)).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);moneyFlow.innerHTML=`<div class="moneyFlowRow"><div><div class="moneyFlowName">💶 Entrate registrate</div><div class="moneyFlowSub">Accrediti riconosciuti nel mese</div></div><div class="moneyFlowAmount green">+${euro(inc)}</div></div><div class="moneyFlowRow"><div><div class="moneyFlowName">🧾 Spese di consumo</div><div class="moneyFlowSub">Esclusi trasferimenti interni e regolamenti già conteggiati</div></div><div class="moneyFlowAmount red">−${euro(sp)}</div></div><div class="moneyFlowRow"><div><div class="moneyFlowName">💰 Accantonamenti / risparmio rilevati</div><div class="moneyFlowSub">Spostamenti classificati come risparmio, non consumo</div></div><div class="moneyFlowAmount amber">${euro(sav)}</div></div>${cats.map(([c,v])=>`<div class="moneyFlowRow categoryTap" onclick="openCategoryDetail('${esc(c)}')"><div><div class="moneyFlowName">${getIcon(c)} ${esc(c)}</div><div class="moneyFlowSub">${sp?Math.round(v/sp*100):0}% delle spese · tocca per dettaglio</div></div><div class="moneyFlowAmount">${euro(v)} <span class="categoryChevron">›</span></div></div>`).join('')}<div class="cleanNote" style="padding:10px 0 2px">I trasferimenti tra tuoi strumenti non vengono trattati come denaro perso.</div>`}
 function previousMonthKeys(month,n=3){const [y,m]=month.split('-').map(Number),arr=[];for(let i=1;i<=n;i++){const d=new Date(y,m-1-i,1);arr.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`)}return arr}
-function renderTraffic(){const day=currentMonth===monthKey(today())?Number(today().slice(8,10)):daysInMonthKey(currentMonth),cur=categoryTotals(currentMonth,day),prev=previousMonthKeys(currentMonth,3),cats=new Set([...Object.keys(cur),...prev.flatMap(m=>Object.keys(categoryTotals(m,Math.min(day,daysInMonthKey(m)))))]),rows=[];cats.forEach(c=>{const now=cur[c]||0,vals=prev.map(m=>categoryTotals(m,Math.min(day,daysInMonthKey(m)))[c]||0),active=vals.filter(v=>v>0);if(!now&&!active.length)return;const avg=active.length?active.reduce((a,b)=>a+b,0)/active.length:0;let color='green',label='nella norma';if(avg>0&&now>avg*1.25){color='red';label='sopra media'}else if(avg>0&&now>avg*1.05){color='yellow';label='leggermente sopra'}else if(avg===0&&now>0){color='yellow';label='nuova questo mese'}rows.push({c,now,avg,color,label})});rows.sort((a,b)=>b.now-a.now);trafficCategories.innerHTML=rows.length?rows.slice(0,10).map(x=>`<div class="trafficRow"><div class="trafficDot ${x.color}"></div><div><div class="moneyFlowName">${getIcon(x.c)} ${esc(x.c)}</div><div class="moneyFlowSub">${x.avg?`media ultimi mesi ${euro(x.avg)}`:'nessuna base storica'}</div></div><div class="trafficValue">${euro(x.now)}<div class="moneyFlowSub">${x.label}</div></div></div>`).join(''):'<div class="empty">Non ci sono ancora abbastanza dati per il confronto.</div>'}
+function renderTraffic(){const day=currentMonth===monthKey(today())?Number(today().slice(8,10)):daysInMonthKey(currentMonth),cur=categoryTotals(currentMonth,day),prev=previousMonthKeys(currentMonth,3),cats=new Set([...Object.keys(cur),...prev.flatMap(m=>Object.keys(categoryTotals(m,Math.min(day,daysInMonthKey(m)))))]),rows=[];cats.forEach(c=>{const now=cur[c]||0,vals=prev.map(m=>categoryTotals(m,Math.min(day,daysInMonthKey(m)))[c]||0),active=vals.filter(v=>v>0);if(!now&&!active.length)return;const avg=active.length?active.reduce((a,b)=>a+b,0)/active.length:0;let color='green',label='nella norma';if(avg>0&&now>avg*1.25){color='red';label='sopra media'}else if(avg>0&&now>avg*1.05){color='yellow';label='leggermente sopra'}else if(avg===0&&now>0){color='yellow';label='nuova questo mese'}rows.push({c,now,avg,color,label})});rows.sort((a,b)=>b.now-a.now);trafficCategories.innerHTML=rows.length?rows.slice(0,10).map(x=>`<div class="trafficRow categoryTap" onclick="openCategoryDetail('${x.c.replace(/'/g,"\'")}')"><div class="trafficDot ${x.color}"></div><div><div class="moneyFlowName">${getIcon(x.c)} ${esc(x.c)}</div><div class="moneyFlowSub">${x.avg?`media ultimi mesi ${euro(x.avg)}`:'nessuna base storica'} · tocca per dettaglio</div></div><div class="trafficValue">${euro(x.now)}<div class="moneyFlowSub">${x.label} ›</div></div></div>`).join(''):'<div class="empty">Non ci sono ancora abbastanza dati per il confronto.</div>'}
 function signedInput(id){const el=document.getElementById(id);if(!el)return 0;let s=String(el.value||'').trim().replace(/[€\s]/g,'').replace(',','.');return parseFloat(s)||0}
 function renderScenario(){const f=forecastInfo(),one=Math.max(0,signedInput('simOneOff')),exp=signedInput('simMonthlyExpense'),sav=signedInput('simMonthlySaving'),inc=signedInput('simMonthlyIncome'),project=f.balance-one-exp-sav+inc;simProjected.textContent=euro(project);let tr=(Number(f.trend)||0)-exp-sav+inc;if(project>=f.goal){simEta.textContent='Con questa variazione il saldo teorico resta sopra l’obiettivo.'}else if(tr>0){const months=Math.ceil((f.goal-project)/tr),d=new Date();d.setMonth(d.getMonth()+months);simEta.textContent=`Se il nuovo ritmo si mantenesse, obiettivo indicativamente ${formatMonthYear(d)}.`}else{simEta.textContent=`Impatto immediato sul saldo: ${euro(-one-exp-sav+inc)}. Il trend risultante non consente ancora una data attendibile.`}}
 
@@ -926,21 +958,22 @@ function renderLearnedRules(){const el=document.getElementById('learnedRulesCoun
 
 function renderBudget(){const plb=document.getElementById('planLifeBudget');if(plb)plb.textContent=euro(Number(state.settings.lifeBudget)||0);
  renderAssets();const n=financialNumbers(), due=monthCommitments(), rem=remainingCommitments(), paid=paidSet();
+ const paidAmount=Math.max(0,n.due-n.remaining);
  budgetFree.textContent=n.free===null?'—':euro(Math.max(0,n.free));
- budgetFree.classList.toggle('red',n.free!==null&&n.free<0);
  budgetFormula.textContent=n.free===null?'Inserisci il saldo attuale in ⚙︎ Impostazioni per calcolare il margine.':`${euro(n.balance)} saldo − ${euro(n.goal)} obiettivo − ${euro(n.remaining)} fissi residui`;
  dueThisMonth.textContent=euro(n.due);dueCount.textContent=due.length+' voci previste';
- remainingThisMonth.textContent=euro(n.remaining);paidCount.textContent=due.filter(r=>recurringIsPaid(r)).length+' già rilevate/pagate';
- const pct=n.balance?Math.max(0,Math.min(100,n.balance/n.goal*100)):0;goalProgress.style.width=pct+'%';
+ remainingThisMonth.textContent=euro(n.remaining);paidCount.textContent=due.filter(r=>recurringIsPaid(r)).length+' già rilevate/pagate · '+rem.length+' ancora da sostenere';
+ const pit=document.getElementById('paidThisMonth');if(pit)pit.textContent=euro(paidAmount);
+ const rcl=document.getElementById('remainingCommitmentList');if(rcl)rcl.innerHTML=rem.length?rem.slice().sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)).map(r=>`<div class="recurringItem"><div><div class="recName">${getIcon(r.category)} ${esc(r.name)}</div><div class="recMeta">${r.dueDay?'previsto giorno '+r.dueDay:'data da verificare'} · ${r.category}</div></div><div><div class="recAmount">${euro(r.amount)}</div><div class="remainingStatus">DA SOSTENERE</div></div></div>`).join(''):'<div class="empty">✓ Nessun altro impegno noto da sostenere nel mese.</div>';
+ const pct=n.balance&&n.goal?Math.max(0,Math.min(100,n.balance/n.goal*100)):0;goalProgress.style.width=pct+'%';
  const commits=state.recurring.filter(r=>recurringKind(r)==='commitment');
  paymentRecurringList.innerHTML=recurringHTML(commits.filter(r=>r.active).sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)));
  paymentSuspendedList.innerHTML=recurringHTML(commits.filter(r=>!r.active),false);
  const unknown=state.recurring.filter(r=>r.active&&(r.uncertain||!Number(r.amount)||(r.cadence==='annual'&&!Number(r.dueMonth))));
  unknownNotice.classList.toggle('hidden',!unknown.length);
- unknownNotice.textContent=unknown.length?`⚠️ ${unknown.length} voci hanno importo o scadenza da verificare: il margine disponibile potrebbe cambiare.`:'';
+ unknownNotice.textContent=unknown.length?`⚠️ ${unknown.length} voci hanno importo o scadenza da verificare.`:'';
  renderMoneyFlow();renderTraffic();renderScenario();renderFinanceCalendar();renderForecast();renderAnomalies();renderSubscriptions();renderFutureTimeline();
 }
-
 
 
 function upsertById(arr,obj){const i=arr.findIndex(x=>x.id===obj.id);if(i>=0)arr[i]={...arr[i],...obj};else arr.push(obj)}
@@ -980,6 +1013,12 @@ async function mergeFinancialPatch(file){
     if(r)Object.assign(r,u.values||{});
     else if(u.create)state.recurring.push(u.create);
   });
+  (x.recurringPaidReset||[]).forEach(u=>{
+    const month=u.month||monthKey(today()),ids=new Set(u.ids||[]),names=(u.names||[]).map(v=>String(v).toLowerCase());
+    state.recurringPaid[month]=(state.recurringPaid[month]||[]).filter(id=>{const r=state.recurring.find(x=>x.id===id);return !ids.has(id)&&!(r&&names.includes(String(r.name||'').toLowerCase()))});
+    state.recurring.forEach(r=>{if(ids.has(r.id)||names.includes(String(r.name||'').toLowerCase()))r.forceUnpaidMonth=month});
+  });
+  (x.recurringRemove||[]).forEach(u=>{state.recurring=state.recurring.filter(r=>!(u.id&&r.id===u.id)&&!(u.name&&String(r.name).toLowerCase()===String(u.name).toLowerCase()))});
   (x.transactionUpdates||[]).forEach(u=>{const t=(u.externalKey&&state.transactions.find(z=>z.externalKey===u.externalKey))||(u.id&&state.transactions.find(z=>z.id===u.id));if(t)Object.assign(t,u.values||{});});
   let added=0,skipped=0;
   for(const t0 of (x.transactions||[])){
@@ -1113,7 +1152,7 @@ function renderHome(){
  simpleSavings.textContent=euro(savings);
  const chb=document.getElementById('cashHomeBalance');if(chb)chb.textContent=euro(cashBalance());
  recentList.innerHTML=txHTML([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5));
- renderForecast();renderAnomalies();
+ renderHomeCategories();renderForecast();renderAnomalies();
 }
 function drawChart(txs){
  const c=document.getElementById('chart'), rect=c.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
