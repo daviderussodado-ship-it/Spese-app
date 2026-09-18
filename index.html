@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#183b78">
-<title>Spese — Le mie finanze V18.8</title>
+<title>Spese — Le mie finanze V18.9</title>
 
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
@@ -179,7 +179,7 @@ main{max-width:850px;margin:auto;padding:16px}
 <body>
 <header>
   <div class="headrow">
-    <div><div class="brand">💶 Spese <span class="versionTag">v18.8</span></div><div class="month" id="headerMonth"></div></div>
+    <div><div class="brand">💶 Spese <span class="versionTag">v18.9</span></div><div class="month" id="headerMonth"></div></div>
     <button class="iconbtn" onclick="openModal('settingsModal')">⚙︎</button>
   </div>
 </header>
@@ -320,6 +320,7 @@ main{max-width:850px;margin:auto;padding:16px}
 
     <div class="sectionTitle"><h2>Abbonamenti</h2><button class="linkbtn" onclick="openRecurring('', 'subscription')">＋ Abbonamento</button></div>
     <div class="subscriptionSummary"><div class="card"><div class="kicker">ATTIVI · AL MESE</div><b id="subsMonthly">€ 0,00</b></div><div class="card"><div class="kicker">ATTIVI · ALL'ANNO</div><b id="subsAnnual">€ 0,00</b></div></div>
+    <div class="infoStrip">📅 <b>Date rinnovi:</b> quando la data è confermata dal fornitore uso quella. Il movimento su carta/banca può comparire 1–4 giorni dopo per contabilizzazione.</div>
     <div class="card" id="subscriptionList"></div>
     <div class="sectionTitle"><h2>Abbonamenti disattivati</h2><span class="small">Riattivabili in ogni momento</span></div>
     <div class="card" id="subscriptionInactiveList"></div>
@@ -579,6 +580,40 @@ if(state.settings.lifeBudget===undefined)state.settings.lifeBudget=0;
 let selectedCategory='Altro', currentMonth='', selectedYear=new Date().getFullYear(), photoMode='receipt', calendarMonth='';
 
 function saveState(){ localStorage.setItem('spese_v1',JSON.stringify(state)); }
+
+// V18.9 — date reali/contrattuali dei ricorrenti + regole da storico.
+function applyV189RecurringUpgrade(){
+ if(state.settings?.recurringUpgradeV189)return;
+ const find=(id,re)=>state.recurring.find(r=>r.id===id)||(re?state.recurring.find(r=>re.test(String(r.name||''))):null);
+ const patch=(id,re,values,create=null)=>{let r=find(id,re);if(r)Object.assign(r,values);else if(create)state.recurring.push({...create,...values});};
+
+ patch('p6',/palestra|massoterapia/i,{name:'Palestra / Massoterapia',scheduleRule:'first_business_day',dueDay:0,dateConfidence:'history-strong',uncertain:false,note:'Storico 2026: addebito al primo giorno lavorativo del mese.'});
+ patch('p5',/^finanziamento$|rata prestito/i,{scheduleRule:'last_business_day',dueDay:0,dateConfidence:'history-strong',uncertain:false,note:'Storico 2026: rata contabilizzata l’ultimo giorno lavorativo del mese.'});
+ patch('p4',/fondi|accantonamento/i,{scheduleRule:'day_or_next_business',dueDay:28,dateConfidence:'history-strong',uncertain:false,note:'Versamento previsto il 28 o il primo giorno lavorativo successivo.'});
+
+ patch('p8',/^netflix$/i,{name:'Netflix',amount:6.99,cadence:'monthly',dueDay:29,nextDate:'2026-09-29',account:'PayPal',dateConfidence:'verified',amountConfidence:'verified',uncertain:false,matchText:'netflix',note:'Standard con pubblicità · rinnovo mensile il 29.'});
+ patch('p9',/^apple$|icloud/i,{name:'iCloud+ 50 GB',amount:0.99,cadence:'monthly',dueDay:27,nextDate:'2026-09-27',dateConfidence:'verified',amountConfidence:'verified',uncertain:false,matchText:'apple',note:'Rinnovo mensile confermato da Apple: giorno 27.'});
+
+ // La vecchia voce NOW aggregata viene conservata nello storico ma disattivata.
+ patch('p10',/^now tv$/i,{active:false,superseded:true,note:'Sostituita in V18.9 dai tre Pass NOW separati.'});
+ const nowBase={kind:'subscription',category:'Abbonamenti',account:'PayPal',cadence:'monthly',dueDay:10,nextDate:'2026-10-10',active:true,uncertain:false,dateConfidence:'verified',amountConfidence:'verified',matchText:'sky italia',willEnd:true,stopBeforeEndDate:true,startDate:'2026-01-01'};
+ patch('now-sport',/^now.*sport|pass sport/i,{...nowBase,name:'NOW · Pass Sport',amount:19.99,endDate:'2027-01-10',note:'Disdetto: attivo fino al 10/01/2027. Prezzo attuale 19,99 €/mese.'},{id:'now-sport',...nowBase,name:'NOW · Pass Sport',amount:19.99,endDate:'2027-01-10'});
+ patch('now-entertainment',/^now.*entertainment|pass entertainment/i,{...nowBase,name:'NOW · Pass Entertainment',amount:3.75,endDate:'2027-02-10',note:'Disdetto: attivo fino al 10/02/2027. Prezzo attuale 3,75 €/mese.'},{id:'now-entertainment',...nowBase,name:'NOW · Pass Entertainment',amount:3.75,endDate:'2027-02-10'});
+ patch('now-cinema',/^now.*cinema|pass cinema/i,{...nowBase,name:'NOW · Pass Cinema',amount:4.24,endDate:'2027-02-10',note:'Disdetto: attivo fino al 10/02/2027. Prezzo attuale 4,24 €/mese.'},{id:'now-cinema',...nowBase,name:'NOW · Pass Cinema',amount:4.24,endDate:'2027-02-10'});
+
+ patch('p11',/^fastweb$/i,{amount:9.95,cadence:'monthly',dueDay:25,nextDate:'2026-09-25',dateConfidence:'verified',amountConfidence:'verified',uncertain:false,matchText:'fastweb',note:'Fattura Fastweb: pagamento entro il 25; storico coerente.'});
+ patch('p12',/chatgpt|openai/i,{name:'ChatGPT Plus',amount:0,cadence:'monthly',dueDay:4,nextDate:'2026-10-04',dateConfidence:'verified',amountConfidence:'unknown',uncertain:true,matchText:'chatgpt',note:'Rinnovo automatico il 4. Importo del prossimo rinnovo da confermare: il 15,92 € del 04/09 era legato al cambio piano.'});
+ patch('p13',/amazon prime/i,{name:'Amazon Prime',amount:0,cadence:'annual',dueDay:3,dueMonth:10,nextDate:'2027-10-03',dateConfidence:'verified',amountConfidence:'unknown',uncertain:true,note:'Rinnovo il 03/10/2027. Importo non noto fino al rinnovo.'});
+ patch('p14',/disney/i,{name:'Disney+',amount:109.90,cadence:'annual',dueDay:24,dueMonth:3,nextDate:'2027-03-24',dateConfidence:'verified-history',amountConfidence:'verified',uncertain:false,matchText:'disney',note:'Ultimo rinnovo rilevato il 24/03/2026.'});
+ patch('p15',/^hbo|hbo max/i,{name:'HBO Max · Basic con pubblicità',amount:6.99,cadence:'monthly',dueDay:28,nextDate:'2026-09-28',endDate:'2026-09-28',active:true,willEnd:true,stopBeforeEndDate:true,dateConfidence:'verified',amountConfidence:'verified',uncertain:false,matchText:'hbo',note:'Abbonamento già disdetto: termina il 28/09/2026; non è previsto un nuovo addebito il 28.'});
+ patch('p16',/paramount/i,{name:'Paramount+',amount:7.99,cadence:'monthly',dueDay:25,nextDate:'2026-09-25',account:'Mastercard •0799',dateConfidence:'verified',amountConfidence:'verified',uncertain:false,matchText:'paramount',note:'Rinnovo mensile confermato: giorno 25.'});
+ patch('p17',/topolino|panini/i,{name:'Topolino / Panini Comics',amount:0,cadence:'annual',dueDay:0,dueMonth:10,nextDate:'2026-10-23',dateMode:'expiry',dateConfidence:'expiry-only',amountConfidence:'unknown',uncertain:true,note:'Scadenza 23/10/2026. Rinnovo automatico poco prima della scadenza; giorno di addebito e importo da apprendere dal movimento reale.'});
+ patch('nexi-annual-fee',/quota annuale nexi/i,{dueDay:30,dueMonth:4,nextDate:'2027-04-30',dateConfidence:'verified-history',uncertain:false,note:'Quota annuale rilevata il 30/04/2026.'});
+
+ state.settings.recurringUpgradeV189=true;
+ saveState();
+}
+
 function euro(n){return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(Number(n)||0)}
 function today(){ return new Date().toISOString().slice(0,10) }
 function monthKey(d){return d.slice(0,7)}
@@ -704,6 +739,7 @@ function closeModal(id){document.getElementById(id).classList.remove('show')}
 function backdrop(e,el){if(e.target===el) el.classList.remove('show')}
 
 function init(){
+ applyV189RecurringUpgrade();
  currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0]?.date || today());
  calendarMonth=monthKey(today());
  repairDuplicateFlags();
@@ -798,14 +834,55 @@ function txHTML(list){
 }
 
 function recurringKind(r){return r.kind||(r.category==='Abbonamenti'?'subscription':'commitment')}
+function pad2(n){return String(n).padStart(2,'0')}
+function isItalianFixedHoliday(d){const md=pad2(d.getMonth()+1)+'-'+pad2(d.getDate());return new Set(['01-01','01-06','04-25','05-01','06-02','08-15','11-01','12-08','12-25','12-26']).has(md)}
+function easterMondayISO(y){let a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1,x=new Date(y,mo-1,day+1,12);return x.toISOString().slice(0,10)}
+function isBusinessDayDate(d){const w=d.getDay(),iso=d.toISOString().slice(0,10);return w!==0&&w!==6&&!isItalianFixedHoliday(d)&&iso!==easterMondayISO(d.getFullYear())}
+function businessDateForRule(month,rule,baseDay=0){
+ const [y,m]=month.split('-').map(Number);
+ if(rule==='first_business_day'){let d=new Date(y,m-1,1,12);while(!isBusinessDayDate(d))d.setDate(d.getDate()+1);return d.toISOString().slice(0,10)}
+ if(rule==='last_business_day'){let d=new Date(y,m,0,12);while(!isBusinessDayDate(d))d.setDate(d.getDate()-1);return d.toISOString().slice(0,10)}
+ if(rule==='day_or_next_business'){let day=Math.max(1,Math.min(Number(baseDay)||1,new Date(y,m,0).getDate())),d=new Date(y,m-1,day,12);while(!isBusinessDayDate(d))d.setDate(d.getDate()+1);return d.toISOString().slice(0,10)}
+ return '';
+}
+function plannedRecurringDate(r,month=currentMonth){
+ if(!r)return '';
+ if(r.nextDate&&monthKey(r.nextDate)===month)return r.nextDate;
+ if(r.cadence==='annual'&&Number(r.dueMonth||0)!==Number(month.slice(5,7)))return '';
+ if(r.scheduleRule)return businessDateForRule(month,r.scheduleRule,r.dueDay);
+ if(Number(r.dueDay))return occurrenceDate(r,month);
+ return '';
+}
+function recurringActiveNow(r){if(r.active===false)return false;if(r.willEnd&&r.endDate&&today()>=r.endDate)return false;return true}
 function recurringApplies(r,month=currentMonth){
  if(!r.active)return false;
  if(r.startDate && month < r.startDate.slice(0,7))return false;
  if(r.endDate && month > r.endDate.slice(0,7))return false;
- if(r.cadence==='annual'){
-   const m=Number(month.slice(5,7)); return Number(r.dueMonth||0)===m;
- }
+ if(r.cadence==='annual' && Number(r.dueMonth||0)!==Number(month.slice(5,7)))return false;
+ const planned=plannedRecurringDate(r,month);
+ if(r.stopBeforeEndDate&&r.endDate&&planned&&planned>=r.endDate)return false;
  return true;
+}
+function recurringScheduleText(r,month=currentMonth,preferNext=true){
+ if(r.dateMode==='expiry'&&r.nextDate){const nice=new Date(r.nextDate+'T12:00').toLocaleDateString('it-IT');return `scadenza ${nice} · addebito automatico poco prima`;}
+ let date=plannedRecurringDate(r,month);
+ if(preferNext&&month===monthKey(today())){const next=nextOccurrenceFor(r);if(next)date=next;else if(r.willEnd&&r.endDate)return `termina ${new Date(r.endDate+'T12:00').toLocaleDateString('it-IT')} · nessun altro addebito previsto`;}
+ const nice=date?new Date(date+'T12:00').toLocaleDateString('it-IT'):'';
+ if(r.scheduleRule==='first_business_day')return `1° giorno lavorativo${nice?' · '+nice:''}`;
+ if(r.scheduleRule==='last_business_day')return `ultimo giorno lavorativo${nice?' · '+nice:''}`;
+ if(r.scheduleRule==='day_or_next_business')return `giorno ${r.dueDay} o lavorativo successivo${nice?' · '+nice:''}`;
+ if(date)return `${r.cadence==='annual'?'rinnovo':'pagamento'} ${nice}`;
+ const est=recurringEstimatedDay(r,month);return est?`circa giorno ${est} · stimato dagli estratti`:'data da verificare';
+}
+function recurringBadges(r){
+ let out='';
+ if(r.willEnd&&r.endDate)out+=`<span class="badge">TERMINA ${new Date(r.endDate+'T12:00').toLocaleDateString('it-IT')}</span>`;
+ else if(recurringActiveNow(r))out+='<span class="badge ok">ATTIVO</span>';else out+='<span class="badge">DISATTIVO</span>';
+ if(r.dateConfidence==='verified')out+='<span class="badge ok">DATA CERTA</span>';
+ else if(r.dateConfidence==='history-strong'||r.dateConfidence==='verified-history')out+='<span class="badge">DATA DA STORICO</span>';
+ else if(r.dateConfidence==='expiry-only')out+='<span class="badge">ADDEBITO DA APPRENDERE</span>';
+ if(!Number(r.amount))out+='<span class="badge">IMPORTO DA CONFERMARE</span>';
+ return out;
 }
 function paidSet(month=currentMonth){return new Set(state.recurringPaid[month]||[])}
 function monthlyEquivalent(){
@@ -866,12 +943,16 @@ function recurringEstimatedDay(r,month=currentMonth){
 }
 function recurringAutoMatch(r,month=currentMonth){
  const amount=Number(r.amount)||0;if(!amount)return null;
- const monthTx=state.transactions.filter(t=>monthKey(t.date)===month&&(!t.excluded||t.type==='transfer'));
- const named=monthTx.filter(t=>directRecurringNameMatch(r,t));
+ const planned=plannedRecurringDate(r,month);
+ // Con una data nota cerchiamo anche nei giorni subito prima/dopo: la banca può contabilizzare nel mese successivo.
+ const pool=state.transactions.filter(t=>(!t.excluded||t.type==='transfer')&&(!planned?monthKey(t.date)===month:daysApart(t.date,planned)<=5));
+ const sameAmount=t=>Math.abs((Number(t.amount)||0)-amount)<=.011;
+ const exactNamed=pool.find(t=>sameAmount(t)&&directRecurringNameMatch(r,t));if(exactNamed)return exactNamed;
+ const named=pool.filter(t=>directRecurringNameMatch(r,t));
  if(named.length&&Math.abs(named.reduce((a,t)=>a+(Number(t.amount)||0),0)-amount)<=.011)return named[0];
  const learned=learnedRecurringMerchant(r,month);
- if(learned){const t=monthTx.find(t=>normMerchant(t.merchant||'')===learned&&Math.abs((Number(t.amount)||0)-amount)<=.011);if(t)return t;}
- const candidates=monthTx.filter(t=>Math.abs((Number(t.amount)||0)-amount)<=.011);
+ if(learned){const t=pool.find(t=>normMerchant(t.merchant||'')===learned&&sameAmount(t));if(t)return t;}
+ const candidates=pool.filter(sameAmount);
  return candidates.find(t=>directRecurringNameMatch(r,t)||(r.category==='Finanziamenti'&&t.category==='Finanziamenti'))||null;
 }
 function recurringIsPaid(r,month=currentMonth){
@@ -892,11 +973,11 @@ function togglePaidRecurring(id){
  const arr=new Set(state.recurringPaid[currentMonth]||[]);if(arr.has(id))arr.delete(id);else arr.add(id);state.recurringPaid[currentMonth]=[...arr];saveState();renderAll();
 }
 function nextOccurrenceFor(r){
- if(!r)return today();const now=new Date(today()+'T12:00'),day=Math.max(1,Number(r.dueDay)||1);
- if(r.cadence==='annual'){
-   const mo=Math.max(1,Number(r.dueMonth)||now.getMonth()+1);let d=new Date(now.getFullYear(),mo-1,day,12);if(d<now)d=new Date(now.getFullYear()+1,mo-1,day,12);return d.toISOString().slice(0,10);
- }
- let d=new Date(now.getFullYear(),now.getMonth(),day,12);if(d<now)d=new Date(now.getFullYear(),now.getMonth()+1,day,12);return d.toISOString().slice(0,10);
+ if(!r)return today();
+ if(r.nextDate&&r.nextDate>=today()&&recurringApplies(r,monthKey(r.nextDate)))return r.nextDate;
+ const base=monthKey(today());
+ for(let i=0;i<18;i++){const mk=addMonthsKey(base,i);if(!recurringApplies(r,mk))continue;const d=plannedRecurringDate(r,mk);if(d&&d>=today())return d;}
+ return '';
 }
 function openRecurring(id='',kind='commitment'){
  const r=id?state.recurring.find(x=>x.id===id):null;
@@ -920,12 +1001,11 @@ function deleteRecurring(){
 }
 function recurringHTML(list,allowPaid=true){
  if(!list.length)return '<div class="empty">Nessuna voce</div>';const paid=paidSet();
- return list.map(r=>{const match=recurringAutoMatch(r),auto=!!match,isPaid=paid.has(r.id)||auto,a=Number(r.amount)||0,freq=r.cadence==='annual'?'annuale':'mensile',est=recurringEstimatedDay(r),date=r.dueDay?nextOccurrenceFor(r):'',status=r.active?'<span class="badge ok">ATTIVO</span>':'<span class="badge">DISATTIVO</span>',click=r.virtual?'':"openRecurring('"+r.id+"')";
-  const when=date?new Date(date+'T12:00').toLocaleDateString('it-IT'):(est?'circa giorno '+est+' · stimato dagli estratti':'data da impostare');
-  return `<div class="recurringItem"><div onclick="${click}"><div class="recName ${!r.active?'offText':''}">${getIcon(r.category)} ${esc(r.name)} ${status} ${r.uncertain?'<span class="badge">DA VERIFICARE</span>':''}</div><div class="recMeta">${freq} · ${when}${match?' · ✓ rilevata: '+esc(match.merchant):''}${r.endDate?' · fino al '+new Date(r.endDate+'T12:00').toLocaleDateString('it-IT'):''}${r.virtual?' · ricavato dai dati patrimonio':''}</div></div><div><div class="recAmount">${a?euro(a):'<span class="warnText">da impostare</span>'}</div>${allowPaid&&r.active&&recurringApplies(r)?`<div class="recBtns"><button class="miniBtn ${isPaid?'paid':''}" onclick="event.stopPropagation();togglePaidRecurring('${r.id}')">${isPaid?'✓ Pagata':'Segna pagata'}</button><button class="miniBtn" onclick="event.stopPropagation();${click}">Modifica</button></div>`:''}</div></div>`;
+ return list.map(r=>{const match=recurringAutoMatch(r),auto=!!match,isPaid=paid.has(r.id)||auto,a=Number(r.amount)||0,freq=r.cadence==='annual'?'annuale':'mensile',click=r.virtual?'':"openRecurring('"+r.id+"')";
+  const active=recurringActiveNow(r),status=recurringBadges(r),when=recurringScheduleText(r);
+  return `<div class="recurringItem"><div onclick="${click}"><div class="recName ${!active?'offText':''}">${getIcon(r.category)} ${esc(r.name)} ${status}</div><div class="recMeta">${freq} · ${when}${match?' · ✓ rilevata: '+esc(match.merchant):''}${r.endDate&&!r.willEnd?' · fino al '+new Date(r.endDate+'T12:00').toLocaleDateString('it-IT'):''}${r.virtual?' · ricavato dai dati patrimonio':''}</div></div><div><div class="recAmount">${a?euro(a):'<span class="warnText">da confermare</span>'}</div>${allowPaid&&active&&recurringApplies(r)?`<div class="recBtns"><button class="miniBtn ${isPaid?'paid':''}" onclick="event.stopPropagation();togglePaidRecurring('${r.id}')">${isPaid?'✓ Pagata':'Segna pagata'}</button><button class="miniBtn" onclick="event.stopPropagation();${click}">Modifica</button></div>`:''}</div></div>`;
  }).join('');
 }
-
 function median(values){const a=values.filter(Number.isFinite).sort((x,y)=>x-y);if(!a.length)return 0;const m=Math.floor(a.length/2);return a.length%2?a[m]:(a[m-1]+a[m])/2}
 function addMonthsKey(month,delta){const [y,m]=month.split('-').map(Number),d=new Date(y,m-1+delta,1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
 function daysInMonthKey(month){const [y,m]=month.split('-').map(Number);return new Date(y,m,0).getDate()}
@@ -959,31 +1039,36 @@ function renderAnomalies(){const a=detectAnomalies();anomalyList.innerHTML=a.len
 function renderRecurringPanelsSafe(){
  try{
   const all=Array.isArray(state.recurring)?state.recurring:[];
-  const subs=all.filter(r=>recurringKind(r)==='subscription'), activeSubs=subs.filter(r=>r.active!==false), inactiveSubs=subs.filter(r=>r.active===false);
-  const monthly=activeSubs.reduce((a,r)=>a+(r.cadence==='annual'?(Number(r.amount)||0)/12:(Number(r.amount)||0)),0);
-  const annual=activeSubs.reduce((a,r)=>a+(r.cadence==='annual'?(Number(r.amount)||0):(Number(r.amount)||0)*12),0);
+  const subs=all.filter(r=>recurringKind(r)==='subscription'),activeSubs=subs.filter(recurringActiveNow),inactiveSubs=subs.filter(r=>!recurringActiveNow(r));
+  const billedSubs=activeSubs.filter(r=>!r.willEnd||!!nextOccurrenceFor(r));
+  const monthly=billedSubs.reduce((a,r)=>a+(r.cadence==='annual'?(Number(r.amount)||0)/12:(Number(r.amount)||0)),0);
+  const annual=billedSubs.reduce((a,r)=>a+(r.cadence==='annual'?(Number(r.amount)||0):(Number(r.amount)||0)*12),0);
   const sm=document.getElementById('subsMonthly'),sa=document.getElementById('subsAnnual'),sl=document.getElementById('subscriptionList'),sil=document.getElementById('subscriptionInactiveList');
   if(sm)sm.textContent=euro(monthly);if(sa)sa.textContent=euro(annual);
-  const simpleSubs=list=>list.length?list.slice().sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)).map(r=>{const a=Number(r.amount)||0,yr=r.cadence==='annual'?a:a*12;return `<div class="recurringItem" onclick="openRecurring('${r.id}')"><div><div class="recName">🔁 ${esc(r.name)} ${r.active!==false?'<span class="badge ok">ATTIVO</span>':'<span class="badge">DISATTIVO</span>'}${r.uncertain?'<span class="badge">DA VERIFICARE</span>':''}</div><div class="recMeta">${r.cadence==='annual'?'Annuale':'Mensile'} · ${r.dueDay?'giorno '+r.dueDay:'data modificabile'} · ${euro(yr)}/anno</div></div><div class="recAmount">${a?euro(a):'<span class="warnText">da impostare</span>'}${r.cadence==='monthly'?'<div class="recMeta">/mese</div>':'<div class="recMeta">/anno</div>'}</div></div>`}).join(''):'<div class="empty">Nessuna voce</div>';
+  const simpleSubs=list=>list.length?list.slice().sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)).map(r=>{const a=Number(r.amount)||0,yr=r.cadence==='annual'?a:a*12;return `<div class="recurringItem" onclick="openRecurring('${r.id}')"><div><div class="recName">🔁 ${esc(r.name)} ${recurringBadges(r)}</div><div class="recMeta">${r.cadence==='annual'?'Annuale':'Mensile'} · ${recurringScheduleText(r)}${a?' · '+euro(yr)+'/anno':''}</div></div><div class="recAmount">${a?euro(a):'<span class="warnText">da confermare</span>'}${a?(r.cadence==='monthly'?'<div class="recMeta">/mese</div>':'<div class="recMeta">/anno</div>'):''}</div></div>`}).join(''):'<div class="empty">Nessuna voce</div>';
   if(sl)sl.innerHTML=simpleSubs(activeSubs);if(sil)sil.innerHTML=simpleSubs(inactiveSubs);
 
-  const commits=all.filter(r=>recurringKind(r)==='commitment'),active=commits.filter(r=>r.active!==false),inactive=commits.filter(r=>r.active===false);
+  const commits=all.filter(r=>recurringKind(r)==='commitment'),active=commits.filter(recurringActiveNow),inactive=commits.filter(r=>!recurringActiveNow(r));
   const pl=document.getElementById('paymentRecurringList'),ps=document.getElementById('paymentSuspendedList');
-  const simpleCommits=(list,buttons=true)=>list.length?list.slice().sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)).map(r=>{let paid=false;try{paid=recurringIsPaid(r,currentMonth)}catch(e){}const a=Number(r.amount)||0;return `<div class="recurringItem"><div onclick="openRecurring('${r.id}')"><div class="recName">${getIcon(r.category)} ${esc(r.name)} ${r.active!==false?'<span class="badge ok">ATTIVO</span>':'<span class="badge">DISATTIVO</span>'}</div><div class="recMeta">${r.cadence==='annual'?'annuale':'mensile'} · ${r.dueDay?'giorno '+r.dueDay:'data modificabile'}${paid?' · ✓ già rilevata/pagata':''}</div></div><div><div class="recAmount">${a?euro(a):'<span class="warnText">da impostare</span>'}</div>${buttons&&r.active!==false?`<div class="recBtns"><button class="miniBtn ${paid?'paid':''}" onclick="event.stopPropagation();togglePaidRecurring('${r.id}')">${paid?'✓ Pagata':'Segna pagata'}</button><button class="miniBtn" onclick="event.stopPropagation();openRecurring('${r.id}')">Modifica</button></div>`:''}</div></div>`}).join(''):'<div class="empty">Nessuna voce</div>';
+  const simpleCommits=(list,buttons=true)=>list.length?list.slice().sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)).map(r=>{let paid=false;try{paid=recurringIsPaid(r,currentMonth)}catch(e){}const a=Number(r.amount)||0;return `<div class="recurringItem"><div onclick="openRecurring('${r.id}')"><div class="recName">${getIcon(r.category)} ${esc(r.name)} ${recurringBadges(r)}</div><div class="recMeta">${r.cadence==='annual'?'annuale':'mensile'} · ${recurringScheduleText(r)}${paid?' · ✓ già rilevata/pagata':''}</div></div><div><div class="recAmount">${a?euro(a):'<span class="warnText">da confermare</span>'}</div>${buttons&&recurringActiveNow(r)?`<div class="recBtns"><button class="miniBtn ${paid?'paid':''}" onclick="event.stopPropagation();togglePaidRecurring('${r.id}')">${paid?'✓ Pagata':'Segna pagata'}</button><button class="miniBtn" onclick="event.stopPropagation();openRecurring('${r.id}')">Modifica</button></div>`:''}</div></div>`}).join(''):'<div class="empty">Nessuna voce</div>';
   if(pl)pl.innerHTML=simpleCommits(active,true);if(ps)ps.innerHTML=simpleCommits(inactive,false);
  }catch(e){console.error('renderRecurringPanelsSafe',e)}
 }
 function renderSubscriptions(){
- const subs=state.recurring.filter(r=>recurringKind(r)==='subscription'),active=subs.filter(r=>r.active),inactive=subs.filter(r=>!r.active);
- const monthly=active.reduce((a,r)=>a+(r.cadence==='annual'?(Number(r.amount)||0)/12:(Number(r.amount)||0)),0),annual=active.reduce((a,r)=>a+(r.cadence==='annual'?(Number(r.amount)||0):(Number(r.amount)||0)*12),0);
+ const subs=state.recurring.filter(r=>recurringKind(r)==='subscription'),active=subs.filter(recurringActiveNow),inactive=subs.filter(r=>!recurringActiveNow(r));
+ const billed=active.filter(r=>!r.willEnd||!!nextOccurrenceFor(r));
+ const monthly=billed.reduce((a,r)=>a+(r.cadence==='annual'?(Number(r.amount)||0)/12:(Number(r.amount)||0)),0),annual=billed.reduce((a,r)=>a+(r.cadence==='annual'?(Number(r.amount)||0):(Number(r.amount)||0)*12),0);
  subsMonthly.textContent=euro(monthly);subsAnnual.textContent=euro(annual);
- const html=list=>list.length?list.slice().sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)).map(r=>{const yearly=r.cadence==='annual'?(Number(r.amount)||0):(Number(r.amount)||0)*12,date=r.dueDay?nextOccurrenceFor(r):'';return `<div class="recurringItem" onclick="openRecurring('${r.id}')"><div><div class="recName">🔁 ${esc(r.name)} ${r.active?'<span class="badge ok">ATTIVO</span>':'<span class="badge">DISATTIVO</span>'}${r.uncertain?'<span class="badge">DA VERIFICARE</span>':''}</div><div class="recMeta">${r.cadence==='annual'?'Annuale':'Mensile'} · ${date?'prossimo '+new Date(date+'T12:00').toLocaleDateString('it-IT'):'data da impostare'} · ${euro(yearly)}/anno</div></div><div class="recAmount">${Number(r.amount)?euro(r.amount):'<span class="warnText">da impostare</span>'}${r.cadence==='monthly'?'<div class="recMeta">/mese</div>':'<div class="recMeta">/anno</div>'}</div></div>`}).join(''):'<div class="empty">Nessuna voce</div>';
+ const html=list=>list.length?list.slice().sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)).map(r=>{const yearly=r.cadence==='annual'?(Number(r.amount)||0):(Number(r.amount)||0)*12;return `<div class="recurringItem" onclick="openRecurring('${r.id}')"><div><div class="recName">🔁 ${esc(r.name)} ${recurringBadges(r)}</div><div class="recMeta">${r.cadence==='annual'?'Annuale':'Mensile'} · ${recurringScheduleText(r)}${yearly?' · '+euro(yearly)+'/anno':''}</div></div><div class="recAmount">${Number(r.amount)?euro(r.amount):'<span class="warnText">da confermare</span>'}${Number(r.amount)?(r.cadence==='monthly'?'<div class="recMeta">/mese</div>':'<div class="recMeta">/anno</div>'):''}</div></div>`}).join(''):'<div class="empty">Nessuna voce</div>';
  subscriptionList.innerHTML=html(active);subscriptionInactiveList.innerHTML=html(inactive);
 }
-
 function occurrenceDate(r,month){const [y,m]=month.split('-').map(Number),day=Math.max(1,Math.min(Number(r.dueDay)||1,new Date(y,m,0).getDate()));return `${month}-${String(day).padStart(2,'0')}`}
-function upcomingItems(days=90){const start=new Date(today()+'T12:00'),end=new Date(start);end.setDate(end.getDate()+days);let out=[];state.recurring.filter(r=>r.active).forEach(r=>{for(let i=0;i<5;i++){const mk=addMonthsKey(monthKey(today()),i);if(!recurringApplies(r,mk))continue;const date=r.cadence==='annual'?`${mk}-${String(Math.max(1,Number(r.dueDay)||1)).padStart(2,'0')}`:occurrenceDate(r,mk);const d=new Date(date+'T12:00');if(d>=start&&d<=end)out.push({id:'r:'+r.id,date,name:r.name,amount:Number(r.amount)||0,category:r.category,kind:'recurring',uncertain:!r.dueDay});}});(state.futureExpenses||[]).filter(x=>x.active!==false).forEach(x=>{const d=new Date(x.date+'T12:00');if(d>=start&&d<=end)out.push({id:'f:'+x.id,...x,kind:'future'});});return out.sort((a,b)=>a.date.localeCompare(b.date)).slice(0,25)}
-function renderFutureTimeline(){const items=upcomingItems(90);futureTimeline.innerHTML=items.length?items.map(x=>{const d=new Date(x.date+'T12:00'),mon=new Intl.DateTimeFormat('it-IT',{month:'short'}).format(d),day=d.getDate();return `<div class="timelineItem" ${x.kind==='future'?`onclick="openFutureExpense('${x.id.slice(2)}')"`:''}><div class="dateBox">${day}<small>${mon}</small></div><div><div class="timelineName">${getIcon(x.category)} ${esc(x.name)}</div><div class="timelineMeta">${x.kind==='future'?'Scadenza inserita':'Ricorrente'}${x.uncertain?' · giorno indicativo':''}</div></div><div class="timelineAmount">${x.amount?euro(x.amount):'—'}</div></div>`}).join(''):'<div class="empty">Nessuna scadenza nota nei prossimi 90 giorni</div>'}
+function upcomingItems(days=90){
+ const start=new Date(today()+'T12:00'),end=new Date(start);end.setDate(end.getDate()+days);let out=[];
+ state.recurring.filter(recurringActiveNow).forEach(r=>{for(let i=0;i<5;i++){const mk=addMonthsKey(monthKey(today()),i);if(!recurringApplies(r,mk))continue;let date=plannedRecurringDate(r,mk);if(!date){const est=recurringEstimatedDay(r,mk);if(est)date=`${mk}-${pad2(est)}`;}if(!date)continue;const d=new Date(date+'T12:00');if(d>=start&&d<=end)out.push({id:'r:'+r.id,date,name:r.name,amount:Number(r.amount)||0,category:r.category,kind:'recurring',uncertain:!r.dateConfidence||r.dateConfidence==='expiry-only',dateMode:r.dateMode||'',label:r.dateMode==='expiry'?'Scadenza abbonamento':'Ricorrente'});}});
+ (state.futureExpenses||[]).filter(x=>x.active!==false).forEach(x=>{const d=new Date(x.date+'T12:00');if(d>=start&&d<=end)out.push({id:'f:'+x.id,...x,kind:'future'});});return out.sort((a,b)=>a.date.localeCompare(b.date)).slice(0,25)
+}
+function renderFutureTimeline(){const items=upcomingItems(90);futureTimeline.innerHTML=items.length?items.map(x=>{const d=new Date(x.date+'T12:00'),mon=new Intl.DateTimeFormat('it-IT',{month:'short'}).format(d),day=d.getDate();return `<div class="timelineItem" ${x.kind==='future'?`onclick="openFutureExpense('${x.id.slice(2)}')"`:''}><div class="dateBox">${day}<small>${mon}</small></div><div><div class="timelineName">${getIcon(x.category)} ${esc(x.name)}</div><div class="timelineMeta">${x.kind==='future'?'Scadenza inserita':(x.label||'Ricorrente')}${x.uncertain?' · da verificare':''}</div></div><div class="timelineAmount">${x.amount?euro(x.amount):'—'}</div></div>`}).join(''):'<div class="empty">Nessuna scadenza nota nei prossimi 90 giorni</div>'}
 function openFutureExpense(id=''){const x=id?(state.futureExpenses||[]).find(v=>v.id===id):null;fId.value=x?.id||'';fName.value=x?.name||'';fAmount.value=x?.amount?String(x.amount).replace('.',','):'';fDate.value=x?.date||today();fCategory.value=x?.category||'Altro';deleteFutureBtn.classList.toggle('hidden',!x);openModal('futureExpenseModal')}
 function saveFutureExpense(){const name=fName.value.trim(),amount=parseAmount(fAmount.value),date=fDate.value;if(!name||!date){toast('Inserisci nome e data');return}const id=fId.value||'future'+Date.now(),obj={id,name,amount,date,category:fCategory.value,active:true};const i=state.futureExpenses.findIndex(x=>x.id===id);if(i>=0)state.futureExpenses[i]=obj;else state.futureExpenses.push(obj);saveState();closeModal('futureExpenseModal');renderAll();toast('Scadenza salvata ✓')}
 function deleteFutureExpense(){const id=fId.value;if(!id||!confirm('Eliminare questa scadenza?'))return;state.futureExpenses=state.futureExpenses.filter(x=>x.id!==id);saveState();closeModal('futureExpenseModal');renderAll();toast('Scadenza eliminata')}
@@ -1039,14 +1124,15 @@ function renderBudget(){renderRecurringPanelsSafe();const plb=document.getElemen
  dueThisMonth.textContent=euro(n.due);dueCount.textContent=dueValue.length+' voci con importo';
  remainingThisMonth.textContent=euro(n.remaining);paidCount.textContent=dueValue.filter(r=>recurringIsPaid(r)).length+' già rilevate/pagate · '+remValue.length+' ancora da sostenere';
  const pit=document.getElementById('paidThisMonth');if(pit)pit.textContent=euro(paidAmount);
- const rcl=document.getElementById('remainingCommitmentList');if(rcl){const visibleRem=rem.filter(r=>(Number(r.amount)||0)>0);rcl.innerHTML=visibleRem.length?visibleRem.slice().sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)).map(r=>{const est=recurringEstimatedDay(r,currentMonth),click=r.virtual?'':"openRecurring('"+r.id+"')";return `<div class="recurringItem"><div onclick="${click}"><div class="recName">${getIcon(r.category)} ${esc(r.name)}</div><div class="recMeta">${r.dueDay?'previsto giorno '+r.dueDay:(est?'stimato dagli estratti: giorno '+est:'data da verificare')} · ${r.category}${r.virtual?' · ricavato automaticamente':''}</div></div><div><div class="recAmount">${euro(r.amount)}</div><div class="recBtns"><button class="miniBtn" onclick="event.stopPropagation();togglePaidRecurring('${r.id}')">✓ Segna pagata</button>${r.virtual?'':`<button class="miniBtn" onclick="event.stopPropagation();openRecurring('${r.id}')">Modifica</button>`}</div></div></div>`}).join(''):'<div class="empty">✓ Nessun altro impegno noto da sostenere nel mese.</div>';}
+ const rcl=document.getElementById('remainingCommitmentList');if(rcl){const visibleRem=rem.filter(r=>(Number(r.amount)||0)>0);rcl.innerHTML=visibleRem.length?visibleRem.slice().sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)).map(r=>{const est=recurringEstimatedDay(r,currentMonth),click=r.virtual?'':"openRecurring('"+r.id+"')";return `<div class="recurringItem"><div onclick="${click}"><div class="recName">${getIcon(r.category)} ${esc(r.name)}</div><div class="recMeta">${recurringScheduleText(r,currentMonth,false)} · ${r.category}${r.virtual?' · ricavato automaticamente':''}</div></div><div><div class="recAmount">${euro(r.amount)}</div><div class="recBtns"><button class="miniBtn" onclick="event.stopPropagation();togglePaidRecurring('${r.id}')">✓ Segna pagata</button>${r.virtual?'':`<button class="miniBtn" onclick="event.stopPropagation();openRecurring('${r.id}')">Modifica</button>`}</div></div></div>`}).join(''):'<div class="empty">✓ Nessun altro impegno noto da sostenere nel mese.</div>';}
  const pct=n.balance&&n.goal?Math.max(0,Math.min(100,n.balance/n.goal*100)):0;goalProgress.style.width=pct+'%';
  const commits=state.recurring.filter(r=>recurringKind(r)==='commitment');
  paymentRecurringList.innerHTML=recurringHTML(commits.filter(r=>r.active).sort((a,b)=>(Number(b.amount)||0)-(Number(a.amount)||0)));
  paymentSuspendedList.innerHTML=recurringHTML(commits.filter(r=>!r.active),false);
- const unknown=state.recurring.filter(r=>r.active&&(r.uncertain||!Number(r.amount)||(r.cadence==='annual'&&!Number(r.dueMonth))));
+ const unknown=state.recurring.filter(r=>recurringActiveNow(r)&&(r.uncertain||!Number(r.amount)||(r.cadence==='annual'&&!Number(r.dueMonth))));
  unknownNotice.classList.toggle('hidden',!unknown.length);
- unknownNotice.textContent=unknown.length?`⚠️ ${unknown.length} voci hanno importo o scadenza da verificare.`:'';
+ const unknownAmounts=unknown.filter(r=>!Number(r.amount)).length,unknownDates=unknown.filter(r=>r.dateConfidence==='expiry-only'||(!r.dueDay&&!r.scheduleRule&&!r.nextDate)).length;
+ unknownNotice.textContent=unknown.length?`⚠️ ${unknown.length} voci da completare${unknownAmounts?' · '+unknownAmounts+' importi da confermare':''}${unknownDates?' · '+unknownDates+' date di addebito da apprendere':''}.`:'';
  renderMoneyFlow();renderTraffic();renderScenario();renderFinanceCalendar();renderForecast();renderAnomalies();renderRecurringPanelsSafe();renderFutureTimeline();
 }
 
@@ -1547,7 +1633,7 @@ function exportBackup(){download('spese-backup-'+today()+'.json',JSON.stringify(
 async function restoreBackup(file){try{const x=JSON.parse(await file.text());if(!Array.isArray(x.transactions))throw 0;
  state=x;if(!state.rules)state.rules={};if(!state.budgetRules)state.budgetRules={};if(!state.ocrRules)state.ocrRules={};if(!state.settings)state.settings={goal:0,balance:'',defaultAccount:'Carta',startDate:'2026-01-01'};if(!state.settings.startDate)state.settings.startDate='2026-01-01';if(!Array.isArray(state.recurring))state.recurring=[];if(!state.recurringPaid)state.recurringPaid={};if(!state.annualProfiles)state.annualProfiles={};if(!Array.isArray(state.accounts))state.accounts=[];if(!Array.isArray(state.savingsPots))state.savingsPots=[];if(!Array.isArray(state.debts))state.debts=[];if(!Array.isArray(state.futureExpenses))state.futureExpenses=[];if(!Array.isArray(state.goals))state.goals=[];if(!Array.isArray(state.warranties))state.warranties=[];if(!state.syncConfig)state.syncConfig={enabled:false,provider:'',ready:false};state.recurring.forEach(r=>{if(!r.startDate)r.startDate='2026-01-01';if(!r.kind)r.kind=r.category==='Abbonamenti'?'subscription':'commitment';});state.transactions.forEach(t=>{if(!t.type)t.type='expense';if(typeof t.excluded!=='boolean')t.excluded=false;if(!t.origin)t.origin='backup';if(!t.reviewReason)t.reviewReason='';});
  delete state.rules['pro loco'];delete state.rules['sumup *associazione'];delete state.rules['proloco'];
- saveState();if(state.transactions.length)currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0].date);renderAll();toast('Backup ripristinato ✓')}catch(e){toast('Backup non valido')}}
+ applyV189RecurringUpgrade();saveState();if(state.transactions.length)currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0].date);renderAll();toast('Backup ripristinato ✓')}catch(e){toast('Backup non valido')}}
 function exportCSV(){
  let s='Data;Descrizione;Importo;Categoria;Provenienza;Tipo;Origine;Escluso;Verificato;Da rimborsare;Budget vita\n'+state.transactions.sort((a,b)=>b.date.localeCompare(a.date)).map(t=>[t.date,`"${t.merchant.replace(/"/g,'""')}"`,String(t.amount).replace('.',','),t.category,t.account,t.type||'expense',t.origin||'',t.excluded?'Si':'No',t.verified?'Si':'No',t.reimb?'Si':'No',usesLifeBudget(t)?'Si':'No'].join(';')).join('\n');
  download('movimenti-spese-'+today()+'.csv','\ufeff'+s,'text/csv;charset=utf-8')
