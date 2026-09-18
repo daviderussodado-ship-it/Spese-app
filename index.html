@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#183b78">
-<title>Spese — Le mie finanze V18.7</title>
+<title>Spese — Le mie finanze V18.8</title>
 
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
@@ -179,7 +179,7 @@ main{max-width:850px;margin:auto;padding:16px}
 <body>
 <header>
   <div class="headrow">
-    <div><div class="brand">💶 Spese <span class="versionTag">v18.7</span></div><div class="month" id="headerMonth"></div></div>
+    <div><div class="brand">💶 Spese <span class="versionTag">v18.8</span></div><div class="month" id="headerMonth"></div></div>
     <button class="iconbtn" onclick="openModal('settingsModal')">⚙︎</button>
   </div>
 </header>
@@ -1320,8 +1320,14 @@ async function loadTesseract(){
  await new Promise((res,rej)=>{let s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s)});
 }
 function detectDate(text){
- let m=text.match(/\b([0-3]?\d)[\/\-.]([01]?\d)[\/\-.](20\d{2}|\d{2})\b/);
- if(!m)return today();let y=m[3];if(y.length===2)y='20'+y;return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+ const s=String(text||'');
+ let m=s.match(/\b([0-3]?\d)[\/\-.]([01]?\d)[\/\-.](20\d{2}|\d{2})\b/);
+ if(m){let y=m[3];if(y.length===2)y='20'+y;return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;}
+ // Anche date scritte dalle app: "18 settembre 2026".
+ const months={gennaio:1,gen:1,febbraio:2,feb:2,marzo:3,mar:3,aprile:4,apr:4,maggio:5,mag:5,giugno:6,giu:6,luglio:7,lug:7,agosto:8,ago:8,settembre:9,sett:9,set:9,ottobre:10,ott:10,novembre:11,nov:11,dicembre:12,dic:12};
+ m=s.toLowerCase().match(/\b([0-3]?\d)\s+(gennaio|gen|febbraio|feb|marzo|mar|aprile|apr|maggio|mag|giugno|giu|luglio|lug|agosto|ago|settembre|sett|set|ottobre|ott|novembre|nov|dicembre|dic)\s+(20\d{2})\b/i);
+ if(m){const mm=String(months[m[2].toLowerCase()]).padStart(2,'0');return `${m[3]}-${mm}-${m[1].padStart(2,'0')}`;}
+ return today();
 }
 function normalizeOCRAmounts(text){
  return String(text||'')
@@ -1333,23 +1339,67 @@ function receiptAmounts(text){
  const clean=normalizeOCRAmounts(text);
  return [...clean.matchAll(/(?:€\s*)?(\d{1,5}[,.]\d{2})(?:\s*€)?/g)].map(m=>parseAmount(m[1])).filter(n=>n>0&&n<100000);
 }
+function negativeReceiptAmounts(text){
+ const clean=normalizeOCRAmounts(text);
+ return [...clean.matchAll(/[-−–]\s*(?:€\s*)?(\d{1,5}[,.]\d{2})(?:\s*€)?/g)].map(m=>parseAmount(m[1])).filter(n=>n>0&&n<100000);
+}
+function amountNearLabel(lines,re,maxAhead=2){
+ for(let i=0;i<lines.length;i++){
+   if(!re.test(lines[i]))continue;
+   for(let j=i;j<=Math.min(lines.length-1,i+maxAhead);j++){
+     const a=receiptAmounts(lines[j]);
+     if(a.length)return a[a.length-1];
+   }
+ }
+ return 0;
+}
+function chooseReceiptAmount(text,lines){
+ // 1) Etichette che descrivono esplicitamente quanto è stato speso.
+ let a=amountNearLabel(lines,/disponibilit[aà]\s+utilizzata|importo\s+(?:della\s+)?(?:transazione|pagamento)|addebito|totale\s+(?:pagato|ordine)|da\s+pagare/i,2);
+ if(a)return a;
+ // 2) Nelle app di pagamento una cifra con segno meno è quasi sempre l'operazione.
+ const negatives=negativeReceiptAmounts(text);
+ if(negatives.length)return negatives[0];
+ // 3) Totale classico di scontrini/ricevute.
+ a=amountNearLabel(lines,/\b(?:totale|total|pagato|importo)\b/i,1);
+ if(a)return a;
+ // 4) Fallback: ignora saldi/disponibilità residue, che NON sono una spesa.
+ const allowed=lines.filter(x=>!/disponibilit[aà]\s+(?:dopo|residua|attuale)|saldo|plafond|credito\s+disponibile/i.test(x));
+ const amounts=receiptAmounts(allowed.join('\n'));
+ return amounts.length?Math.max(...amounts):0;
+}
+function merchantCandidate(lines){
+ const noise=/scontrino|documento|partita|iva|www\.|tel\.|data|ricarica|paypal|pagamento|carta|conto corrente|riserva|rivedi ordine|disponibilit[aà]|utilizzata|transazione|confermato|ricevuta|dividi spesa|id ordine|ordine|etolweb|totale|importo|budget|caricata|ocr/i;
+ const status=/^\s*\d{1,2}:\d{2}\b|(?:^|\s)(?:4g|5g|lte|wifi|wi-fi)(?:\s|$)|\b\d{2,3}%\b|[«»]|mb\b|px\b/i;
+ const candidates=lines.filter(x=>x.length>2&&x.length<60&&/[A-Za-zÀ-ÿ]{3}/.test(x)&&!noise.test(x)&&!status.test(x)&&!receiptAmounts(x).length&&!/\b20\d{2}\b/.test(x));
+ if(!candidates.length)return 'Scontrino';
+ // Favorisce denominazioni con più parole alfabetiche rispetto a frammenti casuali.
+ candidates.sort((a,b)=>{
+   const score=x=>(x.match(/[A-Za-zÀ-ÿ]{3,}/g)||[]).length*3 + (/[A-ZÀ-Ý][a-zà-ÿ]+\s+[A-ZÀ-Ýa-zà-ÿ]/.test(x)?2:0) - (/\d/.test(x)?2:0);
+   return score(b)-score(a);
+ });
+ return candidates[0];
+}
 function detectReceipt(text){
  const cleanAmountsText=normalizeOCRAmounts(text);
- const lines=text.split(/\n/).map(x=>x.trim()).filter(Boolean);
- const lower=text.toLowerCase();
- const amounts=receiptAmounts(cleanAmountsText);
- const totalLine=lines.find(x=>/totale|total|importo\s+tot|da pagare|pagato|ordine|acquisto/i.test(x));
- const totalNums=totalLine?receiptAmounts(totalLine):[];
- let amount=totalNums.length?totalNums[totalNums.length-1]:(amounts.length?Math.max(...amounts):0);
+ const lines=cleanAmountsText.split(/\n/).map(x=>x.trim()).filter(Boolean);
+ let amount=chooseReceiptAmount(cleanAmountsText,lines);
  let merchant='',category='Altro',lifeBudget=false,confidence='media',reason='';
  // Prima capisce il contesto della schermata: il metodo di pagamento non è il negozio.
- if(/\bsisal\b|torna\s+al\s+sito\s+di\s+sisal/i.test(text)){
+ if(/\bmooney\s*go\b|telepedagg(?:io|i)/i.test(text)){
+   merchant='Telepedaggio MooneyGo';category='Auto';lifeBudget=false;confidence='alta';reason='Riconosciuto pagamento Telepedaggio MooneyGo.';
+ }else if(/\bsisal\b|torna\s+al\s+sito\s+di\s+sisal/i.test(text)){
    merchant='Sisal';category='Giochi / lotterie';lifeBudget=true;confidence='alta';reason='Riconosciuto Sisal nella schermata.';
- }else if(/amazon/i.test(text)){merchant='Amazon';category='Shopping';confidence='alta';reason='Riconosciuto Amazon.';}
- else if(/satispay/i.test(text) && /pagamento|pagato|acquisto/i.test(text)){merchant='Satispay - acquisto';confidence='media';reason='Schermata di pagamento Satispay.';}
- if(!merchant){
-   merchant=lines.find(x=>x.length>2 && x.length<45 && !/scontrino|documento|partita|iva|www\.|tel\.|data|ricarica|paypal|pagamento|carta|conto corrente|riserva|rivedi ordine/i.test(x))||'Scontrino';
+ }else if(/amazon/i.test(text)){
+   merchant='Amazon';category='Shopping';confidence='alta';reason='Riconosciuto Amazon.';
+ }else if(/satispay/i.test(text) && /pagamento|pagato|acquisto|transazione|confermato/i.test(text)){
+   // Satispay è il metodo/app: cerca il vero esercente tra le righe.
+   merchant=merchantCandidate(lines);
+   if(merchant==='Scontrino')merchant='Satispay - acquisto';
+   confidence=merchant==='Satispay - acquisto'?'media':'alta';
+   reason='Riconosciuta schermata di pagamento Satispay.';
  }
+ if(!merchant)merchant=merchantCandidate(lines);
  const rk=normMerchant(merchant)||merchant.toLowerCase();
  if(state.ocrRules[rk]){
    const learned=state.ocrRules[rk];category=learned.category||category;lifeBudget=!!learned.lifeBudget;confidence='alta';reason='Applicata una tua correzione precedente.';
