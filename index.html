@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#183b78">
-<title>Spese — Le mie finanze V18.6</title>
+<title>Spese — Le mie finanze V18.7</title>
 
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
@@ -179,7 +179,7 @@ main{max-width:850px;margin:auto;padding:16px}
 <body>
 <header>
   <div class="headrow">
-    <div><div class="brand">💶 Spese <span class="versionTag">v18.6</span></div><div class="month" id="headerMonth"></div></div>
+    <div><div class="brand">💶 Spese <span class="versionTag">v18.7</span></div><div class="month" id="headerMonth"></div></div>
     <button class="iconbtn" onclick="openModal('settingsModal')">⚙︎</button>
   </div>
 </header>
@@ -338,7 +338,7 @@ main{max-width:850px;margin:auto;padding:16px}
     <div class="card settingCard importHero" style="margin-bottom:10px"><h3>✨ Aggiorna i miei conti</h3><p>Un solo punto di ingresso. Riconosce aggiornamenti JSON, CSV, immagini/screenshot e prova a leggere anche PDF testuali. Prima di conteggiare controlla trasferimenti e possibili doppioni.</p>
       <div class="field"><label>PROVENIENZA</label><select id="unifiedSource"><option value="Conto principale">Conto principale</option><option value="Carta di credito">Nexi / carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option><option value="Carta">Altro / riconosci dopo</option></select></div>
       <input class="hidden" type="file" id="unifiedFile" accept=".csv,.json,.pdf,image/*" onchange="handleUnifiedImport(this.files[0])">
-      <button class="save" onclick="document.getElementById('unifiedFile').click()">Scegli file / screenshot</button>
+      <button class="save" onclick="const f=document.getElementById('unifiedFile');f.value='';f.click()">Scegli file / screenshot</button>
       <div class="sourceNote">I dati importati restano nell'app sul dispositivo. I PDF vengono solo letti localmente nel browser; i candidati vanno confermati.</div>
     </div>
     <div class="settingsGrid">
@@ -431,10 +431,14 @@ main{max-width:850px;margin:auto;padding:16px}
     <button class="chip" id="modeBank" onclick="setPhotoMode('bank')">🏦 Screenshot banca</button>
   </div>
   <div class="field"><label>PROVENIENZA / METODO DI PAGAMENTO</label><select id="photoSource"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
-  <div class="drop" onclick="document.getElementById('photoFile').click()">
+  <div class="drop" onclick="pickPhotoImage()">
     <strong>Scatta una foto o scegli uno screenshot</strong>
-    Tocca qui. L'immagine viene analizzata sul dispositivo.
-    <input class="hidden" id="photoFile" type="file" accept="image/*" onchange="handlePhoto(this.files[0])">
+    Tocca qui. Puoi scegliere anche la stessa immagine più volte.
+    <input class="hidden" id="photoFile" type="file" accept="image/*,.heic,.heif" onchange="handlePhoto(this.files[0])">
+  </div>
+  <div id="photoPreviewWrap" class="hidden" style="margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px">
+    <img id="photoPreview" alt="Anteprima immagine" style="display:block;max-width:100%;max-height:240px;margin:auto;border-radius:10px">
+    <div id="photoMeta" class="sourceNote" style="margin-top:7px"></div>
   </div>
   <div class="ocrStatus" id="ocrStatus"></div>
   <div id="ocrResult"></div>
@@ -1271,6 +1275,44 @@ function switchView(v){
 }
 
 // OCR
+let _photoPreviewURL='';
+function pickPhotoImage(){
+ const f=document.getElementById('photoFile');
+ if(!f)return;
+ // Fondamentale su iPhone/PWA: permette di riselezionare la stessa identica immagine.
+ f.value='';
+ f.click();
+}
+function imageElementFromFile(file){
+ return new Promise((resolve,reject)=>{
+   const url=URL.createObjectURL(file),im=new Image();
+   im.onload=()=>resolve({im,url});
+   im.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Formato immagine non decodificabile'));};
+   im.src=url;
+ });
+}
+async function prepareImageForOCR(file){
+ const {im,url}=await imageElementFromFile(file);
+ try{
+   const w=im.naturalWidth||im.width,h=im.naturalHeight||im.height;
+   if(!w||!h)throw new Error('Dimensioni immagine non valide');
+   // Limita la memoria su iPhone senza perdere i caratteri degli screenshot.
+   const maxSide=2400,scale=Math.min(1,maxSide/Math.max(w,h));
+   const cw=Math.max(1,Math.round(w*scale)),ch=Math.max(1,Math.round(h*scale));
+   const c=document.createElement('canvas');c.width=cw;c.height=ch;
+   const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,cw,ch);ctx.drawImage(im,0,0,cw,ch);
+   const blob=await new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('Conversione immagine non riuscita')),'image/png'));
+   return {blob,width:w,height:h,ocrWidth:cw,ocrHeight:ch};
+ }finally{URL.revokeObjectURL(url);}
+}
+function showPhotoPreview(file){
+ if(_photoPreviewURL)URL.revokeObjectURL(_photoPreviewURL);
+ _photoPreviewURL=URL.createObjectURL(file);
+ photoPreview.src=_photoPreviewURL;
+ photoPreviewWrap.classList.remove('hidden');
+ const mb=(file.size/1024/1024).toFixed(1).replace('.',',');
+ photoMeta.textContent=`Caricata: ${file.name||'immagine'} · ${mb} MB`;
+}
 function setPhotoMode(m){photoMode=m;modeReceipt.classList.toggle('active',m==='receipt');modeBank.classList.toggle('active',m==='bank');ocrResult.innerHTML='';ocrStatus.style.display='none'}
 async function loadTesseract(){
  if(window.Tesseract)return;
@@ -1318,22 +1360,32 @@ function detectReceipt(text){
  return {merchant,amount,date:detectDate(text),category,lifeBudget,confidence,reason};
 }
 async function enhancedAmountOCR(file,contextText=''){
- // Secondo passaggio solo se il totale non è stato trovato: ingrandisce e contrasta la parte centrale.
- const bmp=await createImageBitmap(file);
+ // Secondo passaggio: compatibile anche con Safari/iPhone (niente dipendenza da createImageBitmap).
+ const {im,url}=await imageElementFromFile(file);
  try{
-   const paypal=/paypal/i.test(contextText), y0=paypal?0.18:0.08, y1=paypal?0.72:0.88;
-   const sx=0, sy=Math.round(bmp.height*y0), sw=bmp.width, sh=Math.max(1,Math.round(bmp.height*(y1-y0)));
-   const targetW=Math.min(1800,Math.max(sw,Math.round(sw*1.8))), scale=targetW/sw, targetH=Math.max(1,Math.round(sh*scale));
+   const iw=im.naturalWidth||im.width,ih=im.naturalHeight||im.height;
+   const paypal=/paypal|sisal/i.test(contextText), y0=paypal?0.15:0.05, y1=paypal?0.78:0.92;
+   const sy=Math.round(ih*y0), sh=Math.max(1,Math.round(ih*(y1-y0)));
+   const targetW=Math.min(2200,Math.max(iw,Math.round(iw*2))),scale=targetW/iw,targetH=Math.max(1,Math.round(sh*scale));
    const c=document.createElement('canvas');c.width=targetW;c.height=targetH;
-   const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(bmp,sx,sy,sw,sh,0,0,targetW,targetH);
-   const im=ctx.getImageData(0,0,c.width,c.height),d=im.data;
-   for(let i=0;i<d.length;i+=4){const g=.299*d[i]+.587*d[i+1]+.114*d[i+2];const v=g<205?Math.max(0,(g-128)*1.65+128):255;d[i]=d[i+1]=d[i+2]=v;}
-   ctx.putImageData(im,0,0);
-   const blob=await new Promise(res=>c.toBlob(res,'image/png'));
-   if(!blob)return '';
-   const rr=await Tesseract.recognize(blob,'eng',{logger:m=>{if(m.status==='recognizing text')ocrStatus.textContent='Ricerco l’importo… '+Math.round((m.progress||0)*100)+'%'}});
-   return rr?.data?.text||'';
- }finally{if(bmp.close)bmp.close();}
+   const ctx=c.getContext('2d',{willReadFrequently:true});
+   // Prima variante: mantiene l'immagine naturale ingrandita; spesso legge meglio le cifre sottili di iOS.
+   ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(im,0,sy,iw,sh,0,0,targetW,targetH);
+   const natural=await new Promise(res=>c.toBlob(res,'image/png'));
+   let combined='';
+   if(natural){
+     const rr=await Tesseract.recognize(natural,'eng',{logger:m=>{if(m.status==='recognizing text')ocrStatus.textContent='Ricerco l’importo… '+Math.round((m.progress||0)*100)+'%'}});
+     combined+=rr?.data?.text||'';
+     if(receiptAmounts(combined).length)return combined;
+   }
+   // Seconda variante solo se serve: scala di grigi con contrasto morbido.
+   const imd=ctx.getImageData(0,0,c.width,c.height),d=imd.data;
+   for(let i=0;i<d.length;i+=4){const g=.299*d[i]+.587*d[i+1]+.114*d[i+2];const v=Math.max(0,Math.min(255,(g-128)*1.35+128));d[i]=d[i+1]=d[i+2]=v;}
+   ctx.putImageData(imd,0,0);
+   const contrast=await new Promise(res=>c.toBlob(res,'image/png'));
+   if(contrast){const rr2=await Tesseract.recognize(contrast,'eng',{logger:m=>{if(m.status==='recognizing text')ocrStatus.textContent='Seconda lettura importo… '+Math.round((m.progress||0)*100)+'%'}});combined+='\n'+(rr2?.data?.text||'');}
+   return combined;
+ }finally{URL.revokeObjectURL(url);}
 }
 
 function detectBank(text){
@@ -1355,17 +1407,21 @@ function detectBank(text){
 async function handlePhoto(file){
  if(!file)return;
  ocrStatus.style.display='block';ocrResult.innerHTML='';
+ showPhotoPreview(file);
+ ocrStatus.textContent='Immagine caricata. La preparo per la lettura…';
  try{
+   const prepared=await prepareImageForOCR(file);
+   photoMeta.textContent+=` · ${prepared.width}×${prepared.height}px · pronta per OCR`;
    await loadTesseract();
    ocrStatus.textContent='Leggo l’immagine… 0%';
-   const result=await Tesseract.recognize(file,'ita+eng',{logger:m=>{if(m.status==='recognizing text')ocrStatus.textContent='Leggo l’immagine… '+Math.round((m.progress||0)*100)+'%'}});
+   const result=await Tesseract.recognize(prepared.blob,'ita+eng',{logger:m=>{if(m.status==='recognizing text')ocrStatus.textContent='Leggo l’immagine… '+Math.round((m.progress||0)*100)+'%'}});
    let text=result.data.text||'';
    if(photoMode==='receipt'){
      let r=detectReceipt(text);
      if(!r.amount){
        try{
          ocrStatus.textContent='Il totale non è chiaro: rileggo la zona dell’importo…';
-         const extra=await enhancedAmountOCR(file,text);
+         const extra=await enhancedAmountOCR(prepared.blob,text);
          if(extra){text+='\n'+extra;r=detectReceipt(text);}
        }catch(extraErr){console.warn('Secondo passaggio OCR importo non riuscito',extraErr);}
      }
@@ -1384,7 +1440,7 @@ async function handlePhoto(file){
      ocrResult.innerHTML=rows.length?`<div class="card settingCard" style="margin-top:10px"><div id="bankRows">${rows.map((r,i)=>`<div style="border-bottom:1px solid var(--line);padding:8px 0"><label style="font-size:11px;font-weight:800;color:var(--muted)"><input type="checkbox" class="brCheck" data-i="${i}" checked> MOVIMENTO ${i+1}</label><div class="importedRow"><input class="brM" value="${esc(r.merchant)}"><input class="brA" value="${String(r.amount).replace('.',',')}"></div><input class="brD" type="date" value="${r.date}"></div>`).join('')}</div><button class="save" onclick="saveBankOCR()">Importa selezionati</button></div>`:'';
      window._bankOCR=rows;
    }
- }catch(e){ocrStatus.textContent='Non riesco a leggere automaticamente l’immagine. Puoi comunque inserirla manualmente con “+ Spesa”.'}
+ }catch(e){console.error('Errore caricamento/OCR immagine',e);ocrStatus.textContent='Immagine selezionata, ma non riesco a prepararla o leggerla. Riprova con uno screenshot PNG/JPG.'}
 }
 function saveOCRReceipt(){
  const merchant=ocrM.value.trim()||'Scontrino',amount=parseAmount(ocrA.value);if(!amount){toast('Controlla il totale');return}
