@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#183b78">
-<title>Spese — Le mie finanze V19.4</title>
+<title>Spese — Le mie finanze V19.4.1</title>
 
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
@@ -179,7 +179,7 @@ main{max-width:850px;margin:auto;padding:16px}
 <body>
 <header>
   <div class="headrow">
-    <div><div class="brand">💶 Spese <span class="versionTag">v19.4</span></div><div class="month" id="headerMonth"></div></div>
+    <div><div class="brand">💶 Spese <span class="versionTag">v19.4.1</span></div><div class="month" id="headerMonth"></div></div>
     <button class="iconbtn" onclick="openModal('settingsModal')">⚙︎</button>
   </div>
 </header>
@@ -544,8 +544,9 @@ main{max-width:850px;margin:auto;padding:16px}
   <div class="field"><label>SALDO DISPONIBILE ATTUALE (€)</label><input id="sBalance" inputmode="decimal" placeholder="Serve per “Quanto posso spendere?”"></div>
   <div class="field"><label>OBIETTIVO SALDO MINIMO (€)</label><input id="sGoal" inputmode="decimal"></div><div class="field"><label>BUDGET USCITE E DIVERTIMENTO / MESE (€)</label><input id="sLifeBudget" inputmode="decimal" placeholder="0,00"></div>
   <div class="field"><label>CONTO PREDEFINITO</label><select id="sDefaultAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
-  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V19.4</b></p>
+  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V19.4.1</b></p>
   <button class="save" onclick="saveSettings()">Salva impostazioni</button>
+  <button class="settingsShortcut" onclick="forceAppUpdate()">🔄 Controlla aggiornamenti<div class="small" style="margin-top:4px;font-weight:600">Aggiorna l’app senza cancellare movimenti e impostazioni</div></button>
   <button class="settingsShortcut" onclick="closeModal('settingsModal');switchView('data')">⚙️ Dati, importazioni e backup</button>
  </div>
 </div>
@@ -1940,9 +1941,50 @@ init();
   const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   const tip = document.getElementById('installTip');
   if(tip && !standalone) tip.style.display='block';
+
+  let reloadingForUpdate=false;
   if('serviceWorker' in navigator && location.protocol.startsWith('http')){
-    window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(reloadingForUpdate) return;
+      reloadingForUpdate=true;
+      location.reload();
+    });
+
+    window.addEventListener('load',async()=>{
+      try{
+        const reg=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});
+        await reg.update();
+        if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
+        reg.addEventListener('updatefound',()=>{
+          const worker=reg.installing;
+          if(!worker) return;
+          worker.addEventListener('statechange',()=>{
+            if(worker.state==='installed' && navigator.serviceWorker.controller){
+              worker.postMessage({type:'SKIP_WAITING'});
+            }
+          });
+        });
+      }catch(e){}
+    });
   }
+
+  window.forceAppUpdate=async function(){
+    try{
+      if('caches' in window){
+        const keys=await caches.keys();
+        await Promise.all(keys.filter(k=>k.startsWith('spese-pwa-')).map(k=>caches.delete(k)));
+      }
+      if('serviceWorker' in navigator){
+        const regs=await navigator.serviceWorker.getRegistrations();
+        for(const reg of regs){
+          if(reg.scope.includes('/Spese-app/')) await reg.update();
+        }
+      }
+      location.replace('./?refresh='+Date.now());
+    }catch(e){
+      location.replace('./?refresh='+Date.now());
+    }
+  };
 })();
 </script>
 
