@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#183b78">
-<title>Spese — Le mie finanze V19.3</title>
+<title>Spese — Le mie finanze V19.4</title>
 
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
@@ -173,13 +173,13 @@ main{max-width:850px;margin:auto;padding:16px}
 .homeQuickTop{margin:8px 0 12px}.homeQuickTop .sectionTitle{margin:4px 4px 9px}.homeQuickTop .quick{margin:0}.homeQuickTop .cashMini{margin-top:8px}
 .remainingList .recurringItem{padding:11px 13px}.remainingList .recName{font-size:14px}.remainingList .recMeta{font-size:11px}.remainingStatus{font-size:11px;font-weight:850;color:var(--muted);margin-top:3px}
 .categoryTap{cursor:pointer}.categoryTap:active{transform:scale(.99);background:#f3f7fd}.categoryChevron{color:var(--blue);font-weight:950;margin-left:8px}
-.categoryDetailTotal{font-size:28px;font-weight:950;margin:5px 0 12px}.homeCats{margin-top:9px}.homeCats .moneyFlowRow{padding:11px 2px}
+.categoryDetailTotal{font-size:28px;font-weight:950;margin:5px 0 12px}.homeCats{margin-top:9px}.homeCats .moneyFlowRow{padding:11px 2px}.annualCategoryList{padding:2px 12px}.annualCategoryRow{padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}.annualCategoryRow:last-child{border-bottom:0}.annualCategoryTop{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.annualCategoryName{font-size:13px;font-weight:900}.annualCategoryMeta{font-size:10px;color:var(--muted);margin-top:3px}.annualCategoryAmount{font-size:14px;font-weight:950;text-align:right}.annualCategoryBar{height:7px;background:#edf1f7;border-radius:99px;overflow:hidden;margin-top:8px}.annualCategoryBar i{display:block;height:100%;background:var(--accent);border-radius:99px}.annualCategoryRow:active{transform:scale(.995);background:#f7f9fc}.annualCategoryFooter{padding:10px 0 3px;font-size:10px;color:var(--muted)}
 </style>
 </head>
 <body>
 <header>
   <div class="headrow">
-    <div><div class="brand">💶 Spese <span class="versionTag">v19.3</span></div><div class="month" id="headerMonth"></div></div>
+    <div><div class="brand">💶 Spese <span class="versionTag">v19.4</span></div><div class="month" id="headerMonth"></div></div>
     <button class="iconbtn" onclick="openModal('settingsModal')">⚙︎</button>
   </div>
 </header>
@@ -272,13 +272,16 @@ main{max-width:850px;margin:auto;padding:16px}
     <div class="card sumcard">
       <div class="summary">
         <div><div class="small">Spese</div><div class="big red" id="yearSpent">€ 0,00</div></div>
-        <div><div class="small">Movimenti</div><div class="big" id="yearCount">0</div></div>
+        <div><div class="small">Movimenti conteggiati</div><div class="big" id="yearCount">0</div></div>
       </div>
       <div class="summary" style="margin-top:10px">
         <div><div class="small">Saldo 1 gennaio</div><div style="font-weight:900;margin-top:3px" id="yearOpening">Da impostare</div></div>
         <div><div class="small">Confronto anno prima</div><div style="font-weight:900;margin-top:3px" id="yearCompare">Nessun dato</div></div>
       </div>
     </div>
+    <div class="sectionTitle"><h2>📊 Spese annuali per categoria</h2><span class="small">Dal maggiore al minore</span></div>
+    <div class="card annualCategoryList" id="annualCategoryStats"></div>
+    <div class="cleanNote" style="margin:0 4px 12px">Sono conteggiate solo le spese personali reali dell’anno: esclusi trasferimenti, risparmi/investimenti, duplicati e spese per conto di altri.</div>
     <div class="sectionTitle"><h2>Da controllare</h2><span class="small">Solo ciò che richiede attenzione</span></div>
     <div class="card txList" id="verifyList"></div>
     <div class="hidden"><span id="statsTotal"></span><div id="categoryStats"></div></div>
@@ -541,7 +544,7 @@ main{max-width:850px;margin:auto;padding:16px}
   <div class="field"><label>SALDO DISPONIBILE ATTUALE (€)</label><input id="sBalance" inputmode="decimal" placeholder="Serve per “Quanto posso spendere?”"></div>
   <div class="field"><label>OBIETTIVO SALDO MINIMO (€)</label><input id="sGoal" inputmode="decimal"></div><div class="field"><label>BUDGET USCITE E DIVERTIMENTO / MESE (€)</label><input id="sLifeBudget" inputmode="decimal" placeholder="0,00"></div>
   <div class="field"><label>CONTO PREDEFINITO</label><select id="sDefaultAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
-  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V19.3</b></p>
+  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V19.4</b></p>
   <button class="save" onclick="saveSettings()">Salva impostazioni</button>
   <button class="settingsShortcut" onclick="closeModal('settingsModal');switchView('data')">⚙️ Dati, importazioni e backup</button>
  </div>
@@ -1458,9 +1461,39 @@ function selectYear(y){
 function annualSpent(y){
  return state.transactions.filter(t=>Number(t.date.slice(0,4))===Number(y) && countable(t)).reduce((a,t)=>a+spendImpact(t),0);
 }
+function annualCategoryTotals(y=selectedYear){
+ const out={};
+ state.transactions.filter(t=>Number(t.date.slice(0,4))===Number(y)&&countable(t)).forEach(t=>{
+  const cat=t.category||'Altro';
+  out[cat]=(out[cat]||0)+spendImpact(t);
+ });
+ return out;
+}
+function annualCategoryTransactions(cat,y=selectedYear){
+ return state.transactions.filter(t=>Number(t.date.slice(0,4))===Number(y)&&countable(t)&&(t.category||'Altro')===cat).sort((a,b)=>b.date.localeCompare(a.date));
+}
+function openAnnualCategoryDetail(cat,y=selectedYear){
+ const list=annualCategoryTransactions(cat,y),total=list.reduce((a,t)=>a+spendImpact(t),0);
+ categoryDetailTitle.textContent=getIcon(cat)+' '+cat;
+ categoryDetailMonth.textContent='Anno '+y+' · '+list.length+' '+(list.length===1?'movimento':'movimenti');
+ categoryDetailTotal.textContent=euro(total);
+ categoryDetailList.innerHTML=list.length?txHTML(list):'<div class="empty">Nessuna spesa in questa categoria.</div>';
+ openModal('categoryDetailModal');
+}
+function renderAnnualCategories(y=selectedYear){
+ const el=document.getElementById('annualCategoryStats');if(!el)return;
+ const total=annualSpent(y),rows=Object.entries(annualCategoryTotals(y)).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+ if(!rows.length){el.innerHTML='<div class="empty">Nessuna spesa personale conteggiata per questo anno.</div>';return}
+ const max=Math.max(...rows.map(([,v])=>v),1);
+ el.innerHTML=rows.map(([cat,val])=>{
+  const n=annualCategoryTransactions(cat,y).length,pct=total>0?val/total*100:0,width=Math.max(2,val/max*100),enc=encodeURIComponent(cat);
+  return `<div class="annualCategoryRow" onclick="openAnnualCategoryDetail(decodeURIComponent('${enc}'),${Number(y)})"><div class="annualCategoryTop"><div><div class="annualCategoryName">${getIcon(cat)} ${esc(cat)}</div><div class="annualCategoryMeta">${pct.toFixed(1).replace('.',',')}% del totale · ${n} ${n===1?'movimento':'movimenti'} · tocca per dettaglio</div></div><div class="annualCategoryAmount">${euro(val)} <span class="categoryChevron">›</span></div></div><div class="annualCategoryBar"><i style="width:${width.toFixed(1)}%"></i></div></div>`;
+ }).join('')+`<div class="annualCategoryFooter">Totale spese personali ${y}: <b>${euro(total)}</b></div>`;
+}
 function renderAnnual(){
- const tx=state.transactions.filter(t=>Number(t.date.slice(0,4))===selectedYear),spent=annualSpent(selectedYear),p=yearProfile(selectedYear);
- annualYearLabel.textContent=selectedYear;yearSpent.textContent=euro(spent);yearCount.textContent=tx.length;
+ const tx=state.transactions.filter(t=>Number(t.date.slice(0,4))===selectedYear),countedTx=tx.filter(countable),spent=annualSpent(selectedYear),p=yearProfile(selectedYear);
+ annualYearLabel.textContent=selectedYear;yearSpent.textContent=euro(spent);yearCount.textContent=countedTx.length;
+ renderAnnualCategories(selectedYear);
  const inherited=(!p.openingBalance && state.annualProfiles[String(selectedYear-1)]?.closingBalance)?state.annualProfiles[String(selectedYear-1)].closingBalance:'';
  yearOpening.textContent=(p.openingBalance||inherited)?euro(parseAmount(p.openingBalance||inherited)):'Da impostare';
  const months=[...new Set(tx.map(t=>Number(t.date.slice(5,7))))].sort((a,b)=>a-b), prevTx=state.transactions.filter(t=>Number(t.date.slice(0,4))===selectedYear-1),prevMonths=new Set(prevTx.map(t=>Number(t.date.slice(5,7))));
