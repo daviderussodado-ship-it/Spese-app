@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#183b78">
-<title>Spese — Le mie finanze V18.9</title>
+<title>Spese — Le mie finanze V19.0</title>
 
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
@@ -179,7 +179,7 @@ main{max-width:850px;margin:auto;padding:16px}
 <body>
 <header>
   <div class="headrow">
-    <div><div class="brand">💶 Spese <span class="versionTag">v18.9</span></div><div class="month" id="headerMonth"></div></div>
+    <div><div class="brand">💶 Spese <span class="versionTag">v19.0</span></div><div class="month" id="headerMonth"></div></div>
     <button class="iconbtn" onclick="openModal('settingsModal')">⚙︎</button>
   </div>
 </header>
@@ -257,14 +257,14 @@ main{max-width:850px;margin:auto;padding:16px}
       <div class="card assetCard"><div class="kicker">Salvadanai</div><div class="val reserveVal" id="reservedTotal">€ 0,00</div><div class="small">denaro accantonato</div></div>
       <div class="card assetCard"><div class="kicker">Investimenti</div><div class="val" id="investmentTotal">€ 0,00</div><div class="small">valore registrato</div></div>
       <div class="card assetCard"><div class="kicker">Debiti residui</div><div class="val debtVal" id="debtTotal">€ 0,00</div><div class="small">finanziamenti noti</div></div>
-      <div class="card assetCard"><div class="kicker">Netto noto</div><div class="val" id="knownNet">€ 0,00</div><div class="small">senza valore fondi</div></div>
+      <div class="card assetCard"><div class="kicker">Patrimonio finanziario</div><div class="val" id="knownNet">€ 0,00</div><div class="small">disponibile + salvadanai + investimenti</div></div>
     </div>
     <div class="sectionTitle"><h2>Conti e wallet</h2></div><div class="card assetList" id="accountsList"></div>
     <div class="sectionTitle"><h2>Salvadanai</h2></div><div class="card assetList" id="potsList"></div>
     <div class="sectionTitle"><h2>Finanziamenti</h2></div><div class="card assetList" id="debtsList"></div>
     <div class="sectionTitle"><h2>Obiettivi</h2><button class="linkbtn" onclick="openGoal()">＋ Obiettivo</button></div><div class="card" id="goalsList"></div>
     <div class="sectionTitle"><h2>Acquisti & garanzie</h2><button class="linkbtn" onclick="openWarranty()">＋ Aggiungi</button></div><div class="card" id="warrantyList"></div>
-    <div class="sectionTitle"><h2>Storico mensile</h2><span class="small">Chiusura automatica</span></div><div class="card" id="monthHistory"></div>
+    <div class="sectionTitle"><h2>Riepilogo mensile</h2><span class="small">Entrate, spese e risparmio</span></div><div class="card" id="monthHistory"></div>
     <div class="sectionTitle"><h2>Anno <span id="annualYearLabel"></span></h2></div>
     <div class="card sumcard">
       <div class="summary">
@@ -509,7 +509,7 @@ main{max-width:850px;margin:auto;padding:16px}
   <div class="field"><label>SALDO DISPONIBILE ATTUALE (€)</label><input id="sBalance" inputmode="decimal" placeholder="Serve per “Quanto posso spendere?”"></div>
   <div class="field"><label>OBIETTIVO SALDO MINIMO (€)</label><input id="sGoal" inputmode="decimal"></div><div class="field"><label>BUDGET USCITE E DIVERTIMENTO / MESE (€)</label><input id="sLifeBudget" inputmode="decimal" placeholder="0,00"></div>
   <div class="field"><label>CONTO PREDEFINITO</label><select id="sDefaultAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
-  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V18.5</b></p>
+  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V19.0</b></p>
   <button class="save" onclick="saveSettings()">Salva impostazioni</button>
   <button class="settingsShortcut" onclick="closeModal('settingsModal');switchView('data')">⚙️ Dati, importazioni e backup</button>
  </div>
@@ -548,6 +548,9 @@ const CATEGORIES = [
   ['Finanziamenti','🧾'],['Commissioni','🏦'],['Svago','🎟️'],['Giochi / lotterie','🎰'],['Altro','•']
 ];
 let state = JSON.parse(localStorage.getItem('spese_v1') || 'null');
+const CORE_SETTINGS_KEY='spese_core_settings_v19';
+function readCoreSettings(){try{return JSON.parse(localStorage.getItem(CORE_SETTINGS_KEY)||'null')}catch(e){return null}}
+function writeCoreSettings(){try{localStorage.setItem(CORE_SETTINGS_KEY,JSON.stringify({goal:Number(state?.settings?.goal)||0,lifeBudget:Number(state?.settings?.lifeBudget)||0,defaultAccount:state?.settings?.defaultAccount||'Carta',savedAt:new Date().toISOString()}))}catch(e){}}
 if(!state){
   state = {
     transactions: [],
@@ -577,6 +580,12 @@ state.recurring.forEach(r=>{if(!r.startDate)r.startDate='2026-01-01';if(!r.kind)
 delete state.rules?.['pro loco']; delete state.rules?.['sumup *associazione']; delete state.rules?.['proloco'];
 state.transactions.forEach(t=>{if(!t.type)t.type='expense';if(typeof t.excluded!=='boolean')t.excluded=false;if(!t.origin)t.origin='legacy';if(!t.reviewReason)t.reviewReason='';});
 if(state.settings.lifeBudget===undefined)state.settings.lifeBudget=0;
+const _core=readCoreSettings();
+if(_core){
+ if((state.settings.goal===undefined||state.settings.goal===null||state.settings.goal==='')&&Number(_core.goal))state.settings.goal=Number(_core.goal);
+ if((state.settings.lifeBudget===undefined||state.settings.lifeBudget===null||state.settings.lifeBudget==='')&&Number(_core.lifeBudget))state.settings.lifeBudget=Number(_core.lifeBudget);
+ if(!state.settings.defaultAccount&&_core.defaultAccount)state.settings.defaultAccount=_core.defaultAccount;
+}
 let selectedCategory='Altro', currentMonth='', selectedYear=new Date().getFullYear(), photoMode='receipt', calendarMonth='';
 
 function saveState(){ localStorage.setItem('spese_v1',JSON.stringify(state)); }
@@ -612,6 +621,23 @@ function applyV189RecurringUpgrade(){
 
  state.settings.recurringUpgradeV189=true;
  saveState();
+}
+
+
+// V19.0 — correzioni emerse dal collaudo V18.9.
+function applyV190Upgrade(){
+ if(state.settings?.upgradeV190)return;
+ // Ultimi punti certi comunicati dall'utente durante il collaudo.
+ let sat=state.accounts.find(a=>a.id==='satispay'||/^satispay$/i.test(a.name||''));
+ if(sat){sat.balance=485;sat.snapshotDate='2026-09-18';sat.spendable=true;}
+ let inv=state.accounts.find(a=>a.id==='satispay-investments'||/satispay.*invest|azionario globale/i.test((a.name||'')+' '+(a.kind||'')));
+ const invObj={id:'satispay-investments',name:'Satispay · Azionario Globale',kind:'Investimento',balance:265.68,spendable:false,primary:false,snapshotDate:'2026-09-18',note:'Valore confermato da screenshot Satispay il 18/09/2026.'};
+ if(inv)Object.assign(inv,invObj);else state.accounts.push(invObj);
+ let nexi=state.accounts.find(a=>a.id==='nexi-9011'||/nexi.*9011/i.test(a.name||''));
+ if(nexi){nexi.creditLimit=1500;nexi.used=25.61;nexi.snapshotDate='2026-09-18';nexi.spendable=false;nexi.kind='Carta di credito';}
+ if(!state.settings.defaultAccount||state.settings.defaultAccount==='Carta')state.settings.defaultAccount='Conto principale';
+ state.settings.upgradeV190=true;
+ saveState();writeCoreSettings();
 }
 
 function euro(n){return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(Number(n)||0)}
@@ -651,13 +677,14 @@ function isTransferDescription(m){
 }
 function isRefundDescription(m){return /\b(rimborso|storno|refund|rettifica|reso)\b/i.test(m||'')}
 function isIncomeDescription(m){return /\b(stipendio|bonifico ricevuto|accredito stipendio|interessi attivi|premio|cashback)\b/i.test(m||'')}
+function suspectedDuplicate(t){return !!(t&&t.reviewReason&&/duplic|doppio conteggio/i.test(t.reviewReason))}
 function spendImpact(t){
- if(t.excluded)return 0;
+ if(t.excluded||suspectedDuplicate(t))return 0;
  if((t.type||'expense')==='expense')return Number(t.amount)||0;
  if(t.type==='refund')return -(Number(t.amount)||0);
  return 0;
 }
-function countable(t){return !t.excluded && ['expense','refund'].includes(t.type||'expense')}
+function countable(t){return !t.excluded && !suspectedDuplicate(t) && ['expense','refund'].includes(t.type||'expense')}
 function usesLifeBudget(t){
  if(t.lifeBudget===true)return true;
  if(t.lifeBudget===false)return false;
@@ -668,7 +695,7 @@ function lifeBudgetCountable(t){
  const type=t.type||'expense';
  // Se l'utente ha scelto esplicitamente Budget vita, questa scelta è indipendente
  // da "Escludi dai totali", che riguarda solo i totali generali.
- if(t.lifeBudget===true)return ['expense','refund'].includes(type);
+ if(t.lifeBudget===true)return !suspectedDuplicate(t) && ['expense','refund'].includes(type);
  if(t.lifeBudget===false)return false;
  // Per i vecchi movimenti manteniamo il comportamento storico.
  return countable(t) && ['Ristoranti','Svago'].includes(t.category);
@@ -740,6 +767,8 @@ function backdrop(e,el){if(e.target===el) el.classList.remove('show')}
 
 function init(){
  applyV189RecurringUpgrade();
+ applyV190Upgrade();
+ writeCoreSettings();
  currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0]?.date || today());
  calendarMonth=monthKey(today());
  repairDuplicateFlags();
@@ -1103,7 +1132,7 @@ function openGoal(id=''){const x=id?state.goals.find(g=>g.id===id):null;gId.valu
 function saveGoal(){const name=gName.value.trim(),target=parseAmount(gTarget.value),current=parseAmount(gCurrent.value),monthly=parseAmount(gMonthly.value);if(!name||!target){toast('Inserisci nome e obiettivo');return}const id=gId.value||'goal'+Date.now(),o={id,name,target,current,monthly};const i=state.goals.findIndex(x=>x.id===id);if(i>=0)state.goals[i]=o;else state.goals.push(o);saveState();closeModal('goalModal');renderAll();toast('Obiettivo salvato ✓')}
 function deleteGoal(){if(!gId.value||!confirm('Eliminare questo obiettivo?'))return;state.goals=state.goals.filter(x=>x.id!==gId.value);saveState();closeModal('goalModal');renderAll()}
 function renderGoals(){const auto=state.savingsPots.filter(x=>x.target&&!x.closed).map(x=>({id:'pot:'+x.id,name:x.name,target:Number(x.target)||0,current:Number(x.balance)||0,monthly:Number(x.contribution)||0,auto:true})),all=[...auto,...state.goals];goalsList.innerHTML=all.length?all.map(g=>{const pct=g.target?Math.max(0,Math.min(100,g.current/g.target*100)):0,remain=Math.max(0,g.target-g.current),months=g.monthly>0?Math.ceil(remain/g.monthly):0;return `<div class="goalCard" ${g.auto?'':`onclick="openGoal('${g.id}')"`}><div class="goalTop"><div class="goalName">🎯 ${esc(g.name)}${g.auto?' <span class="badge ok">AUTO</span>':''}</div><div class="goalPct">${Math.round(pct)}%</div></div><div class="goalBar"><i style="width:${pct}%"></i></div><div class="moneyFlowSub">${euro(g.current)} su ${euro(g.target)}${months?` · circa ${months} mesi al ritmo impostato`:''}</div></div>`}).join(''):'<div class="empty">Nessun obiettivo. Puoi aggiungerne uno senza modificare il budget mensile.</div>'}
-function renderMonthHistory(){const months=[...new Set(state.transactions.map(t=>monthKey(t.date)))].sort().reverse().slice(0,12);monthHistory.innerHTML=months.length?months.map(m=>{const inc=monthIncomeTotal(m),sp=state.transactions.filter(t=>monthKey(t.date)===m&&countable(t)).reduce((a,t)=>a+spendImpact(t),0),sav=actualSavingsForMonth(m);return `<div class="monthClose"><div class="monthCloseDate">${monthName(m).split(' ')[0]}</div><div><div class="monthCloseMain">Spese ${euro(sp)} · entrate ${euro(inc)}</div><div class="monthCloseSub">Accantonamenti rilevati ${euro(sav)}</div></div><b class="${inc-sp-sav>=0?'green':'red'}">${inc-sp-sav>=0?'+':'−'}${euro(Math.abs(inc-sp-sav))}</b></div>`}).join(''):'<div class="empty">Nessuno storico disponibile</div>'}
+function renderMonthHistory(){const months=[...new Set(state.transactions.map(t=>monthKey(t.date)))].sort().reverse().slice(0,12);monthHistory.innerHTML=months.length?months.map(m=>{const inc=monthIncomeTotal(m),sp=state.transactions.filter(t=>monthKey(t.date)===m&&countable(t)).reduce((a,t)=>a+spendImpact(t),0),sav=actualSavingsForMonth(m),result=inc-sp,free=result-sav;return `<div class="monthClose"><div class="monthCloseDate">${monthName(m).split(' ')[0]}</div><div><div class="monthCloseMain">Entrate ${euro(inc)} · spese reali ${euro(sp)}</div><div class="monthCloseSub">Risultato ${result>=0?'+':'−'}${euro(Math.abs(result))} · accantonato/investito ${euro(sav)} · margine libero ${free>=0?'+':'−'}${euro(Math.abs(free))}</div></div><b class="${result>=0?'green':'red'}">${result>=0?'+':'−'}${euro(Math.abs(result))}</b></div>`}).join(''):'<div class="empty">Nessuno storico disponibile</div>'}
 function openWarrantyDB(){return new Promise((res,rej)=>{const q=indexedDB.open('spese_docs_v1',1);q.onupgradeneeded=()=>{if(!q.result.objectStoreNames.contains('warrantyPhotos'))q.result.createObjectStore('warrantyPhotos')};q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
 async function warrantyPhotoGet(id){try{const db=await openWarrantyDB();return await new Promise((res,rej)=>{const q=db.transaction('warrantyPhotos').objectStore('warrantyPhotos').get(id);q.onsuccess=()=>res(q.result||'');q.onerror=()=>rej(q.error)})}catch(e){return ''}}
 async function warrantyPhotoPut(id,data){const db=await openWarrantyDB();return new Promise((res,rej)=>{const q=db.transaction('warrantyPhotos','readwrite').objectStore('warrantyPhotos').put(data,id);q.onsuccess=()=>res();q.onerror=()=>rej(q.error)})}
@@ -1138,22 +1167,108 @@ function renderBudget(){renderRecurringPanelsSafe();const plb=document.getElemen
 
 
 function upsertById(arr,obj){const i=arr.findIndex(x=>x.id===obj.id);if(i>=0)arr[i]={...arr[i],...obj};else arr.push(obj)}
+function accountIsMain(a){return !!a&&(a.primary===true||a.id==='mediolanum-main'||/mediolanum/i.test(a.name||''))}
+function accountIsSatispay(a){return !!a&&(a.id==='satispay'||/^satispay$/i.test(a.name||''))}
+function accountIsCredit(a){return !!a&&(/carta di credito/i.test(a.kind||'')||/nexi/i.test(a.name||''))}
+function accountIsInvestment(a){return !!a&&(a.id==='satispay-investments'||/satispay.*invest|azionario globale/i.test((a.name||'')+' '+(a.kind||'')))}
+function txMatchesAccount(t,a){
+ const q=String(t.account||'').toLowerCase(),name=String(a.name||'').toLowerCase();
+ if(accountIsMain(a))return /conto principale|mediolanum|carta di debito/.test(q)||q==='carta';
+ if(accountIsSatispay(a))return /satispay/.test(q);
+ if(accountIsCredit(a))return /carta di credito|nexi|9011/.test(q)||q===name;
+ if(/portafoglio|contanti/i.test(a.name||''))return /contanti|portafoglio/.test(q);
+ return q&&name&&(q===name||q.includes(name)||name.includes(q));
+}
+function transferDeltaForAccount(t,a){
+ const x=normMerchant((t.merchant||'')+' '+(t.providerType||''));const amount=Number(t.amount)||0;
+ if(accountIsSatispay(a)){
+   if(/deposito investimento|salvadanaio investito|azionario globale/.test(x))return -amount;
+   if(/prelievo investimento/.test(x))return amount;
+   if(/ricarica satispay|dalla banca/.test(x))return amount;
+   if(/verso la banca/.test(x))return -amount;
+ }
+ if(accountIsMain(a)){
+   if(/verso la banca|prelievo risparmi|prelievo investimento/.test(x))return amount;
+   if(/dalla banca|ricarica satispay|prelievo contanti|regolamento carta|pagamento nexi|addebito carta/.test(x))return -amount;
+   if(/deposito risparmi|deposito investimento|salvadanaio investito|fond|spese macchina|pellet/.test(x))return -amount;
+ }
+ return 0;
+}
+function txBalanceDelta(t,a){
+ if(!txMatchesAccount(t,a)||suspectedDuplicate(t))return 0;
+ const type=t.type||'expense',amount=Number(t.amount)||0;
+ if(type==='expense')return -amount;
+ if(type==='refund'||type==='income')return amount;
+ if(type==='transfer')return transferDeltaForAccount(t,a);
+ return 0;
+}
+function currentAccountBalance(a){
+ if(!a)return 0;
+ if(/portafoglio|contanti/i.test(a.name||''))return Number(a.balance)||0; // saldo già aggiornato in inserimento/prelievo
+ if(accountIsCredit(a))return Number(a.balance)||0;
+ const snap=Number(a.balance)||0, d=a.snapshotDate||'';
+ if(accountIsInvestment(a)){
+   const delta=state.transactions.filter(t=>(!d||t.date>d)&&!suspectedDuplicate(t)&&(t.type||'')==='transfer').reduce((sum,t)=>{
+     const x=normMerchant((t.merchant||'')+' '+(t.providerType||'')),amt=Number(t.amount)||0;
+     if(/deposito investimento|salvadanaio investito|azionario globale/.test(x))return sum+amt;
+     if(/prelievo investimento/.test(x))return sum-amt;
+     return sum;
+   },0);
+   return Math.round((snap+delta)*100)/100;
+ }
+ return Math.round((snap+state.transactions.filter(t=>!d||t.date>d).reduce((sum,t)=>sum+txBalanceDelta(t,a),0))*100)/100;
+}
+function creditCardUsed(a){
+ const snapDate=a.snapshotDate||'';
+ const reset=state.transactions.filter(t=>(!snapDate||t.date>snapDate)&&/regolamento carta|pagamento nexi|addebito carta di credito/i.test(t.merchant||'')).sort((x,y)=>y.date.localeCompare(x.date))[0];
+ const fromDate=reset?reset.date:snapDate,base=reset?0:(Number(a.used)||0);
+ const delta=state.transactions.filter(t=>(!fromDate||t.date>fromDate)&&txMatchesAccount(t,a)&&!suspectedDuplicate(t)).reduce((sum,t)=>{
+   const type=t.type||'expense',amt=Number(t.amount)||0;
+   if(type==='expense')return sum+amt;
+   if(type==='refund')return sum-amt;
+   return sum;
+ },0);
+ return Math.max(0,Math.round((base+delta)*100)/100);
+}
 function primaryAccountBalance(){
  const a=state.accounts.find(x=>x.primary===true)||state.accounts.find(x=>x.id==='mediolanum-main')||state.accounts.find(x=>/mediolanum/i.test(x.name||''));
- if(a)return Number(a.balance)||0;
+ if(a)return currentAccountBalance(a);
  return parseAmount(state.settings.balance);
 }
 function latestSpendableBalance(){
- return state.accounts.length?state.accounts.filter(a=>a.spendable!==false).reduce((sum,a)=>sum+(Number(a.balance)||0),0):parseAmount(state.settings.balance);
+ return state.accounts.length?state.accounts.filter(a=>a.spendable!==false).reduce((sum,a)=>sum+currentAccountBalance(a),0):parseAmount(state.settings.balance);
+}
+function historicalAccountBalance(a,year){
+ const cur=new Date().getFullYear();
+ if(year===cur)return accountIsCredit(a)?null:currentAccountBalance(a);
+ const nextOpen=a['opening'+(year+1)];if(nextOpen!==undefined&&nextOpen!==null&&nextOpen!=='')return Number(nextOpen)||0;
+ if(year===2025&&a.opening2026!==undefined&&a.opening2026!==null)return Number(a.opening2026)||0;
+ return null;
 }
 function renderAssets(){
- const investAccounts=state.accounts.filter(a=>/invest|fondo|titoli|etf/i.test((a.kind||'')+' '+(a.name||''))),investments=investAccounts.reduce((s,a)=>s+(Number(a.balance)||0),0),liquid=state.accounts.length?state.accounts.filter(a=>a.spendable!==false&&!/invest|fondo|titoli|etf/i.test((a.kind||'')+' '+(a.name||''))).reduce((sum,a)=>sum+(Number(a.balance)||0),0):parseAmount(state.settings.balance),reserved=state.savingsPots.reduce((a,x)=>a+(Number(x.balance)||0),0),debt=state.debts.reduce((a,x)=>a+(Number(x.residual)||0),0);
- liquidTotal.textContent=euro(liquid);reservedTotal.textContent=euro(reserved);investmentTotal.textContent=investAccounts.length?euro(investments):'—';debtTotal.textContent=euro(debt);knownNet.textContent=euro(liquid+reserved+investments-debt);
- accountsList.innerHTML=state.accounts.length?state.accounts.map(a=>`<div class="assetLine"><div><div class="assetName">${esc(a.name)}</div><div class="assetSub">${esc(a.kind||'Conto')}${a.instrument?' · '+esc(a.instrument):''}${a.snapshotDate?' · aggiornato '+new Date(a.snapshotDate+'T12:00').toLocaleDateString('it-IT'):''}${a.opening2026?' · 01/01/26 '+euro(a.opening2026):''}</div></div><b>${euro(a.balance)}</b></div>`).join(''):'<div class="empty">Nessun conto registrato</div>';
- potsList.innerHTML=state.savingsPots.length?state.savingsPots.map(x=>`<div class="assetLine"><div><div class="assetName">${esc(x.name)}</div><div class="assetSub">${x.contribution?euro(x.contribution)+' al mese'+(x.dueDay?' · giorno '+x.dueDay:''):''}${x.progressPct&&!x.target?' · obiettivo da verificare':''}</div></div><b>${euro(x.balance)}${x.target?'<div class="assetSub">su '+euro(x.target)+'</div>':(x.progressPct?'<div class="assetSub">'+x.progressPct+'%</div>':'')}</b></div>`).join(''):'<div class="empty">Nessun salvadanaio</div>';
- debtsList.innerHTML=state.debts.length?state.debts.map(d=>`<div class="assetLine"><div><div class="assetName">${esc(d.name)}</div><div class="assetSub">${d.installment?euro(d.installment)+' / mese':''}${d.dueDay?' · giorno '+d.dueDay:''}${d.endDate?' · fine '+new Date(d.endDate+'T12:00').toLocaleDateString('it-IT'):''}</div></div><b class="debtVal">${euro(d.residual)}</b></div>`).join(''):'<div class="empty">Nessun finanziamento registrato</div>';
+ const curYear=new Date().getFullYear(), historical=selectedYear!==curYear;
+ const investAccounts=state.accounts.filter(a=>/invest|fondo|titoli|etf|azionario/i.test((a.kind||'')+' '+(a.name||'')));
+ const liquidAccounts=state.accounts.filter(a=>a.spendable!==false&&!accountIsCredit(a)&&!/invest|fondo|titoli|etf|azionario/i.test((a.kind||'')+' '+(a.name||'')));
+ const vals=liquidAccounts.map(a=>historicalAccountBalance(a,selectedYear)),knownLiquid=vals.filter(v=>v!==null),liquid=knownLiquid.reduce((s,v)=>s+v,0);
+ const invVals=investAccounts.map(a=>historicalAccountBalance(a,selectedYear)),knownInv=invVals.filter(v=>v!==null),investments=knownInv.reduce((s,v)=>s+v,0);
+ const reserved=historical?null:state.savingsPots.reduce((a,x)=>a+(Number(x.balance)||0),0);
+ const debt=historical?null:state.debts.reduce((a,x)=>a+(Number(x.residual)||0),0);
+ liquidTotal.textContent=knownLiquid.length?euro(liquid):'—';
+ reservedTotal.textContent=reserved===null?'—':euro(reserved);
+ investmentTotal.textContent=knownInv.length?euro(investments):'—';
+ debtTotal.textContent=debt===null?'—':euro(debt);
+ const patrimonio=(knownLiquid.length?liquid:0)+(reserved||0)+(knownInv.length?investments:0);
+ knownNet.textContent=(knownLiquid.length||reserved!==null||knownInv.length)?euro(patrimonio):'—';
+ accountsList.innerHTML=state.accounts.length?state.accounts.map(a=>{
+   if(accountIsCredit(a)&&!historical){const used=creditCardUsed(a),lim=Number(a.creditLimit)||0,avail=Math.max(0,lim-used);return `<div class="assetLine"><div><div class="assetName">${esc(a.name)}</div><div class="assetSub">Carta di credito · utilizzato ${euro(used)}${lim?' · disponibile '+euro(avail)+' / '+euro(lim):''}${a.snapshotDate?' · saldo carta certo '+new Date(a.snapshotDate+'T12:00').toLocaleDateString('it-IT'):''}</div></div><b>${euro(used)}</b></div>`;}
+   const v=historicalAccountBalance(a,selectedYear),label=historical?('situazione nota al 31/12/'+selectedYear):(a.snapshotDate?'saldo certo '+new Date(a.snapshotDate+'T12:00').toLocaleDateString('it-IT')+' · aggiornato coi movimenti successivi':'saldo calcolato');
+   return `<div class="assetLine"><div><div class="assetName">${esc(a.name)}</div><div class="assetSub">${esc(a.kind||'Conto')}${a.instrument?' · '+esc(a.instrument):''} · ${label}</div></div><b>${v===null?'—':euro(v)}</b></div>`;
+ }).join(''):'<div class="empty">Nessun conto registrato</div>';
+ potsList.innerHTML=historical?'<div class="empty">Dati storici dei salvadanai non disponibili con precisione.</div>':(state.savingsPots.length?state.savingsPots.map(x=>`<div class="assetLine"><div><div class="assetName">${esc(x.name)}</div><div class="assetSub">${x.contribution?euro(x.contribution)+' al mese'+(x.dueDay?' · giorno '+x.dueDay:''):''}${x.progressPct&&!x.target?' · obiettivo da verificare':''}</div></div><b>${euro(x.balance)}${x.target?'<div class="assetSub">su '+euro(x.target)+'</div>':(x.progressPct?'<div class="assetSub">'+x.progressPct+'%</div>':'')}</b></div>`).join(''):'<div class="empty">Nessun salvadanaio</div>');
+ debtsList.innerHTML=historical?'<div class="empty">Debito residuo storico non ricostruibile con precisione.</div>':(state.debts.length?state.debts.map(d=>`<div class="assetLine"><div><div class="assetName">${esc(d.name)}</div><div class="assetSub">${d.installment?euro(d.installment)+' / mese':''}${d.dueDay?' · giorno '+d.dueDay:''}${d.endDate?' · fine '+new Date(d.endDate+'T12:00').toLocaleDateString('it-IT'):''}</div></div><b class="debtVal">${euro(d.residual)}</b></div>`).join(''):'<div class="empty">Nessun finanziamento registrato</div>');
  renderGoals();renderMonthHistory();renderWarranties();
 }
+
 async function mergeFinancialPatch(file){
  if(!file)return;
  try{
@@ -1217,12 +1332,14 @@ function annualSpent(y){
  return state.transactions.filter(t=>Number(t.date.slice(0,4))===Number(y) && countable(t)).reduce((a,t)=>a+spendImpact(t),0);
 }
 function renderAnnual(){
- const tx=state.transactions.filter(t=>Number(t.date.slice(0,4))===selectedYear),spent=annualSpent(selectedYear),prev=annualSpent(selectedYear-1),p=yearProfile(selectedYear);
+ const tx=state.transactions.filter(t=>Number(t.date.slice(0,4))===selectedYear),spent=annualSpent(selectedYear),p=yearProfile(selectedYear);
  annualYearLabel.textContent=selectedYear;yearSpent.textContent=euro(spent);yearCount.textContent=tx.length;
  const inherited=(!p.openingBalance && state.annualProfiles[String(selectedYear-1)]?.closingBalance)?state.annualProfiles[String(selectedYear-1)].closingBalance:'';
  yearOpening.textContent=(p.openingBalance||inherited)?euro(parseAmount(p.openingBalance||inherited)):'Da impostare';
- if(prev>0){const d=spent-prev,pc=prev?d/prev*100:0;yearCompare.textContent=(d>=0?'+':'')+pc.toFixed(1).replace('.',',')+'% vs '+(selectedYear-1);}
- else yearCompare.textContent='Nessun dato '+(selectedYear-1);
+ const months=[...new Set(tx.map(t=>Number(t.date.slice(5,7))))].sort((a,b)=>a-b), prevTx=state.transactions.filter(t=>Number(t.date.slice(0,4))===selectedYear-1),prevMonths=new Set(prevTx.map(t=>Number(t.date.slice(5,7))));
+ const comparable=months.length>=3&&months.every(m=>prevMonths.has(m));
+ if(comparable){const thisComparable=state.transactions.filter(t=>Number(t.date.slice(0,4))===selectedYear&&months.includes(Number(t.date.slice(5,7)))&&countable(t)).reduce((a,t)=>a+spendImpact(t),0),prevComparable=state.transactions.filter(t=>Number(t.date.slice(0,4))===selectedYear-1&&months.includes(Number(t.date.slice(5,7)))&&countable(t)).reduce((a,t)=>a+spendImpact(t),0);if(prevComparable>0){const pc=(thisComparable-prevComparable)/prevComparable*100;yearCompare.textContent=(pc>=0?'+':'')+pc.toFixed(1).replace('.',',')+'% su mesi comparabili';}else yearCompare.textContent='Dati anno precedente insufficienti';}
+ else yearCompare.textContent='Dati anno precedente insufficienti';
 }
 function loadYearSettings(){
  const y=Number(sYear.value),p=yearProfile(y);sOpeningBalance.value=p.openingBalance||'';sClosingBalance.value=p.closingBalance||'';
@@ -1263,7 +1380,7 @@ function lifeBudgetTransactions(month=currentMonth){
 function openLifeBudgetDetail(){
  const list=lifeBudgetTransactions(currentMonth);
  const budget=Number(state.settings.lifeBudget)||0;
- const used=Math.max(0,list.reduce((sum,t)=>sum+spendImpact(t),0));
+ const used=Math.max(0,list.reduce((sum,t)=>sum+lifeBudgetImpact(t),0));
  const remaining=Math.max(0,budget-used);
  lifeBudgetDetailMonth.textContent=monthName(currentMonth)+' · budget mensile '+euro(budget);
  lifeDetailUsed.textContent=euro(used);
@@ -1287,7 +1404,7 @@ function renderHome(){
  const main=state.accounts.find(a=>a.primary===true)||state.accounts.find(a=>a.id==='mediolanum-main');
  const balance=fn.balance||0,goal=fn.goal||0,gap=Math.max(0,goal-balance);
  simplePrimaryBalance.textContent=euro(balance);
- simpleBalanceDate.textContent=main?.snapshotDate?'Aggiornato al '+new Date(main.snapshotDate+'T12:00').toLocaleDateString('it-IT'):'Saldo disponibile';
+ simpleBalanceDate.textContent=main?.snapshotDate?'Saldo certo '+new Date(main.snapshotDate+'T12:00').toLocaleDateString('it-IT')+' · aggiornato coi movimenti':'Saldo calcolato';
  simpleGoalAmount.textContent=goal?euro(goal):'—';
  simpleGoalBar.style.width=goal?Math.max(0,Math.min(100,balance/goal*100))+'%':'0%';
  simpleGoalText.textContent=!goal?'Imposta il tuo obiettivo':(gap>0?'Manca per arrivare a '+euro(goal):'Obiettivo raggiunto');
@@ -1295,13 +1412,17 @@ function renderHome(){
  const lifeBudget=Number(state.settings.lifeBudget)||0;
  const lifeUsed=Math.max(0,lifeSpendingForMonth(currentMonth));
  const lifeRemaining=Math.max(0,lifeBudget-lifeUsed);
- const extraFree=Math.max(0,fn.free===null?0:fn.free);
- const free=Math.max(lifeRemaining,extraFree);
- freeToSpend.textContent=euro(free);
- lifeBudgetTotal.textContent=euro(lifeBudget);
+ const extraFree=(goal>0&&fn.free!==null)?Math.max(0,fn.free):0;
+ const free=goal>0?Math.max(lifeRemaining,extraFree):(lifeBudget>0?lifeRemaining:null);
+ freeToSpend.textContent=free===null?'—':euro(free);
+ lifeBudgetTotal.textContent=lifeBudget?euro(lifeBudget):'—';
  lifeBudgetUsed.textContent=euro(lifeUsed);
- if(extraFree>lifeRemaining){
-   freeToSpendNote.textContent='Hai anche margine oltre obiettivo e impegni';
+ if(!goal){
+   freeToSpendNote.textContent=lifeBudget>0?'Obiettivo saldo non impostato: mostro solo il budget vita restante':'Imposta obiettivo e budget vita per calcolare il margine';
+ }else if(balance<goal){
+   freeToSpendNote.textContent=lifeBudget>0?'Budget vita restante · saldo sotto obiettivo di '+euro(goal-balance):'Saldo sotto obiettivo di '+euro(goal-balance);
+ }else if(extraFree>lifeRemaining){
+   freeToSpendNote.textContent='Margine oltre obiettivo e impegni';
  }else if(lifeRemaining>0){
    freeToSpendNote.textContent='Ti restano '+euro(lifeRemaining)+' per uscite e divertimento questo mese';
  }else{
@@ -1631,9 +1752,11 @@ function download(name,content,type){
 }
 function exportBackup(){download('spese-backup-'+today()+'.json',JSON.stringify(state,null,2),'application/json')}
 async function restoreBackup(file){try{const x=JSON.parse(await file.text());if(!Array.isArray(x.transactions))throw 0;
+ const coreBefore=readCoreSettings();
  state=x;if(!state.rules)state.rules={};if(!state.budgetRules)state.budgetRules={};if(!state.ocrRules)state.ocrRules={};if(!state.settings)state.settings={goal:0,balance:'',defaultAccount:'Carta',startDate:'2026-01-01'};if(!state.settings.startDate)state.settings.startDate='2026-01-01';if(!Array.isArray(state.recurring))state.recurring=[];if(!state.recurringPaid)state.recurringPaid={};if(!state.annualProfiles)state.annualProfiles={};if(!Array.isArray(state.accounts))state.accounts=[];if(!Array.isArray(state.savingsPots))state.savingsPots=[];if(!Array.isArray(state.debts))state.debts=[];if(!Array.isArray(state.futureExpenses))state.futureExpenses=[];if(!Array.isArray(state.goals))state.goals=[];if(!Array.isArray(state.warranties))state.warranties=[];if(!state.syncConfig)state.syncConfig={enabled:false,provider:'',ready:false};state.recurring.forEach(r=>{if(!r.startDate)r.startDate='2026-01-01';if(!r.kind)r.kind=r.category==='Abbonamenti'?'subscription':'commitment';});state.transactions.forEach(t=>{if(!t.type)t.type='expense';if(typeof t.excluded!=='boolean')t.excluded=false;if(!t.origin)t.origin='backup';if(!t.reviewReason)t.reviewReason='';});
  delete state.rules['pro loco'];delete state.rules['sumup *associazione'];delete state.rules['proloco'];
- applyV189RecurringUpgrade();saveState();if(state.transactions.length)currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0].date);renderAll();toast('Backup ripristinato ✓')}catch(e){toast('Backup non valido')}}
+ if(coreBefore){if(!Number(state.settings.goal)&&Number(coreBefore.goal))state.settings.goal=Number(coreBefore.goal);if(!Number(state.settings.lifeBudget)&&Number(coreBefore.lifeBudget))state.settings.lifeBudget=Number(coreBefore.lifeBudget);if(!state.settings.defaultAccount&&coreBefore.defaultAccount)state.settings.defaultAccount=coreBefore.defaultAccount;}
+ applyV189RecurringUpgrade();applyV190Upgrade();saveState();writeCoreSettings();if(state.transactions.length)currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0].date);renderAll();toast('Backup ripristinato ✓')}catch(e){toast('Backup non valido')}}
 function exportCSV(){
  let s='Data;Descrizione;Importo;Categoria;Provenienza;Tipo;Origine;Escluso;Verificato;Da rimborsare;Budget vita\n'+state.transactions.sort((a,b)=>b.date.localeCompare(a.date)).map(t=>[t.date,`"${t.merchant.replace(/"/g,'""')}"`,String(t.amount).replace('.',','),t.category,t.account,t.type||'expense',t.origin||'',t.excluded?'Si':'No',t.verified?'Si':'No',t.reimb?'Si':'No',usesLifeBudget(t)?'Si':'No'].join(';')).join('\n');
  download('movimenti-spese-'+today()+'.csv','\ufeff'+s,'text/csv;charset=utf-8')
@@ -1642,7 +1765,7 @@ function saveSettings(){
  const y=Number(sYear.value)||selectedYear,p=yearProfile(y);
  p.openingBalance=sOpeningBalance.value;p.closingBalance=sClosingBalance.value;
  state.settings.goal=parseAmount(sGoal.value)||0;state.settings.lifeBudget=parseAmount(sLifeBudget.value)||0;state.settings.balance=sBalance.value;state.settings.defaultAccount=sDefaultAccount.value;
- saveState();closeModal('settingsModal');renderAll();toast('Impostazioni salvate');
+ saveState();writeCoreSettings();closeModal('settingsModal');renderAll();toast('Impostazioni salvate');
 }
 settingsModal.addEventListener('click',()=>{
  sGoal.value=state.settings.goal||'';sLifeBudget.value=state.settings.lifeBudget||'';sBalance.value=state.settings.balance||'';sDefaultAccount.value=state.settings.defaultAccount||'Carta';
