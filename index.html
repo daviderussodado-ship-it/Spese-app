@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#183b78">
-<title>Spese — Le mie finanze V20.0 Beta</title>
+<title>Spese — Le mie finanze V19.4.1</title>
 
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
@@ -174,29 +174,12 @@ main{max-width:850px;margin:auto;padding:16px}
 .remainingList .recurringItem{padding:11px 13px}.remainingList .recName{font-size:14px}.remainingList .recMeta{font-size:11px}.remainingStatus{font-size:11px;font-weight:850;color:var(--muted);margin-top:3px}
 .categoryTap{cursor:pointer}.categoryTap:active{transform:scale(.99);background:#f3f7fd}.categoryChevron{color:var(--blue);font-weight:950;margin-left:8px}
 .categoryDetailTotal{font-size:28px;font-weight:950;margin:5px 0 12px}.homeCats{margin-top:9px}.homeCats .moneyFlowRow{padding:11px 2px}.annualCategoryList{padding:2px 12px}.annualCategoryRow{padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}.annualCategoryRow:last-child{border-bottom:0}.annualCategoryTop{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.annualCategoryName{font-size:13px;font-weight:900}.annualCategoryMeta{font-size:10px;color:var(--muted);margin-top:3px}.annualCategoryAmount{font-size:14px;font-weight:950;text-align:right}.annualCategoryBar{height:7px;background:#edf1f7;border-radius:99px;overflow:hidden;margin-top:8px}.annualCategoryBar i{display:block;height:100%;background:var(--accent);border-radius:99px}.annualCategoryRow:active{transform:scale(.995);background:#f7f9fc}.annualCategoryFooter{padding:10px 0 3px;font-size:10px;color:var(--muted)}
-
-/* V20 BETA — iOS-inspired redesign */
-:root{--bg:#f3f5f8;--card:#ffffff;--ink:#111318;--muted:#707783;--accent:#0a63f6;--accent2:#0a63f6;--danger:#d92d3a;--ok:#148a55;--line:#e7e9ee;--shadow:0 10px 28px rgba(16,24,40,.055);--r:24px}
-html,body{background:var(--bg);color:var(--ink)}body{padding-bottom:104px}
-header{background:rgba(243,245,248,.88);color:var(--ink);padding:calc(12px + env(safe-area-inset-top)) 18px 10px;box-shadow:none;border-bottom:0;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
-.headrow{max-width:720px}.brand{font-size:27px;font-weight:850;letter-spacing:-.75px}.month{font-size:12px;color:var(--muted);opacity:1;font-weight:650;text-transform:capitalize}.versionTag{background:#e8eef9;color:#46617f;padding:3px 7px;border-radius:999px;opacity:1;font-size:9px;margin-left:6px}.iconbtn{width:42px;height:42px;padding:0;border-radius:50%;background:rgba(255,255,255,.82);color:var(--ink);box-shadow:0 4px 16px rgba(15,23,42,.07);font-size:18px}
-main{max-width:720px;padding:10px 16px 28px}.card{border:0;box-shadow:var(--shadow);border-radius:24px}.sectionTitle{margin:24px 3px 10px;align-items:center}.sectionTitle h2{font-size:20px;letter-spacing:-.5px;font-weight:850}.linkbtn{color:var(--accent);font-size:13px}.kicker{font-size:10px;letter-spacing:.75px;color:var(--muted);font-weight:800}.small{color:var(--muted)}
-.v20Home{padding-top:2px}.v20Hero{background:#fff;border-radius:26px;padding:19px 18px 16px;margin:4px 0 11px;box-shadow:var(--shadow);border:0}.v20Hero .simpleBalance{font-size:34px;line-height:1.05;letter-spacing:-1.2px;font-weight:900;color:var(--ink);margin-top:4px}.v20Hero .cleanNote{font-size:11px;margin-top:5px;color:var(--muted)}.v20GoalSide{text-align:right;padding-top:1px}.v20GoalAmount{font-size:19px;font-weight:900;margin-top:4px}.v20Hero .goalLine{height:7px;background:#edf0f4;margin-top:16px;border-radius:99px}.v20Hero .goalLine i{background:var(--accent);border-radius:99px}.v20Hero .goalInfo{font-size:11px;color:var(--muted);margin-top:8px}.v20Hero .goalInfo b{color:var(--ink)}
-.v20BudgetHero{margin:0 0 16px;padding:16px 17px;background:#eaf2ff!important;color:var(--ink)!important;border:0;border-radius:22px;box-shadow:none}.v20BudgetHero .kicker{color:#55749b!important}.v20BudgetHero .big{font-size:28px;color:var(--ink);margin-top:2px}.v20BudgetHero>.small{color:#66758a!important;font-size:11px}.v20BudgetHero .budgetMeta{margin-top:11px;gap:8px}.v20BudgetHero .budgetMini{background:rgba(255,255,255,.75);border:0;border-radius:15px;padding:9px 11px;color:var(--ink)!important}.v20BudgetHero .budgetMini .small{color:#6a7789!important;font-size:10px}.v20BudgetHero .budgetMini b{font-size:14px}
-.v20QuickTop{margin:0 0 8px}.v20ActionTitle{margin-top:0}.v20ActionGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.v20Action{height:72px;border:0;border-radius:21px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:13px;box-shadow:none}.v20Action span{font-size:23px;line-height:1}.v20Action b{font-weight:850}.v20Action.primary{background:#145ee8;color:#fff}.v20Action.incomeAction{background:#e8f7ef;color:#11794c}.v20Action.photoAction{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
-.v20Wallet{margin-top:10px;padding:0;overflow:hidden}.v20WalletMain{width:100%;border:0;background:transparent;padding:14px 15px;display:flex;justify-content:space-between;align-items:center;text-align:left;color:var(--ink)}.v20WalletMain span{display:block}.v20WalletMain b{font-size:14px}.v20WalletMain small{display:block;font-size:10px;color:var(--muted);font-weight:550;margin-top:3px}.v20WalletMain strong{font-size:16px;white-space:nowrap}.v20WalletTools{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}.v20WalletTools button{border:0;background:#fbfcfd;padding:10px 8px;color:#4f5968;font-size:11px;font-weight:750}.v20WalletTools button+button{border-left:1px solid var(--line)}
-.v20MonthSimple{gap:8px}.v20MonthSimple .card{padding:13px 11px;min-width:0}.v20MonthSimple .v{font-size:17px;margin-top:4px;letter-spacing:-.4px}.homeCats{padding:4px 14px}.homeCats .moneyFlowRow{padding:12px 0}.moneyFlowName{font-size:13px}.moneyFlowAmount{font-size:13px}.txList{box-shadow:var(--shadow)}.tx{padding:12px 13px;grid-template-columns:42px 1fr auto;gap:10px}.catIcon{width:38px;height:38px;border-radius:13px;background:#f0f3f7;font-size:17px}.txname{font-size:14px}.txmeta{font-size:10px;margin-top:3px}.amount{font-size:14px}
-#movementsView .field input{background:#fff;border:0;box-shadow:var(--shadow);padding:14px 16px;border-radius:18px}.filters{gap:7px;padding-bottom:12px}.chip{border:0;background:#fff;padding:9px 13px;box-shadow:0 2px 10px rgba(16,24,40,.035)}.chip.active{background:var(--ink);color:#fff}.assetGrid{gap:9px!important}.assetCard{padding:15px!important}.assetCard .val{font-size:21px!important;letter-spacing:-.6px}.sumcard{padding:16px}.summary{gap:9px}.big{font-size:27px}.infoStrip{border:0!important;border-radius:18px!important;background:#eef3fb!important;color:#44556c!important}.settingCard{padding:16px}.settingsGrid{gap:9px}.field input,.field select,.field textarea{border:0;background:#fff;border-radius:16px;padding:13px 14px;box-shadow:0 1px 0 rgba(16,24,40,.04)}.save{background:var(--accent);border-radius:18px;box-shadow:none}.secondary{border:0;background:#fff;border-radius:18px;box-shadow:var(--shadow);color:var(--accent)}
-.fabbar{background:transparent;border:0;padding:8px 14px calc(10px + env(safe-area-inset-bottom));pointer-events:none}.nav{max-width:440px;pointer-events:auto;background:rgba(255,255,255,.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.7);border-radius:25px;padding:6px 7px;box-shadow:0 12px 34px rgba(15,23,42,.15);grid-template-columns:repeat(4,1fr)}.nav button{padding:6px 3px;border-radius:17px;color:#7b818d;font-size:9px;transition:.15s}.nav button span{font-size:19px;margin-bottom:1px}.nav button.active{color:var(--accent);background:#edf4ff}
-.modal{background:rgba(16,24,40,.34);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}.sheet{background:rgba(247,248,251,.98);border-radius:30px 30px 0 0;padding:14px 16px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -18px 60px rgba(15,23,42,.18)}.grab{background:#c7cbd2}.sheet h2{font-size:23px;letter-spacing:-.6px}
-@media(max-width:520px){main{padding-left:14px;padding-right:14px}.summary{grid-template-columns:1fr 1fr}.v20Hero .simpleBalance{font-size:31px}.sectionTitle h2{font-size:19px}}
-
 </style>
 </head>
 <body>
 <header>
   <div class="headrow">
-    <div><div class="brand">💶 Spese <span class="versionTag">v20.0 β</span></div><div class="month" id="headerMonth"></div></div>
+    <div><div class="brand">💶 Spese <span class="versionTag">v19.4.1</span></div><div class="month" id="headerMonth"></div></div>
     <button class="iconbtn" onclick="openModal('settingsModal')">⚙︎</button>
   </div>
 </header>
@@ -207,58 +190,53 @@ main{max-width:720px;padding:10px 16px 28px}.card{border:0;box-shadow:var(--shad
     Apri questa pagina in Safari → Condividi <b>□↑</b> → <b>Aggiungi alla schermata Home</b> → attiva <b>Apri come app web</b> → Aggiungi.
   </div>
 
-  <section id="homeView" class="v20Home">
-    <div class="simpleHero v20Hero">
+  <section id="homeView">
+    <div class="homeQuickTop">
+      <div class="sectionTitle"><h2>Nuovo movimento</h2><span class="small">Registralo subito</span></div>
+      <div class="quick">
+      <button class="primary" onclick="openQuick()">＋ Spesa</button>
+      <button class="photo" onclick="openModal('photoModal')">📸 Foto / screenshot</button>
+      </div>
+      <button class="settingsShortcut" onclick="openMoneyIn()" style="margin-bottom:5px">💶 Denaro ricevuto / trasferimento<div class="small" style="margin-top:4px;font-weight:600">Entrata, rimborso o spostamento tra i tuoi soldi</div></button>
+      <button class="settingsShortcut" onclick="openCashSpend()" style="margin-bottom:5px">💵 Portafoglio <b id="cashHomeBalance" style="float:right">€ 0,00</b><div class="small" style="margin-top:4px;font-weight:600">Tocca per registrare una spesa in contanti</div></button>
+      <button class="settingsShortcut" onclick="openCashWithdrawal()" style="margin-top:5px">🏧 Ho prelevato contanti</button>
+      <button class="settingsShortcut" onclick="openCashBalanceEdit()" style="margin-top:5px">✏️ Correggi saldo portafoglio</button>
+    </div>
+    <div class="simpleHero">
       <div class="simpleHeroTop">
         <div>
           <div class="kicker">CONTO PRINCIPALE</div>
           <div class="simpleBalance" id="simplePrimaryBalance">€ 0,00</div>
           <div class="cleanNote" id="simpleBalanceDate">Saldo disponibile</div>
         </div>
-        <div class="v20GoalSide">
+        <div style="text-align:right">
           <div class="kicker">OBIETTIVO</div>
-          <div class="v20GoalAmount" id="simpleGoalAmount">—</div>
+          <div style="font-size:20px;font-weight:950" id="simpleGoalAmount">—</div>
         </div>
       </div>
       <div class="goalLine"><i id="simpleGoalBar" style="width:0%"></i></div>
       <div class="goalInfo"><span id="simpleGoalText">Obiettivo</span><b id="simpleGoalGap">€ 0,00</b></div>
     </div>
 
-    <div class="budgetHero v20BudgetHero">
-      <div class="kicker">MARGINE PERSONALE</div>
+    <div class="budgetHero">
+      <div class="kicker">QUANTO POSSO SPENDERE LIBERAMENTE?</div>
       <div class="big" id="freeToSpend">€ 0,00</div>
-      <div class="small" id="freeToSpendNote">Budget minimo per uscite e divertimento</div>
+      <div class="small" id="freeToSpendNote" style="color:#d8e9ff">Budget minimo per uscite e divertimento</div>
       <div class="budgetMeta">
-        <div class="budgetMini"><span class="small">Budget vita del mese</span><b id="lifeBudgetTotal">—</b></div>
-        <button class="budgetMini budgetTap" onclick="openLifeBudgetDetail()"><span class="small">Già usato · dettagli</span><b id="lifeBudgetUsed">€ 0,00</b></button>
-      </div>
-    </div>
-
-    <div class="homeQuickTop v20QuickTop">
-      <div class="sectionTitle v20ActionTitle"><h2>Azioni rapide</h2><span class="small">Registra in pochi secondi</span></div>
-      <div class="v20ActionGrid">
-        <button class="v20Action primary" onclick="openQuick()"><span>＋</span><b>Spesa</b></button>
-        <button class="v20Action incomeAction" onclick="openMoneyIn()"><span>↗</span><b>Entrata</b></button>
-        <button class="v20Action photoAction" onclick="openModal('photoModal')"><span>⌁</span><b>Foto</b></button>
-      </div>
-      <div class="v20Wallet card">
-        <button class="v20WalletMain" onclick="openCashSpend()"><span><b>💵 Portafoglio</b><small>Tocca per registrare una spesa in contanti</small></span><strong id="cashHomeBalance">€ 0,00</strong></button>
-        <div class="v20WalletTools">
-          <button onclick="openCashWithdrawal()">🏧 Prelievo</button>
-          <button onclick="openCashBalanceEdit()">✏️ Correggi saldo</button>
-        </div>
+        <div class="budgetMini"><span class="small" style="color:#d8e9ff">Budget vita del mese</span><b id="lifeBudgetTotal">—</b></div>
+        <button class="budgetMini budgetTap" onclick="openLifeBudgetDetail()"><span class="small" style="color:#d8e9ff">Già usato · tocca per vedere</span><b id="lifeBudgetUsed">€ 0,00</b></button>
       </div>
     </div>
 
     <div class="hidden"><span id="homeGoalEta"></span><span id="homeGoalEtaNote"></span><button id="homeAttention"><span id="homeAttentionText"></span></button></div>
 
+
     <div class="sectionTitle"><h2>Questo mese</h2><span class="small" id="simpleMonthName"></span></div>
-    <div class="monthSimple v20MonthSimple">
+    <div class="monthSimple">
       <div class="card"><div class="kicker">Entrate</div><div class="v green" id="simpleIncome">€ 0</div></div>
       <div class="card"><div class="kicker">Spese</div><div class="v red" id="simpleExpense">€ 0</div></div>
       <div class="card"><div class="kicker">Risparmio</div><div class="v amber" id="simpleSavings">€ 0</div></div>
     </div>
-
     <div class="sectionTitle"><h2>Categorie</h2><span class="small">Tocca per vedere le spese</span></div>
     <div class="card homeCats" id="homeCategories"></div>
 
@@ -390,7 +368,7 @@ main{max-width:720px;padding:10px 16px 28px}.card{border:0;box-shadow:var(--shad
   <div class="nav">
     <button id="nav-home" class="active" onclick="switchView('home')"><span>⌂</span>Home</button>
     <button id="nav-movements" onclick="switchView('movements')"><span>≡</span>Movimenti</button>
-    <button id="nav-stats" onclick="switchView('stats')"><span>▥</span>Analisi</button>
+    <button id="nav-stats" onclick="switchView('stats')"><span>◎</span>Patrimonio</button>
     <button id="nav-budget" onclick="switchView('budget')"><span>✓</span>Piano</button>
   </div>
 </div>
@@ -566,7 +544,7 @@ main{max-width:720px;padding:10px 16px 28px}.card{border:0;box-shadow:var(--shad
   <div class="field"><label>SALDO DISPONIBILE ATTUALE (€)</label><input id="sBalance" inputmode="decimal" placeholder="Serve per “Quanto posso spendere?”"></div>
   <div class="field"><label>OBIETTIVO SALDO MINIMO (€)</label><input id="sGoal" inputmode="decimal"></div><div class="field"><label>BUDGET USCITE E DIVERTIMENTO / MESE (€)</label><input id="sLifeBudget" inputmode="decimal" placeholder="0,00"></div>
   <div class="field"><label>CONTO PREDEFINITO</label><select id="sDefaultAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
-  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V20.0 Beta</b></p>
+  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V19.4.1</b></p>
   <button class="save" onclick="saveSettings()">Salva impostazioni</button>
   <button class="settingsShortcut" onclick="forceAppUpdate()">🔄 Controlla aggiornamenti<div class="small" style="margin-top:4px;font-weight:600">Aggiorna l’app senza cancellare movimenti e impostazioni</div></button>
   <button class="settingsShortcut" onclick="closeModal('settingsModal');switchView('data')">⚙️ Dati, importazioni e backup</button>
@@ -601,7 +579,7 @@ main{max-width:720px;padding:10px 16px 28px}.card{border:0;box-shadow:var(--shad
 
 <script>
 const CATEGORIES = [
-  ['Alimentari','🛒'],['Auto','🚗'],['Casa','🏠'],['Abbonamenti','🔁'],
+  ['Alimentari','🛒'],['Ristoranti','🍴'],['Auto','🚗'],['Casa','🏠'],['Abbonamenti','🔁'],
   ['Shopping','🛍️'],['Spesa alimentare','🛒'],['Viaggi','✈️'],['Salute','⚕️'],['Necessità / imprevisti','🛠️'],['Associazione / anticipi','🤝'],['Sport','⚽'],['Risparmio','💰'],
   ['Finanziamenti','🧾'],['Commissioni','🏦'],['Svago','🎟️'],['Giochi / lotterie','🎰'],['Altro','•']
 ];
@@ -730,16 +708,6 @@ function applyV192Upgrade(){
  // Le vecchie spese già marcate “da rimborsare” sono flussi per conto di altri: incidono sui saldi, non sulle spese personali.
  state.transactions.filter(t=>t.reimb&&(t.type||'expense')==='expense').forEach(t=>{t.thirdParty=true;t.excluded=true;});
  state.settings.upgradeV192=true;saveState();writeCoreSettings();
-}
-
-// V20 — unifica ristorazione e locali nella categoria Svago.
-function applyV20Upgrade(){
- if(state.settings?.upgradeV20)return;
- state.transactions.forEach(t=>{if(t.category==='Ristoranti')t.category='Svago';});
- Object.keys(state.rules||{}).forEach(k=>{if(state.rules[k]==='Ristoranti')state.rules[k]='Svago';});
- state.recurring.forEach(r=>{if(r.category==='Ristoranti')r.category='Svago';});
- state.settings.upgradeV20=true;
- saveState();
 }
 
 function euro(n){return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(Number(n)||0)}
@@ -873,7 +841,6 @@ function init(){
  applyV190Upgrade();
  applyV191Upgrade();
  applyV192Upgrade();
- applyV20Upgrade();
  writeCoreSettings();
  currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0]?.date || today());
  calendarMonth=monthKey(today());
@@ -1950,7 +1917,7 @@ async function restoreBackup(file){try{const x=JSON.parse(await file.text());if(
  state=x;if(!state.rules)state.rules={};if(!state.budgetRules)state.budgetRules={};if(!state.ocrRules)state.ocrRules={};if(!state.settings)state.settings={goal:0,balance:'',defaultAccount:'Carta',startDate:'2026-01-01'};if(!state.settings.startDate)state.settings.startDate='2026-01-01';if(!Array.isArray(state.recurring))state.recurring=[];if(!state.recurringPaid)state.recurringPaid={};if(!state.annualProfiles)state.annualProfiles={};if(!Array.isArray(state.accounts))state.accounts=[];if(!Array.isArray(state.savingsPots))state.savingsPots=[];if(!Array.isArray(state.debts))state.debts=[];if(!Array.isArray(state.futureExpenses))state.futureExpenses=[];if(!Array.isArray(state.goals))state.goals=[];if(!Array.isArray(state.warranties))state.warranties=[];if(!state.syncConfig)state.syncConfig={enabled:false,provider:'',ready:false};state.recurring.forEach(r=>{if(!r.startDate)r.startDate='2026-01-01';if(!r.kind)r.kind=r.category==='Abbonamenti'?'subscription':'commitment';});state.transactions.forEach(t=>{if(!t.type)t.type='expense';if(typeof t.excluded!=='boolean')t.excluded=false;if(!t.origin)t.origin='backup';if(!t.reviewReason)t.reviewReason='';});
  delete state.rules['pro loco'];delete state.rules['sumup *associazione'];delete state.rules['proloco'];
  if(coreBefore){if(!Number(state.settings.goal)&&Number(coreBefore.goal))state.settings.goal=Number(coreBefore.goal);if(!Number(state.settings.lifeBudget)&&Number(coreBefore.lifeBudget))state.settings.lifeBudget=Number(coreBefore.lifeBudget);if(!state.settings.defaultAccount&&coreBefore.defaultAccount)state.settings.defaultAccount=coreBefore.defaultAccount;}
- applyV189RecurringUpgrade();applyV190Upgrade();applyV191Upgrade();applyV192Upgrade();applyV20Upgrade();saveState();writeCoreSettings();if(state.transactions.length)currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0].date);renderAll();toast('Backup ripristinato ✓')}catch(e){toast('Backup non valido')}}
+ applyV189RecurringUpgrade();applyV190Upgrade();applyV191Upgrade();saveState();writeCoreSettings();if(state.transactions.length)currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0].date);renderAll();toast('Backup ripristinato ✓')}catch(e){toast('Backup non valido')}}
 function exportCSV(){
  let s='Data;Descrizione;Importo;Categoria;Provenienza;Tipo;Origine;Escluso;Verificato;Per conto di altri;Rimborsata;Budget vita\n'+state.transactions.sort((a,b)=>b.date.localeCompare(a.date)).map(t=>[t.date,`"${t.merchant.replace(/"/g,'""')}"`,String(t.amount).replace('.',','),t.category,t.account,t.type||'expense',t.origin||'',t.excluded?'Si':'No',t.verified?'Si':'No',(t.reimb||t.thirdParty)?'Si':'No',t.reimbursed?'Si':'No',usesLifeBudget(t)?'Si':'No'].join(';')).join('\n');
  download('movimenti-spese-'+today()+'.csv','\ufeff'+s,'text/csv;charset=utf-8')
