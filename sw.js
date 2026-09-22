@@ -1,4 +1,4 @@
-const CACHE='spese-pwa-v19-5';
+const CACHE='spese-pwa-v19-5-1';
 const CORE=['./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 
 self.addEventListener('install',event=>{

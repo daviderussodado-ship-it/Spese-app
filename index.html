@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#183b78">
-<title>Spese — Le mie finanze V19.5</title>
+<title>Spese — Le mie finanze V19.5.1</title>
 
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
@@ -175,7 +175,7 @@ main{max-width:850px;margin:auto;padding:16px}
 .categoryTap{cursor:pointer}.categoryTap:active{transform:scale(.99);background:#f3f7fd}.categoryChevron{color:var(--blue);font-weight:950;margin-left:8px}
 .categoryDetailTotal{font-size:28px;font-weight:950;margin:5px 0 12px}.homeCats{margin-top:9px}.homeCats .moneyFlowRow{padding:11px 2px}.annualCategoryList{padding:2px 12px}.annualCategoryRow{padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}.annualCategoryRow:last-child{border-bottom:0}.annualCategoryTop{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.annualCategoryName{font-size:13px;font-weight:900}.annualCategoryMeta{font-size:10px;color:var(--muted);margin-top:3px}.annualCategoryAmount{font-size:14px;font-weight:950;text-align:right}.annualCategoryBar{height:7px;background:#edf1f7;border-radius:99px;overflow:hidden;margin-top:8px}.annualCategoryBar i{display:block;height:100%;background:var(--accent);border-radius:99px}.annualCategoryRow:active{transform:scale(.995);background:#f7f9fc}.annualCategoryFooter{padding:10px 0 3px;font-size:10px;color:var(--muted)}
 
-/* V19.5 — patrimonio gestibile, saldi reali e ciclo carte di credito */
+/* V19.5.1 — patrimonio gestibile, saldi reali e ciclo carte di credito */
 .managerRow{padding:13px;border-bottom:1px solid var(--line)}.managerRow:last-child{border-bottom:0}
 .managerTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.managerName{font-weight:900;font-size:14px}.managerMeta{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.35}
 .managerBtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.managerBtns button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 9px;font-size:11px;font-weight:850;color:var(--accent)}
@@ -190,7 +190,7 @@ main{max-width:850px;margin:auto;padding:16px}
 <body>
 <header>
   <div class="headrow">
-    <div><div class="brand">💶 Spese <span class="versionTag">v19.5</span></div><div class="month" id="headerMonth"></div></div>
+    <div><div class="brand">💶 Spese <span class="versionTag">v19.5.1</span></div><div class="month" id="headerMonth"></div></div>
     <button class="iconbtn" onclick="openModal('settingsModal')">⚙︎</button>
   </div>
 </header>
@@ -395,6 +395,7 @@ main{max-width:850px;margin:auto;padding:16px}
   <div class="grab"></div><h2>Aggiungi spesa</h2>
   <div class="field"><input class="moneyInput" id="qAmount" inputmode="decimal" placeholder="0,00 €"></div>
   <div class="field"><label>DOVE? (FACOLTATIVO)</label><input id="qMerchant" autocomplete="off" placeholder="Es. Conad, benzina, bar…" oninput="autoCategory()"></div>
+  <div class="field"><label>NOTE (FACOLTATIVE)</label><textarea id="qNote" rows="2" placeholder="Es. motivo dell’acquisto, per chi era, dettaglio utile…"></textarea></div>
   <div class="field"><label>CATEGORIA</label><div class="catgrid" id="quickCats"></div></div>
   <div class="grid2">
     <div class="field"><label>DATA</label><input id="qDate" type="date"></div>
@@ -452,6 +453,7 @@ main{max-width:850px;margin:auto;padding:16px}
   <div class="grab"></div><h2>Modifica movimento</h2>
   <input type="hidden" id="eId">
   <div class="field"><label>DESCRIZIONE</label><input id="eMerchant"></div>
+  <div class="field"><label>NOTE (FACOLTATIVE)</label><textarea id="eNote" rows="3" placeholder="Aggiungi un dettaglio sull’acquisto…"></textarea></div>
   <div class="grid2">
     <div class="field"><label>IMPORTO</label><input id="eAmount" inputmode="decimal"></div>
     <div class="field"><label>DATA SPESA</label><input id="eDate" type="date"></div>
@@ -547,7 +549,7 @@ main{max-width:850px;margin:auto;padding:16px}
 </div>
 
 
-<!-- V19.5 — GESTIONE PATRIMONIO -->
+<!-- V19.5.1 — GESTIONE PATRIMONIO -->
 <div class="modal" id="assetManagerModal" onclick="backdrop(event,this)">
  <div class="sheet">
   <div class="grab"></div><h2>⚙️ Gestisci patrimonio</h2>
@@ -623,7 +625,7 @@ main{max-width:850px;margin:auto;padding:16px}
   <div class="field"><label>SALDO DISPONIBILE ATTUALE (€)</label><input id="sBalance" inputmode="decimal" placeholder="Serve per “Quanto posso spendere?”"></div>
   <div class="field"><label>OBIETTIVO SALDO MINIMO (€)</label><input id="sGoal" inputmode="decimal"></div><div class="field"><label>BUDGET USCITE E DIVERTIMENTO / MESE (€)</label><input id="sLifeBudget" inputmode="decimal" placeholder="0,00"></div>
   <div class="field"><label>CONTO PREDEFINITO</label><select id="sDefaultAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
-  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V19.5</b></p>
+  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V19.5.1</b></p>
   <button class="save" onclick="saveSettings()">Salva impostazioni</button>
   <button class="settingsShortcut" onclick="forceAppUpdate()">🔄 Controlla aggiornamenti<div class="small" style="margin-top:4px;font-weight:600">Aggiorna l’app senza cancellare movimenti e impostazioni</div></button>
   <button class="settingsShortcut" onclick="closeModal('settingsModal');switchView('data')">⚙️ Dati, importazioni e backup</button>
@@ -792,7 +794,7 @@ function applyV192Upgrade(){
 }
 
 
-// V19.5 — patrimonio gestibile, categoria Svago, saldo certo e ciclo Nexi.
+// V19.5.1 — patrimonio gestibile, categoria Svago, saldo certo e ciclo Nexi.
 function applyV195Upgrade(){
  if(state.settings?.upgradeV195)return;
  state.creditStatements=Array.isArray(state.creditStatements)?state.creditStatements:[];
@@ -835,6 +837,21 @@ function applyV195Upgrade(){
  if(!hasFastweb)state.transactions.push({id:'v195-fastweb-20260922',date:'2026-09-22',createdAt:'2026-09-22T07:17:00+02:00',merchant:'FASTWEB',amount:9.95,category:'Abbonamenti',account:nexi.name,cardAccountId:nexi.id,cardState:'pending',verified:true,reimb:false,origin:'nexi-authorization',type:'expense',excluded:false,reviewReason:'',note:'Autorizzazione Nexi del 22/09/2026; sarà saldata con l’estratto carta.'});
  state.rules['ristorante']='Svago';state.rules['pizzeria']='Svago';state.rules['fast food']='Svago';
  state.settings.upgradeV195=true;saveState();writeCoreSettings();
+}
+
+// V19.5.1 — collega le EasyPark già presenti alla Nexi senza duplicarle.
+function applyV1951Upgrade(){
+ if(state.settings?.upgradeV1951)return;
+ const nexi=state.accounts.find(a=>a.id==='nexi-9011'||/nexi.*9011/i.test(a.name||''));
+ if(nexi){
+   const targets=[['2026-09-07',8.62],['2026-09-16',16.99],['2026-09-18',8.17]];
+   targets.forEach(([date,amount])=>{
+     const candidates=state.transactions.filter(t=>t.date===date&&Math.abs((Number(t.amount)||0)-amount)<.011&&/easypark/i.test(t.merchant||'')&&['expense','refund'].includes(t.type||'expense'));
+     const t=candidates.find(x=>!x.excluded&&!suspectedDuplicate(x))||candidates[0];
+     if(t){t.account=nexi.name;t.cardAccountId=nexi.id;t.cardState='pending';t.verified=true;if(!t.category||t.category==='Altro')t.category='Auto';}
+   });
+ }
+ state.settings.upgradeV1951=true;saveState();writeCoreSettings();
 }
 
 function euro(n){return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(Number(n)||0)}
@@ -968,7 +985,7 @@ function ingestTransaction(tx){
  analyzeIncoming(tx);
  if(tx.cardSettlement&&tx.statementId){
    const existing=state.transactions.find(x=>x.cardSettlement&&x.statementId===tx.statementId);
-   if(existing){Object.assign(existing,{verified:true,reviewReason:'',externalKey:tx.externalKey||existing.externalKey,postedDate:tx.postedDate||tx.date||existing.postedDate});return existing;}
+   if(existing){Object.assign(existing,{verified:true,reviewReason:'',externalKey:tx.externalKey||existing.externalKey,postedDate:tx.postedDate||tx.date||existing.postedDate});const stmt=state.creditStatements.find(x=>x.id===tx.statementId);if(stmt)settleCreditStatement(stmt,existing.date,existing.id);return existing;}
  }
  state.transactions.push(tx);return tx;
 }
@@ -984,6 +1001,7 @@ function init(){
  applyV191Upgrade();
  applyV192Upgrade();
  applyV195Upgrade();
+ applyV1951Upgrade();
  applyDueCreditStatements();
  refreshPaymentSelectors();
  writeCoreSettings();
@@ -1014,11 +1032,13 @@ function cashAccount(){
 function cashBalance(){return Number(cashAccount().balance)||0}
 function setCashBalance(v){cashAccount().balance=Math.max(0,Math.round((Number(v)||0)*100)/100);cashAccount().snapshotDate=today()}
 function openCashSpend(){
+ if(!entityActive(cashAccount())){toast('Portafoglio sospeso o chiuso');return}
  openQuick();
  qAccount.value='Contanti';
  qMerchant.placeholder='Dove li hai spesi? Es. bar, pizzeria…';
 }
 function openCashWithdrawal(){
+ if(!entityActive(cashAccount())){toast('Portafoglio sospeso o chiuso');return}
  cashWithdrawalAmount.value='';cashWithdrawalDate.value=today();openModal('cashWithdrawalModal');setTimeout(()=>cashWithdrawalAmount.focus(),250);
 }
 function saveCashWithdrawal(){
@@ -1028,7 +1048,7 @@ function saveCashWithdrawal(){
  ingestTransaction({id:'cashwd'+Date.now(),date,merchant:'Prelievo contanti → Portafoglio',amount,category:'Altro',account:'Conto Mediolanum → Portafoglio',sourceAccount:'Conto principale',destinationAccount:'Contanti',verified:true,reimb:false,origin:'manual',type:'transfer',excluded:true,reviewReason:''});
  saveState();closeModal('cashWithdrawalModal');renderAll();toast('Contanti aggiunti al portafoglio ✓');
 }
-function openCashBalanceEdit(){cashBalanceInput.value=String(cashBalance()).replace('.',',');cashBalanceDate.value=today();openModal('cashBalanceModal');setTimeout(()=>cashBalanceInput.focus(),200)}
+function openCashBalanceEdit(){if(!entityActive(cashAccount())){toast('Portafoglio sospeso o chiuso');return}cashBalanceInput.value=String(cashBalance()).replace('.',',');cashBalanceDate.value=today();openModal('cashBalanceModal');setTimeout(()=>cashBalanceInput.focus(),200)}
 function saveCashBalanceCorrection(){
  const value=parseAmount(cashBalanceInput.value),date=cashBalanceDate.value||today();
  setCashBalance(value);cashAccount().snapshotDate=date;
@@ -1074,7 +1094,7 @@ function saveMoneyIn(){
 function openQuick(){
  refreshPaymentSelectors();
  selectedCategory='Altro';renderCats();
- qAmount.value='';qMerchant.value='';qDate.value=today();qAccount.value=state.settings.defaultAccount||'Carta';qReimb.checked=false;qLifeBudget.checked=false;qLifeBudgetLabel.textContent=euro(Number(state.settings.lifeBudget)||0);
+ qAmount.value='';qMerchant.value='';qNote.value='';qDate.value=today();qAccount.value=state.settings.defaultAccount||'Carta';qReimb.checked=false;qLifeBudget.checked=false;qLifeBudgetLabel.textContent=euro(Number(state.settings.lifeBudget)||0);
  openModal('quickModal');
  setTimeout(()=>qAmount.focus(),250);
 }
@@ -1088,7 +1108,7 @@ function saveQuick(){
  const amount=parseAmount(qAmount.value); if(!amount){toast('Inserisci un importo');qAmount.focus();return}
  const merchant=qMerchant.value.trim()||'Spesa';
  if(qAccount.value==='Contanti' && amount>cashBalance()){toast('Nel portafoglio risultano '+euro(cashBalance()));return}
- const tx={id:'t'+Date.now(),date:qDate.value||today(),merchant,amount,category:selectedCategory,account:qAccount.value,verified:true,reimb:qReimb.checked,thirdParty:qReimb.checked,origin:'manual',type:'expense',excluded:qReimb.checked,reviewReason:'',lifeBudget:qReimb.checked?false:qLifeBudget.checked};
+ const tx={id:'t'+Date.now(),date:qDate.value||today(),merchant,amount,category:selectedCategory,account:qAccount.value,note:qNote.value.trim(),verified:true,reimb:qReimb.checked,thirdParty:qReimb.checked,origin:'manual',type:'expense',excluded:qReimb.checked,reviewReason:'',lifeBudget:qReimb.checked?false:qLifeBudget.checked};
  ingestTransaction(tx);
  if(qAccount.value==='Contanti')setCashBalance(cashBalance()-amount);
  if(merchant!=='Spesa'){const rk=normMerchant(merchant)||merchant.toLowerCase();state.rules[rk]=selectedCategory;state.budgetRules[rk]=qLifeBudget.checked;}
@@ -1097,12 +1117,12 @@ function saveQuick(){
 function openEdit(id){
  const t=state.transactions.find(x=>x.id===id); if(!t)return;
  refreshPaymentSelectors(t.account);
- eId.value=t.id;eMerchant.value=t.merchant;eAmount.value=String(t.amount).replace('.',',');eDate.value=t.date;ePostedDate.value=t.postedDate||t.operationDate||'';eCategory.value=t.category;eAccount.value=t.account||'Carta';eLifeBudget.checked=usesLifeBudget(t);eReimb.checked=!!(t.reimb||t.thirdParty);eType.value=t.type||'expense';eExcluded.checked=!!t.excluded;eOrigin.value=t.origin||'legacy';eReviewBox.classList.toggle('hidden',!t.reviewReason);eReviewActions.classList.toggle('hidden',!t.reviewReason);eReviewBox.textContent=t.reviewReason||'';openModal('editModal')
+ eId.value=t.id;eMerchant.value=t.merchant;eNote.value=t.note||'';eAmount.value=String(t.amount).replace('.',',');eDate.value=t.date;ePostedDate.value=t.postedDate||t.operationDate||'';eCategory.value=t.category;eAccount.value=t.account||'Carta';eLifeBudget.checked=usesLifeBudget(t);eReimb.checked=!!(t.reimb||t.thirdParty);eType.value=t.type||'expense';eExcluded.checked=!!t.excluded;eOrigin.value=t.origin||'legacy';eReviewBox.classList.toggle('hidden',!t.reviewReason);eReviewActions.classList.toggle('hidden',!t.reviewReason);eReviewBox.textContent=t.reviewReason||'';openModal('editModal')
 }
 function syncThirdPartyEdit(){if(eReimb.checked){eExcluded.checked=true;eLifeBudget.checked=false;}}
 function saveEdit(){
  const t=state.transactions.find(x=>x.id===eId.value); if(!t)return;
- t.merchant=eMerchant.value.trim()||'Spesa';t.amount=parseAmount(eAmount.value);t.date=eDate.value;t.postedDate=ePostedDate.value||'';t.category=eCategory.value;t.account=eAccount.value;t.reimb=eReimb.checked;t.thirdParty=eReimb.checked;t.lifeBudget=eReimb.checked?false:eLifeBudget.checked;t.type=eType.value;t.excluded=eReimb.checked?true:eExcluded.checked;
+ t.merchant=eMerchant.value.trim()||'Spesa';t.note=eNote.value.trim();t.amount=parseAmount(eAmount.value);t.date=eDate.value;t.postedDate=ePostedDate.value||'';t.category=eCategory.value;t.account=eAccount.value;t.reimb=eReimb.checked;t.thirdParty=eReimb.checked;t.lifeBudget=eReimb.checked?false:eLifeBudget.checked;t.type=eType.value;t.excluded=eReimb.checked?true:eExcluded.checked;
  if(t.category==='Ristoranti')t.category='Svago';normalizeCardMetadata(t);
  const rk=normMerchant(t.merchant)||t.merchant.toLowerCase();state.rules[rk]=t.category;state.budgetRules[rk]=t.lifeBudget;saveState();closeModal('editModal');renderAll();toast('Modifica salvata');
 }
@@ -1119,7 +1139,7 @@ function txHTML(list){
    const postedDate=t.postedDate||t.operationDate||'';const posted=postedDate&&postedDate!==t.date?` · contabilizzata ${new Date(postedDate+'T12:00').toLocaleDateString('it-IT')}`:'';
    return `<div class="tx" onclick="openEdit('${t.id}')">
    <div class="catIcon">${getIcon(t.category)}</div>
-   <div><div class="txname">${esc(t.merchant)}</div><div class="txmeta">${new Date(t.date+'T12:00').toLocaleDateString('it-IT')} · ${esc(t.category)}${posted}${(t.reimb||t.thirdParty)?(t.reimbursed?' · rimborsata':' · da rimborsare'):''}</div>${t.verified?'<span class="badge ok">VERIFICATO</span>':'<span class="badge">DA VERIFICARE</span>'}${(t.reimb||t.thirdParty)?'<span class="budgetBadge">PER CONTO DI ALTRI</span>':''}${t.reimbursed?'<span class="badge ok">RIMBORSATA</span>':''}${t.cardState==='pending'?'<span class="cardPending">NEXI · DA SALDARE</span>':(t.cardState==='paid'?'<span class="cardPaid">NEXI · PAGATA</span>':'')}${usesLifeBudget(t)?'<span class="budgetBadge">BUDGET VITA</span>':''}</div>
+   <div><div class="txname">${esc(t.merchant)}</div><div class="txmeta">${new Date(t.date+'T12:00').toLocaleDateString('it-IT')} · ${esc(t.category)}${posted}${(t.reimb||t.thirdParty)?(t.reimbursed?' · rimborsata':' · da rimborsare'):''}</div>${t.note?`<div class="sourceNote">📝 ${esc(t.note)}</div>`:''}${t.verified?'<span class="badge ok">VERIFICATO</span>':'<span class="badge">DA VERIFICARE</span>'}${(t.reimb||t.thirdParty)?'<span class="budgetBadge">PER CONTO DI ALTRI</span>':''}${t.reimbursed?'<span class="badge ok">RIMBORSATA</span>':''}${t.cardState==='pending'?'<span class="cardPending">NEXI · DA SALDARE</span>':(t.cardState==='paid'?'<span class="cardPaid">NEXI · PAGATA</span>':'')}${usesLifeBudget(t)?'<span class="budgetBadge">BUDGET VITA</span>':''}</div>
    <div class="${cls}">${sign}${euro(t.amount)}</div>
  </div>`}).join('');
 }
@@ -2259,9 +2279,9 @@ async function restoreBackup(file){try{const x=JSON.parse(await file.text());if(
  state=x;if(!state.rules)state.rules={};if(!state.budgetRules)state.budgetRules={};if(!state.ocrRules)state.ocrRules={};if(!state.settings)state.settings={goal:0,balance:'',defaultAccount:'Carta',startDate:'2026-01-01'};if(!state.settings.startDate)state.settings.startDate='2026-01-01';if(!Array.isArray(state.recurring))state.recurring=[];if(!state.recurringPaid)state.recurringPaid={};if(!state.annualProfiles)state.annualProfiles={};if(!Array.isArray(state.accounts))state.accounts=[];if(!Array.isArray(state.savingsPots))state.savingsPots=[];if(!Array.isArray(state.debts))state.debts=[];if(!Array.isArray(state.futureExpenses))state.futureExpenses=[];if(!Array.isArray(state.goals))state.goals=[];if(!Array.isArray(state.warranties))state.warranties=[];if(!Array.isArray(state.creditStatements))state.creditStatements=[];if(!Array.isArray(state.balanceSnapshots))state.balanceSnapshots=[];if(!state.syncConfig)state.syncConfig={enabled:false,provider:'',ready:false};state.recurring.forEach(r=>{if(!r.startDate)r.startDate='2026-01-01';if(!r.kind)r.kind=r.category==='Abbonamenti'?'subscription':'commitment';});state.transactions.forEach(t=>{if(!t.type)t.type='expense';if(typeof t.excluded!=='boolean')t.excluded=false;if(!t.origin)t.origin='backup';if(!t.reviewReason)t.reviewReason='';});
  delete state.rules['pro loco'];delete state.rules['sumup *associazione'];delete state.rules['proloco'];
  if(coreBefore){if(!Number(state.settings.goal)&&Number(coreBefore.goal))state.settings.goal=Number(coreBefore.goal);if(!Number(state.settings.lifeBudget)&&Number(coreBefore.lifeBudget))state.settings.lifeBudget=Number(coreBefore.lifeBudget);if(!state.settings.defaultAccount&&coreBefore.defaultAccount)state.settings.defaultAccount=coreBefore.defaultAccount;}
- applyV189RecurringUpgrade();applyV190Upgrade();applyV191Upgrade();applyV192Upgrade();applyV195Upgrade();applyDueCreditStatements();refreshPaymentSelectors();saveState();writeCoreSettings();if(state.transactions.length)currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0].date);renderAll();toast('Backup ripristinato ✓')}catch(e){toast('Backup non valido')}}
+ applyV189RecurringUpgrade();applyV190Upgrade();applyV191Upgrade();applyV192Upgrade();applyV195Upgrade();applyV1951Upgrade();applyDueCreditStatements();refreshPaymentSelectors();saveState();writeCoreSettings();if(state.transactions.length)currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0].date);renderAll();toast('Backup ripristinato ✓')}catch(e){toast('Backup non valido')}}
 function exportCSV(){
- let s='Data;Descrizione;Importo;Categoria;Provenienza;Tipo;Origine;Escluso;Verificato;Per conto di altri;Rimborsata;Budget vita\n'+state.transactions.sort((a,b)=>b.date.localeCompare(a.date)).map(t=>[t.date,`"${t.merchant.replace(/"/g,'""')}"`,String(t.amount).replace('.',','),t.category,t.account,t.type||'expense',t.origin||'',t.excluded?'Si':'No',t.verified?'Si':'No',(t.reimb||t.thirdParty)?'Si':'No',t.reimbursed?'Si':'No',usesLifeBudget(t)?'Si':'No'].join(';')).join('\n');
+ let s='Data;Descrizione;Note;Importo;Categoria;Provenienza;Tipo;Origine;Escluso;Verificato;Per conto di altri;Rimborsata;Budget vita\n'+state.transactions.sort((a,b)=>b.date.localeCompare(a.date)).map(t=>[t.date,`"${t.merchant.replace(/"/g,'""')}"`,`"${String(t.note||'').replace(/"/g,'""')}"`,String(t.amount).replace('.',','),t.category,t.account,t.type||'expense',t.origin||'',t.excluded?'Si':'No',t.verified?'Si':'No',(t.reimb||t.thirdParty)?'Si':'No',t.reimbursed?'Si':'No',usesLifeBudget(t)?'Si':'No'].join(';')).join('\n');
  download('movimenti-spese-'+today()+'.csv','\ufeff'+s,'text/csv;charset=utf-8')
 }
 function saveSettings(){
