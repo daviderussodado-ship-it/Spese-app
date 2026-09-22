@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#183b78">
-<title>Spese — Le mie finanze V19.4.1</title>
+<title>Spese — Le mie finanze V19.5</title>
 
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
@@ -174,12 +174,23 @@ main{max-width:850px;margin:auto;padding:16px}
 .remainingList .recurringItem{padding:11px 13px}.remainingList .recName{font-size:14px}.remainingList .recMeta{font-size:11px}.remainingStatus{font-size:11px;font-weight:850;color:var(--muted);margin-top:3px}
 .categoryTap{cursor:pointer}.categoryTap:active{transform:scale(.99);background:#f3f7fd}.categoryChevron{color:var(--blue);font-weight:950;margin-left:8px}
 .categoryDetailTotal{font-size:28px;font-weight:950;margin:5px 0 12px}.homeCats{margin-top:9px}.homeCats .moneyFlowRow{padding:11px 2px}.annualCategoryList{padding:2px 12px}.annualCategoryRow{padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}.annualCategoryRow:last-child{border-bottom:0}.annualCategoryTop{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.annualCategoryName{font-size:13px;font-weight:900}.annualCategoryMeta{font-size:10px;color:var(--muted);margin-top:3px}.annualCategoryAmount{font-size:14px;font-weight:950;text-align:right}.annualCategoryBar{height:7px;background:#edf1f7;border-radius:99px;overflow:hidden;margin-top:8px}.annualCategoryBar i{display:block;height:100%;background:var(--accent);border-radius:99px}.annualCategoryRow:active{transform:scale(.995);background:#f7f9fc}.annualCategoryFooter{padding:10px 0 3px;font-size:10px;color:var(--muted)}
+
+/* V19.5 — patrimonio gestibile, saldi reali e ciclo carte di credito */
+.managerRow{padding:13px;border-bottom:1px solid var(--line)}.managerRow:last-child{border-bottom:0}
+.managerTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.managerName{font-weight:900;font-size:14px}.managerMeta{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.35}
+.managerBtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.managerBtns button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 9px;font-size:11px;font-weight:850;color:var(--accent)}
+.statusPill{display:inline-block;border-radius:999px;padding:3px 7px;font-size:9px;font-weight:900;margin-left:5px;background:#e8f7f0;color:#13744f}
+.statusPill.suspended{background:#fff3d7;color:#8d6500}.statusPill.closed{background:#eef0f4;color:#667085}
+.cardPending{display:inline-block;margin-top:5px;font-size:10px;background:#fff3d7;color:#8d6500;padding:3px 6px;border-radius:7px;font-weight:800}
+.cardPaid{display:inline-block;margin-top:5px;font-size:10px;background:#e8f7f0;color:#13744f;padding:3px 6px;border-radius:7px;font-weight:800}
+.v195Actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.v195Actions button{margin:0}
+@media(max-width:520px){.v195Actions{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 <header>
   <div class="headrow">
-    <div><div class="brand">💶 Spese <span class="versionTag">v19.4.1</span></div><div class="month" id="headerMonth"></div></div>
+    <div><div class="brand">💶 Spese <span class="versionTag">v19.5</span></div><div class="month" id="headerMonth"></div></div>
     <button class="iconbtn" onclick="openModal('settingsModal')">⚙︎</button>
   </div>
 </header>
@@ -252,7 +263,7 @@ main{max-width:850px;margin:auto;padding:16px}
   </section>
 
   <section id="statsView" class="hidden">
-    <div class="sectionTitle"><h2>Patrimonio</h2><span class="small">Quadro generale</span></div>
+    <div class="sectionTitle"><h2>Patrimonio</h2><button class="linkbtn" onclick="openAssetManager()">⚙️ Gestisci</button></div>
     <div class="filters" id="yearFilters" style="margin-bottom:12px"></div>
     <div class="assetGrid">
       <div class="card assetCard"><div class="kicker">Liquidità disponibile</div><div class="val" id="liquidTotal">€ 0,00</div><div class="small">conti + wallet + contanti</div></div>
@@ -347,6 +358,11 @@ main{max-width:850px;margin:auto;padding:16px}
       <input class="hidden" type="file" id="unifiedFile" accept=".csv,.json,.pdf,image/*" onchange="handleUnifiedImport(this.files[0])">
       <button class="save" onclick="const f=document.getElementById('unifiedFile');f.value='';f.click()">Scegli file / screenshot</button>
       <div class="sourceNote">I dati importati restano nell'app sul dispositivo. I PDF vengono solo letti localmente nel browser; i candidati vanno confermati.</div>
+    </div>
+    <div class="card settingCard" style="margin-bottom:10px"><h3>💳 Estratto conto Nexi</h3><p>Carica CSV, PDF o screenshot della carta. L'app abbina le spese già registrate, evita doppioni e prepara l'addebito Mediolanum del 15 del mese successivo.</p>
+      <input class="hidden" type="file" id="nexiStatementFile" accept=".csv,.pdf,image/*" onchange="handleNexiStatementFile(this.files[0])">
+      <button class="secondary" onclick="const f=document.getElementById('nexiStatementFile');f.value='';f.click()">Carica estratto Nexi</button>
+      <div class="sourceNote">Le spese restano nelle loro categorie. Il saldo Mediolanum scende solo quando viene saldato l'estratto.</div>
     </div>
     <div class="settingsGrid">
       <div class="card settingCard"><h3>📥 Importa estratto conto</h3><p>Prima indica da dove arriva. Tutti i movimenti passano dal controllo anti-duplicati e trasferimenti.</p>
@@ -530,6 +546,69 @@ main{max-width:850px;margin:auto;padding:16px}
  </div>
 </div>
 
+
+<!-- V19.5 — GESTIONE PATRIMONIO -->
+<div class="modal" id="assetManagerModal" onclick="backdrop(event,this)">
+ <div class="sheet">
+  <div class="grab"></div><h2>⚙️ Gestisci patrimonio</h2>
+  <p class="small">Puoi aggiungere, modificare, sospendere o chiudere le voci. Lo storico non viene mai cancellato.</p>
+  <div class="v195Actions">
+   <button class="secondary" onclick="openAssetEditor('account')">＋ Conto / wallet</button>
+   <button class="secondary" onclick="openAssetEditor('credit')">＋ Carta di credito</button>
+   <button class="secondary" onclick="openAssetEditor('pot')">＋ Salvadanaio</button>
+   <button class="secondary" onclick="openAssetEditor('debt')">＋ Finanziamento</button>
+  </div>
+  <div class="card" id="assetManagerList"></div>
+  <button class="secondary" onclick="closeModal('assetManagerModal')">Chiudi</button>
+ </div>
+</div>
+
+<div class="modal" id="assetEditModal" onclick="backdrop(event,this)">
+ <div class="sheet">
+  <div class="grab"></div><h2 id="assetEditTitle">Voce patrimonio</h2>
+  <input type="hidden" id="assetEntityType"><input type="hidden" id="assetEntityId">
+  <div class="field"><label>NOME</label><input id="assetName" placeholder="Nome"></div>
+  <div class="field"><label>STATO</label><select id="assetStatus"><option value="active">Attivo</option><option value="suspended">Sospeso</option><option value="closed">Chiuso</option></select></div>
+  <div class="field assetAccountField"><label>TIPO</label><select id="assetKind"><option>Conto</option><option>Wallet</option><option>Contanti</option><option>Carta di debito</option><option>Carta di credito</option></select></div>
+  <div class="field assetAccountField"><label>SALDO / VALORE (€)</label><input id="assetBalance" inputmode="decimal"><div class="sourceNote">Per un conto già esistente usa “Saldo reale”, così la correzione non diventa una falsa entrata o spesa.</div></div>
+  <div class="field assetCreditField hidden"><label>LIMITE CARTA (€)</label><input id="assetCreditLimit" inputmode="decimal"></div>
+  <label class="budgetChoice assetAccountField"><input type="checkbox" id="assetPrimary"><span>Conto principale<small>Usato come riferimento principale nella Home.</small></span></label>
+  <label class="budgetChoice assetAccountField"><input type="checkbox" id="assetSpendable" checked><span>Liquidità disponibile<small>Conta questo saldo tra i soldi disponibili.</small></span></label>
+  <div class="field assetPotField hidden"><label>SALDO SALVADANAIO (€)</label><input id="assetPotBalance" inputmode="decimal"></div>
+  <div class="grid2 assetPotField hidden"><div class="field"><label>OBIETTIVO (€)</label><input id="assetTarget" inputmode="decimal"></div><div class="field"><label>VERSAMENTO / MESE (€)</label><input id="assetContribution" inputmode="decimal"></div></div>
+  <div class="grid2 assetPotField hidden"><div class="field"><label>GIORNO</label><input id="assetPotDay" type="number" min="1" max="31"></div><div class="field"><label>GESTIONE</label><select id="assetPotMode"><option value="automatic">Automatica</option><option value="manual">Manuale</option></select></div></div>
+  <div class="field assetDebtField hidden"><label>DEBITO RESIDUO (€)</label><input id="assetResidual" inputmode="decimal"></div>
+  <div class="grid2 assetDebtField hidden"><div class="field"><label>RATA (€)</label><input id="assetInstallment" inputmode="decimal"></div><div class="field"><label>GIORNO ADDEBITO</label><input id="assetDebtDay" type="number" min="1" max="31"></div></div>
+  <div class="field assetDebtField hidden"><label>DATA FINE</label><input id="assetEndDate" type="date"></div>
+  <button class="save" onclick="saveAssetEntity()">Salva ✓</button>
+  <button class="secondary" onclick="closeModal('assetEditModal')">Annulla</button>
+ </div>
+</div>
+
+<div class="modal" id="balanceSnapshotModal" onclick="backdrop(event,this)">
+ <div class="sheet">
+  <div class="grab"></div><h2>🔄 Aggiorna saldo reale</h2>
+  <input type="hidden" id="snapshotAccountId">
+  <p class="small" id="snapshotAccountName"></p>
+  <div class="field"><label>SALDO REALE (€)</label><input class="moneyInput" id="snapshotBalance" inputmode="decimal"></div>
+  <div class="grid2"><div class="field"><label>DATA</label><input id="snapshotDate" type="date"></div><div class="field"><label>ORA</label><input id="snapshotTime" type="time"></div></div>
+  <div class="infoStrip">È un punto certo del saldo: non crea né un'entrata né una spesa.</div>
+  <button class="save" onclick="saveRealBalance()">Imposta saldo certo ✓</button>
+  <button class="secondary" onclick="closeModal('balanceSnapshotModal')">Annulla</button>
+ </div>
+</div>
+
+<div class="modal" id="creditStatementModal" onclick="backdrop(event,this)">
+ <div class="sheet">
+  <div class="grab"></div><h2>💳 Conferma estratto Nexi</h2>
+  <div class="infoStrip" id="creditStmtInfo">Movimenti trovati</div>
+  <div class="field"><label>TOTALE ESTRATTO / PROSSIMO ADDEBITO (€)</label><input class="moneyInput" id="creditStmtTotal" inputmode="decimal"></div>
+  <div class="field"><label>DATA ADDEBITO MEDIOLANUM</label><input id="creditStmtDueDate" type="date"></div>
+  <button class="save" onclick="confirmCreditStatement()">Conferma estratto ✓</button>
+  <button class="secondary" onclick="closeModal('creditStatementModal')">Annulla</button>
+ </div>
+</div>
+
 <!-- SETTINGS -->
 <div class="modal" id="settingsModal" onclick="backdrop(event,this)">
  <div class="sheet">
@@ -544,7 +623,7 @@ main{max-width:850px;margin:auto;padding:16px}
   <div class="field"><label>SALDO DISPONIBILE ATTUALE (€)</label><input id="sBalance" inputmode="decimal" placeholder="Serve per “Quanto posso spendere?”"></div>
   <div class="field"><label>OBIETTIVO SALDO MINIMO (€)</label><input id="sGoal" inputmode="decimal"></div><div class="field"><label>BUDGET USCITE E DIVERTIMENTO / MESE (€)</label><input id="sLifeBudget" inputmode="decimal" placeholder="0,00"></div>
   <div class="field"><label>CONTO PREDEFINITO</label><select id="sDefaultAccount"><option value="Carta">Carta (non specificata)</option><option>Conto principale</option><option>Carta di debito</option><option>Carta di credito</option><option>Satispay</option><option>PayPal</option><option value="Contanti">💵 Portafoglio / contanti</option></select></div>
-  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V19.4.1</b></p>
+  <p class="small">I movimenti restano sul dispositivo. Il cambio anno non cancella nulla: cambia soltanto l’esercizio che stai consultando.</p><p class="small"><b>Versione app: V19.5</b></p>
   <button class="save" onclick="saveSettings()">Salva impostazioni</button>
   <button class="settingsShortcut" onclick="forceAppUpdate()">🔄 Controlla aggiornamenti<div class="small" style="margin-top:4px;font-weight:600">Aggiorna l’app senza cancellare movimenti e impostazioni</div></button>
   <button class="settingsShortcut" onclick="closeModal('settingsModal');switchView('data')">⚙️ Dati, importazioni e backup</button>
@@ -579,7 +658,7 @@ main{max-width:850px;margin:auto;padding:16px}
 
 <script>
 const CATEGORIES = [
-  ['Alimentari','🛒'],['Ristoranti','🍴'],['Auto','🚗'],['Casa','🏠'],['Abbonamenti','🔁'],
+  ['Alimentari','🛒'],['Auto','🚗'],['Casa','🏠'],['Abbonamenti','🔁'],
   ['Shopping','🛍️'],['Spesa alimentare','🛒'],['Viaggi','✈️'],['Salute','⚕️'],['Necessità / imprevisti','🛠️'],['Associazione / anticipi','🤝'],['Sport','⚽'],['Risparmio','💰'],
   ['Finanziamenti','🧾'],['Commissioni','🏦'],['Svago','🎟️'],['Giochi / lotterie','🎰'],['Altro','•']
 ];
@@ -611,6 +690,8 @@ if(!state.ocrRules||typeof state.ocrRules!=='object')state.ocrRules={};
 if(!state.syncConfig || typeof state.syncConfig!=='object')state.syncConfig={enabled:false,provider:'',ready:false};
 if(!Array.isArray(state.goals))state.goals=[];
 if(!Array.isArray(state.warranties))state.warranties=[];
+if(!Array.isArray(state.creditStatements))state.creditStatements=[];
+if(!Array.isArray(state.balanceSnapshots))state.balanceSnapshots=[];
 
 state.recurring.forEach(r=>{if(!r.startDate)r.startDate='2026-01-01';if(!r.kind)r.kind=r.category==='Abbonamenti'?'subscription':'commitment';});
 delete state.rules?.['pro loco']; delete state.rules?.['sumup *associazione']; delete state.rules?.['proloco'];
@@ -710,6 +791,52 @@ function applyV192Upgrade(){
  state.settings.upgradeV192=true;saveState();writeCoreSettings();
 }
 
+
+// V19.5 — patrimonio gestibile, categoria Svago, saldo certo e ciclo Nexi.
+function applyV195Upgrade(){
+ if(state.settings?.upgradeV195)return;
+ state.creditStatements=Array.isArray(state.creditStatements)?state.creditStatements:[];
+ state.balanceSnapshots=Array.isArray(state.balanceSnapshots)?state.balanceSnapshots:[];
+ state.transactions.forEach(t=>{
+   if(t.category==='Ristoranti')t.category='Svago';
+   const ca=creditAccountForLabel(t.account);
+   if(ca && ['expense','refund'].includes(t.type||'expense')){
+     t.cardAccountId=ca.id;
+     if(!t.cardState)t.cardState=t.date>='2026-09-01'?'pending':'paid';
+   }
+ });
+ Object.keys(state.rules||{}).forEach(k=>{if(state.rules[k]==='Ristoranti')state.rules[k]='Svago'});
+ state.accounts.forEach(a=>{if(!a.status)a.status='active'});
+ state.savingsPots.forEach(a=>{if(!a.status)a.status='active';if(!a.mode)a.mode=(Number(a.contribution)||0)?'automatic':'manual'});
+ state.debts.forEach(a=>{if(!a.status)a.status='active'});
+ let main=mainAccount();
+ if(main && (!main.snapshotDate || main.snapshotDate<='2026-09-21')){
+   main.balance=2685.77;main.snapshotDate='2026-09-21';main.snapshotTime='08:31';main.snapshotCreatedAt='2026-09-21T08:31:00+02:00';main.primary=true;main.status=main.status||'active';
+   state.settings.balance='2685.77';
+   if(!state.balanceSnapshots.some(x=>x.id==='v195-mediolanum-20260921-0831'))state.balanceSnapshots.push({id:'v195-mediolanum-20260921-0831',accountId:main.id,amount:2685.77,date:'2026-09-21',time:'08:31',createdAt:'2026-09-21T08:31:00+02:00'});
+ }
+ let nexi=state.accounts.find(a=>a.id==='nexi-9011'||/nexi.*9011/i.test(a.name||''));
+ if(!nexi){
+   nexi={id:'nexi-9011',name:'Nexi •9011',kind:'Carta di credito',creditLimit:1500,spendable:false,primary:false,status:'active',billingDay:15,paymentAccountId:main?.id||'mediolanum-main'};
+   state.accounts.push(nexi);
+ }else{
+   nexi.kind='Carta di credito';nexi.spendable=false;nexi.status=nexi.status||'active';nexi.billingDay=15;nexi.paymentAccountId=main?.id||nexi.paymentAccountId||'mediolanum-main';
+ }
+ if(!state.accounts.some(a=>/^paypal$/i.test(a.name||'')))state.accounts.push({id:'paypal-wallet',name:'PayPal',kind:'Wallet',balance:0,balanceKnown:false,spendable:false,primary:false,status:'active'});
+ // Il regolamento Nexi del 15/09 non è una nuova spesa personale.
+ state.transactions.filter(t=>t.date==='2026-09-15'&&Math.abs((Number(t.amount)||0)-381.81)<.011&&/mediolanum|conto principale|carta di debito/i.test(t.account||'')).forEach(t=>{
+   Object.assign(t,{type:'transfer',excluded:true,verified:true,cardSettlement:true,sourceAccount:'Conto principale',destinationAccount:nexi.name,reviewReason:'',category:t.category||'Altro'});
+ });
+ // Il saldo del 21/09 è già successivo ai due movimenti che lo hanno portato a 2.685,77 €.
+ const has25=state.transactions.some(t=>t.date==='2026-09-21'&&Math.abs((Number(t.amount)||0)-25)<.011&&/mediolanum|conto principale|carta di debito/i.test(t.account||''));
+ if(!has25)state.transactions.push({id:'v195-sdd-25-20260921',date:'2026-09-21',createdAt:'2026-09-21T08:30:00+02:00',merchant:'Addebito SDD da identificare',amount:25,category:'Altro',account:'Conto Mediolanum',verified:false,reimb:false,origin:'mediolanum-snapshot-2026-09-21',type:'expense',excluded:false,reviewReason:'Addebito SDD di 25,00 € del 21/09/2026: causale da identificare.'});
+ // Fastweb del 22/09 è una spesa Nexi: categoria subito, Mediolanum invariato fino al saldo carta.
+ const hasFastweb=state.transactions.some(t=>t.date==='2026-09-22'&&Math.abs((Number(t.amount)||0)-9.95)<.011&&/fastweb/i.test(t.merchant||''));
+ if(!hasFastweb)state.transactions.push({id:'v195-fastweb-20260922',date:'2026-09-22',createdAt:'2026-09-22T07:17:00+02:00',merchant:'FASTWEB',amount:9.95,category:'Abbonamenti',account:nexi.name,cardAccountId:nexi.id,cardState:'pending',verified:true,reimb:false,origin:'nexi-authorization',type:'expense',excluded:false,reviewReason:'',note:'Autorizzazione Nexi del 22/09/2026; sarà saldata con l’estratto carta.'});
+ state.rules['ristorante']='Svago';state.rules['pizzeria']='Svago';state.rules['fast food']='Svago';
+ state.settings.upgradeV195=true;saveState();writeCoreSettings();
+}
+
 function euro(n){return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(Number(n)||0)}
 function today(){ return new Date().toISOString().slice(0,10) }
 function monthKey(d){return d.slice(0,7)}
@@ -778,6 +905,13 @@ function lifeBudgetImpact(t){
 }
 function analyzeIncoming(t){
  t.type=t.type||'expense';t.excluded=!!t.excluded;t.reviewReason=t.reviewReason||'';
+ const matchedStatement=matchingCreditStatement(t);
+ if(matchedStatement && !creditAccountForLabel(t.account)){
+   t.type='transfer';t.excluded=true;t.verified=true;t.reviewReason='';t.cardSettlement=true;t.statementId=matchedStatement.id;
+   t.sourceAccount='Conto principale';t.destinationAccount=creditAccountById(matchedStatement.cardAccountId)?.name||'Nexi / carta di credito';
+   settleCreditStatement(matchedStatement,t.date,t.id);
+   return t;
+ }
  if(isTransferDescription(t.merchant)){
    t.type='transfer';t.excluded=true;t.verified=false;t.reviewReason='Possibile trasferimento interno: non viene contato come spesa.';
    return t;
@@ -827,8 +961,16 @@ function repairDuplicateFlags(){
 }
 function ingestTransaction(tx){
  tx.id=tx.id||('tx'+Date.now()+Math.random().toString(36).slice(2,6));
+ tx.createdAt=tx.createdAt||new Date().toISOString();
  tx.origin=tx.origin||'manual';tx.type=tx.type||'expense';tx.excluded=!!tx.excluded;tx.reviewReason=tx.reviewReason||'';
- analyzeIncoming(tx);state.transactions.push(tx);return tx;
+ if(tx.category==='Ristoranti')tx.category='Svago';
+ normalizeCardMetadata(tx);
+ analyzeIncoming(tx);
+ if(tx.cardSettlement&&tx.statementId){
+   const existing=state.transactions.find(x=>x.cardSettlement&&x.statementId===tx.statementId);
+   if(existing){Object.assign(existing,{verified:true,reviewReason:'',externalKey:tx.externalKey||existing.externalKey,postedDate:tx.postedDate||tx.date||existing.postedDate});return existing;}
+ }
+ state.transactions.push(tx);return tx;
 }
 
 function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
@@ -841,6 +983,9 @@ function init(){
  applyV190Upgrade();
  applyV191Upgrade();
  applyV192Upgrade();
+ applyV195Upgrade();
+ applyDueCreditStatements();
+ refreshPaymentSelectors();
  writeCoreSettings();
  currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0]?.date || today());
  calendarMonth=monthKey(today());
@@ -927,6 +1072,7 @@ function saveMoneyIn(){
 }
 
 function openQuick(){
+ refreshPaymentSelectors();
  selectedCategory='Altro';renderCats();
  qAmount.value='';qMerchant.value='';qDate.value=today();qAccount.value=state.settings.defaultAccount||'Carta';qReimb.checked=false;qLifeBudget.checked=false;qLifeBudgetLabel.textContent=euro(Number(state.settings.lifeBudget)||0);
  openModal('quickModal');
@@ -950,12 +1096,14 @@ function saveQuick(){
 }
 function openEdit(id){
  const t=state.transactions.find(x=>x.id===id); if(!t)return;
+ refreshPaymentSelectors(t.account);
  eId.value=t.id;eMerchant.value=t.merchant;eAmount.value=String(t.amount).replace('.',',');eDate.value=t.date;ePostedDate.value=t.postedDate||t.operationDate||'';eCategory.value=t.category;eAccount.value=t.account||'Carta';eLifeBudget.checked=usesLifeBudget(t);eReimb.checked=!!(t.reimb||t.thirdParty);eType.value=t.type||'expense';eExcluded.checked=!!t.excluded;eOrigin.value=t.origin||'legacy';eReviewBox.classList.toggle('hidden',!t.reviewReason);eReviewActions.classList.toggle('hidden',!t.reviewReason);eReviewBox.textContent=t.reviewReason||'';openModal('editModal')
 }
 function syncThirdPartyEdit(){if(eReimb.checked){eExcluded.checked=true;eLifeBudget.checked=false;}}
 function saveEdit(){
  const t=state.transactions.find(x=>x.id===eId.value); if(!t)return;
  t.merchant=eMerchant.value.trim()||'Spesa';t.amount=parseAmount(eAmount.value);t.date=eDate.value;t.postedDate=ePostedDate.value||'';t.category=eCategory.value;t.account=eAccount.value;t.reimb=eReimb.checked;t.thirdParty=eReimb.checked;t.lifeBudget=eReimb.checked?false:eLifeBudget.checked;t.type=eType.value;t.excluded=eReimb.checked?true:eExcluded.checked;
+ if(t.category==='Ristoranti')t.category='Svago';normalizeCardMetadata(t);
  const rk=normMerchant(t.merchant)||t.merchant.toLowerCase();state.rules[rk]=t.category;state.budgetRules[rk]=t.lifeBudget;saveState();closeModal('editModal');renderAll();toast('Modifica salvata');
 }
 function markVerified(){const t=state.transactions.find(x=>x.id===eId.value);if(t){t.verified=true;t.reviewReason='';saveState();closeModal('editModal');renderAll();toast('Movimento verificato ✓')}}
@@ -971,7 +1119,7 @@ function txHTML(list){
    const postedDate=t.postedDate||t.operationDate||'';const posted=postedDate&&postedDate!==t.date?` · contabilizzata ${new Date(postedDate+'T12:00').toLocaleDateString('it-IT')}`:'';
    return `<div class="tx" onclick="openEdit('${t.id}')">
    <div class="catIcon">${getIcon(t.category)}</div>
-   <div><div class="txname">${esc(t.merchant)}</div><div class="txmeta">${new Date(t.date+'T12:00').toLocaleDateString('it-IT')} · ${esc(t.category)}${posted}${(t.reimb||t.thirdParty)?(t.reimbursed?' · rimborsata':' · da rimborsare'):''}</div>${t.verified?'<span class="badge ok">VERIFICATO</span>':'<span class="badge">DA VERIFICARE</span>'}${(t.reimb||t.thirdParty)?'<span class="budgetBadge">PER CONTO DI ALTRI</span>':''}${t.reimbursed?'<span class="badge ok">RIMBORSATA</span>':''}${usesLifeBudget(t)?'<span class="budgetBadge">BUDGET VITA</span>':''}</div>
+   <div><div class="txname">${esc(t.merchant)}</div><div class="txmeta">${new Date(t.date+'T12:00').toLocaleDateString('it-IT')} · ${esc(t.category)}${posted}${(t.reimb||t.thirdParty)?(t.reimbursed?' · rimborsata':' · da rimborsare'):''}</div>${t.verified?'<span class="badge ok">VERIFICATO</span>':'<span class="badge">DA VERIFICARE</span>'}${(t.reimb||t.thirdParty)?'<span class="budgetBadge">PER CONTO DI ALTRI</span>':''}${t.reimbursed?'<span class="badge ok">RIMBORSATA</span>':''}${t.cardState==='pending'?'<span class="cardPending">NEXI · DA SALDARE</span>':(t.cardState==='paid'?'<span class="cardPaid">NEXI · PAGATA</span>':'')}${usesLifeBudget(t)?'<span class="budgetBadge">BUDGET VITA</span>':''}</div>
    <div class="${cls}">${sign}${euro(t.amount)}</div>
  </div>`}).join('');
 }
@@ -1280,6 +1428,190 @@ function renderBudget(){renderRecurringPanelsSafe();const plb=document.getElemen
 }
 
 
+
+function entityActive(x){return (x?.status||'active')==='active'}
+function entityOpen(x){return (x?.status||'active')!=='closed'}
+function statusLabel(status){
+ const s=status||'active',txt=s==='closed'?'CHIUSO':s==='suspended'?'SOSPESO':'ATTIVO';
+ return '<span class="statusPill '+(s==='active'?'':s)+'">'+txt+'</span>';
+}
+function creditAccountById(id){return state.accounts.find(a=>a.id===id&&accountIsCredit(a))}
+function creditAccountForLabel(label){
+ const q=String(label||'').toLowerCase();
+ return state.accounts.find(a=>accountIsCredit(a)&&(a.id===label||String(a.name||'').toLowerCase()===q||/carta di credito|nexi|9011/.test(q)));
+}
+function isCreditSource(label){return !!creditAccountForLabel(label)||/carta di credito|nexi|9011/i.test(label||'')}
+function mainAccount(){return state.accounts.find(a=>a.primary===true)||state.accounts.find(a=>a.id==='mediolanum-main')||state.accounts.find(a=>/mediolanum/i.test(a.name||''))}
+function normalizeCardMetadata(t){
+ if(t.category==='Ristoranti')t.category='Svago';
+ const ca=creditAccountForLabel(t.account);
+ if(ca&&['expense','refund'].includes(t.type||'expense')){t.cardAccountId=ca.id;if(!t.cardState||t.cardState==='none')t.cardState='pending';}
+ else if(!t.statementId&&!t.cardSettlement){delete t.cardAccountId;delete t.cardState;}
+ return t;
+}
+function paymentValueForAccount(a){
+ if(accountIsMain(a))return 'Conto principale';
+ if(accountIsSatispay(a))return 'Satispay';
+ if(/portafoglio|contanti/i.test((a.name||'')+' '+(a.kind||'')))return 'Contanti';
+ return a.name;
+}
+function activePaymentOptions(){
+ const out=[{value:'Carta',label:'Carta (non specificata)'}],seen=new Set(['Carta']);
+ const push=(value,label)=>{if(!value||seen.has(value))return;seen.add(value);out.push({value,label:label||value})};
+ state.accounts.filter(a=>entityActive(a)&&!accountIsInvestment(a)).forEach(a=>push(paymentValueForAccount(a),a.name));
+ push('Carta di debito','Carta di debito');
+ return out;
+}
+function setSelectOptions(id,opts,current,extra=false){
+ const el=document.getElementById(id);if(!el)return;
+ const arr=[...opts];if(current&&!arr.some(o=>o.value===current))arr.push({value:current,label:current+' · storico'});
+ if(extra&&!arr.some(o=>o.value==='Carta'))arr.push({value:'Carta',label:'Altro / riconosci dopo'});
+ el.innerHTML=arr.map(o=>'<option value="'+esc(o.value)+'">'+esc(o.label)+'</option>').join('');
+ if(current&&arr.some(o=>o.value===current))el.value=current;
+}
+function refreshPaymentSelectors(currentHistorical=''){
+ const opts=activePaymentOptions(),def=state.settings.defaultAccount||'Conto principale';
+ ['qAccount','photoSource','importSource','unifiedSource','sDefaultAccount','eAccount'].forEach(id=>setSelectOptions(id,opts,id==='eAccount'?currentHistorical:def,id==='unifiedSource'));
+ const transfers=opts.filter(o=>o.value!=='Carta');
+ setSelectOptions('miSource',transfers,'Conto principale');setSelectOptions('miDestination',transfers,'Conto principale');
+}
+
+function openAssetManager(){renderAssetManager();openModal('assetManagerModal')}
+function renderAssetManager(){
+ const el=document.getElementById('assetManagerList');if(!el)return;
+ const row=(type,x,meta)=>{
+   const balanceBtn=(type==='account'&&!accountIsCredit(x))?'<button onclick="openRealBalance(\''+x.id+'\')">🔄 Saldo reale</button>':'';
+   return '<div class="managerRow"><div class="managerTop"><div><div class="managerName">'+esc(x.name||'Senza nome')+' '+statusLabel(x.status)+'</div><div class="managerMeta">'+meta+'</div></div></div><div class="managerBtns"><button onclick="openAssetEditor(\''+type+'\',\''+x.id+'\')">✏️ Modifica</button>'+balanceBtn+'</div></div>';
+ };
+ let html='';
+ if(state.accounts.length){
+   html+='<div class="kicker" style="padding:12px 13px 4px">CONTI, WALLET E CARTE</div>'+state.accounts.filter(a=>!accountIsInvestment(a)).map(a=>{
+     const meta=esc(a.kind||'Conto')+(accountIsCredit(a)?' · da saldare '+euro(creditCardUsed(a)):' · '+(a.balanceKnown===false?'saldo non impostato':euro(currentAccountBalance(a))));
+     return row(accountIsCredit(a)?'credit':'account',a,meta);
+   }).join('');
+ }
+ if(state.savingsPots.length){
+   html+='<div class="kicker" style="padding:14px 13px 4px">SALVADANAI</div>'+state.savingsPots.map(x=>row('pot',x,euro(x.balance||0)+(x.target?' / '+euro(x.target):'')+(x.contribution?' · '+euro(x.contribution)+'/mese':''))).join('');
+ }
+ if(state.debts.length){
+   html+='<div class="kicker" style="padding:14px 13px 4px">FINANZIAMENTI</div>'+state.debts.map(x=>row('debt',x,'Residuo '+euro(x.residual||0)+(x.installment?' · rata '+euro(x.installment):''))).join('');
+ }
+ el.innerHTML=html||'<div class="empty">Nessuna voce</div>';
+}
+function toggleAssetFields(type){
+ document.querySelectorAll('.assetAccountField').forEach(e=>e.classList.toggle('hidden',!['account','credit'].includes(type)));
+ document.querySelectorAll('.assetCreditField').forEach(e=>e.classList.toggle('hidden',type!=='credit'));
+ document.querySelectorAll('.assetPotField').forEach(e=>e.classList.toggle('hidden',type!=='pot'));
+ document.querySelectorAll('.assetDebtField').forEach(e=>e.classList.toggle('hidden',type!=='debt'));
+}
+function openAssetEditor(type,id=''){
+ let x=null;if(id)x=type==='pot'?state.savingsPots.find(v=>v.id===id):type==='debt'?state.debts.find(v=>v.id===id):state.accounts.find(v=>v.id===id);
+ assetEntityType.value=type;assetEntityId.value=id||'';toggleAssetFields(type);
+ assetEditTitle.textContent=(id?'Modifica ':'Nuovo ')+(type==='pot'?'salvadanaio':type==='debt'?'finanziamento':type==='credit'?'carta di credito':'conto / wallet');
+ assetName.value=x?.name||'';assetStatus.value=x?.status||'active';assetKind.value=type==='credit'?'Carta di credito':(x?.kind||'Conto');assetBalance.value=x&&x.balanceKnown!==false?String(Number(x.balance)||0).replace('.',','):'';assetBalance.disabled=!!x;
+ assetCreditLimit.value=x?.creditLimit?String(x.creditLimit).replace('.',','):'';assetPrimary.checked=!!x?.primary;assetSpendable.checked=x?.spendable!==false&&!accountIsCredit(x||{kind:type==='credit'?'Carta di credito':''});
+ assetPotBalance.value=x?.balance?String(x.balance).replace('.',','):'';assetTarget.value=x?.target?String(x.target).replace('.',','):'';assetContribution.value=x?.contribution?String(x.contribution).replace('.',','):'';assetPotDay.value=x?.dueDay||'';assetPotMode.value=x?.mode||((Number(x?.contribution)||0)?'automatic':'manual');
+ assetResidual.value=x?.residual?String(x.residual).replace('.',','):'';assetInstallment.value=x?.installment?String(x.installment).replace('.',','):'';assetDebtDay.value=x?.dueDay||'';assetEndDate.value=x?.endDate||'';
+ closeModal('assetManagerModal');openModal('assetEditModal');
+}
+function saveAssetEntity(){
+ const type=assetEntityType.value,id=assetEntityId.value||('asset-'+Date.now()),name=assetName.value.trim();if(!name){toast('Inserisci un nome');return}
+ if(type==='pot'){
+   const o={id,name,status:assetStatus.value,balance:parseAmount(assetPotBalance.value),target:parseAmount(assetTarget.value),contribution:parseAmount(assetContribution.value),dueDay:Number(assetPotDay.value)||0,mode:assetPotMode.value||'manual'};upsertById(state.savingsPots,o);
+ }else if(type==='debt'){
+   const o={id,name,status:assetStatus.value,residual:parseAmount(assetResidual.value),installment:parseAmount(assetInstallment.value),dueDay:Number(assetDebtDay.value)||0,endDate:assetEndDate.value||''};upsertById(state.debts,o);
+ }else{
+   const existing=state.accounts.find(a=>a.id===id),kind=type==='credit'?'Carta di credito':assetKind.value,oldName=existing?.name||'';
+   const entered=assetBalance.value.trim(),o={id,name,status:assetStatus.value,kind,creditLimit:parseAmount(assetCreditLimit.value),primary:assetPrimary.checked,spendable:type==='credit'?false:assetSpendable.checked};
+   if(existing){o.balance=existing.balance;o.snapshotDate=existing.snapshotDate;o.snapshotTime=existing.snapshotTime;o.snapshotCreatedAt=existing.snapshotCreatedAt;o.balanceKnown=existing.balanceKnown;o.aliases=[...(existing.aliases||[])];if(oldName&&oldName!==name&&!o.aliases.includes(oldName))o.aliases.push(oldName);}
+   else{o.balance=entered?parseAmount(entered):0;o.balanceKnown=!!entered;o.snapshotDate=today();o.snapshotCreatedAt=new Date().toISOString();}
+   if(o.primary)state.accounts.forEach(a=>{if(a.id!==id)a.primary=false});
+   upsertById(state.accounts,o);
+ }
+ saveState();refreshPaymentSelectors();renderAll();closeModal('assetEditModal');renderAssetManager();openModal('assetManagerModal');toast('Patrimonio aggiornato ✓');
+}
+function openRealBalance(id){
+ const a=state.accounts.find(x=>x.id===id);if(!a||accountIsCredit(a))return;
+ snapshotAccountId.value=id;snapshotAccountName.textContent=a.name;snapshotBalance.value=a.balanceKnown===false?'':String(currentAccountBalance(a)).replace('.',',');snapshotDate.value=today();
+ const n=new Date();snapshotTime.value=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+ closeModal('assetManagerModal');openModal('balanceSnapshotModal');
+}
+function saveRealBalance(){
+ const a=state.accounts.find(x=>x.id===snapshotAccountId.value),raw=snapshotBalance.value.trim();if(!a){toast('Conto non trovato');return}if(!raw){toast('Inserisci il saldo reale');return}
+ const amount=parseAmount(raw),now=new Date().toISOString();a.balance=amount;a.balanceKnown=true;a.snapshotDate=snapshotDate.value||today();a.snapshotTime=snapshotTime.value||'';a.snapshotCreatedAt=now;a.status=a.status||'active';
+ if(accountIsMain(a))state.settings.balance=String(amount);
+ state.balanceSnapshots.push({id:'snap-'+Date.now(),accountId:a.id,amount,date:a.snapshotDate,time:a.snapshotTime,createdAt:now});
+ saveState();writeCoreSettings();closeModal('balanceSnapshotModal');renderAll();toast('Saldo reale aggiornato ✓');
+}
+
+function nextCreditDueDate(card){
+ const d=new Date(today()+'T12:00');return new Date(d.getFullYear(),d.getMonth()+1,15,12).toISOString().slice(0,10);
+}
+function nextConfirmedStatement(cardId){
+ return state.creditStatements.filter(x=>x.cardAccountId===cardId&&x.status!=='paid').sort((a,b)=>a.dueDate.localeCompare(b.dueDate))[0]||null;
+}
+function matchingCreditStatement(t){
+ if(!t||creditAccountForLabel(t.account))return null;
+ return state.creditStatements.find(x=>['confirmed','paid'].includes(x.status)&&Math.abs((Number(x.total)||0)-(Number(t.amount)||0))<.011&&daysApart(x.dueDate,t.date)<=2)||null;
+}
+function settleCreditStatement(stmt,date,settlementTxId=''){
+ if(!stmt)return;stmt.status='paid';stmt.paidDate=date||stmt.dueDate;stmt.settlementTxId=settlementTxId||stmt.settlementTxId||'';
+ (stmt.transactionIds||[]).forEach(id=>{const t=state.transactions.find(x=>x.id===id);if(t){t.cardState='paid';t.cardPaidDate=stmt.paidDate;}});
+}
+function applyDueCreditStatements(){
+ let changed=false;
+ state.creditStatements.filter(x=>x.status==='confirmed'&&x.dueDate&&x.dueDate<=today()).forEach(stmt=>{
+   const card=creditAccountById(stmt.cardAccountId),existing=state.transactions.find(t=>t.cardSettlement&&t.statementId===stmt.id);
+   if(existing){settleCreditStatement(stmt,existing.date,existing.id);changed=true;return}
+   const t={id:'settlement-'+stmt.id,date:stmt.dueDate,createdAt:new Date().toISOString(),merchant:'Pagamento '+(card?.name||'carta di credito'),amount:Number(stmt.total)||0,category:'Altro',account:'Conto principale',verified:true,reimb:false,origin:'credit-card-auto-settlement',type:'transfer',excluded:true,reviewReason:'',cardSettlement:true,statementId:stmt.id,sourceAccount:'Conto principale',destinationAccount:card?.name||'Carta di credito'};
+   state.transactions.push(t);settleCreditStatement(stmt,stmt.dueDate,t.id);changed=true;
+ });
+ if(changed)saveState();
+}
+function statementDefaultDue(rows){
+ const dates=rows.map(r=>r.date).filter(Boolean).sort(),base=dates[dates.length-1]||today(),d=new Date(base+'T12:00');
+ return new Date(d.getFullYear(),d.getMonth()+1,15,12).toISOString().slice(0,10);
+}
+function stageCreditStatementRows(rows,source){
+ rows=(rows||[]).filter(r=>Number(r.amount)>0);if(!rows.length){toast('Nessun movimento Nexi riconosciuto');return}
+ const card=creditAccountForLabel(source)||state.accounts.find(accountIsCredit);if(!card){toast('Carta di credito non configurata');return}
+ window._creditStatementRows=rows;window._creditStatementCardId=card.id;
+ const total=rows.reduce((sum,r)=>sum+(Number(r.amount)||0),0);creditStmtTotal.value=String(Math.round(total*100)/100).replace('.',',');creditStmtDueDate.value=statementDefaultDue(rows);
+ creditStmtInfo.textContent=rows.length+' movimenti trovati · controlla il totale prima di confermare.';
+ openModal('creditStatementModal');
+}
+function reconcileCreditStatementRows(rows,card){
+ const ids=[];
+ rows.forEach((r,i)=>{
+   let match=state.transactions.filter(t=>t.id&&['expense','refund'].includes(t.type||'expense')&&(t.cardAccountId===card.id||txMatchesAccount(t,card))&&!t.statementId&&Math.abs((Number(t.amount)||0)-(Number(r.amount)||0))<.011)
+     .sort((a,b)=>{const as=merchantSimilarity(a.merchant,r.merchant)+(daysApart(a.date,r.date)<=4?.7:0),bs=merchantSimilarity(b.merchant,r.merchant)+(daysApart(b.date,r.date)<=4?.7:0);return bs-as})[0];
+   if(match && (merchantSimilarity(match.merchant,r.merchant)>=.25||daysApart(match.date,r.date)<=4)){
+     match.cardAccountId=card.id;match.cardState='pending';match.statementVerified=true;match.verified=true;if(match.date!==r.date&&!match.postedDate)match.postedDate=r.date;ids.push(match.id);return;
+   }
+   const lower=normMerchant(r.merchant),key=Object.keys(state.rules).sort((a,b)=>b.length-a.length).find(k=>lower.includes(k));
+   const tx=ingestTransaction({id:'nexi-'+Date.now()+'-'+i,date:r.date||today(),merchant:r.merchant||'Movimento Nexi',amount:Number(r.amount)||0,category:key?state.rules[key]:'Altro',account:card.name,cardAccountId:card.id,cardState:'pending',statementVerified:true,verified:false,reimb:false,origin:'nexi-statement',type:'expense',excluded:false,reviewReason:key?'':'Movimento presente nell’estratto Nexi: categoria da verificare.'});
+   ids.push(tx.id);
+ });
+ return [...new Set(ids)];
+}
+function confirmCreditStatement(){
+ const card=creditAccountById(window._creditStatementCardId),rows=window._creditStatementRows||[],total=parseAmount(creditStmtTotal.value),due=creditStmtDueDate.value;
+ if(!card||!rows.length||!total||!due){toast('Controlla totale e data');return}
+ const ids=reconcileCreditStatementRows(rows,card),period=(rows.map(r=>r.date).filter(Boolean).sort().pop()||today()).slice(0,7),id='stmt-'+card.id+'-'+period;
+ let stmt=state.creditStatements.find(x=>x.id===id);const data={id,cardAccountId:card.id,periodKey:period,total,dueDate:due,status:'confirmed',transactionIds:ids,confirmedAt:new Date().toISOString()};
+ if(stmt)Object.assign(stmt,data);else state.creditStatements.push(data);
+ ids.forEach(txid=>{const t=state.transactions.find(x=>x.id===txid);if(t)t.statementId=id});
+ applyDueCreditStatements();saveState();closeModal('creditStatementModal');renderAll();toast('Estratto Nexi confermato ✓');
+}
+async function handleNexiStatementFile(file){
+ if(!file)return;const card=state.accounts.find(a=>entityActive(a)&&accountIsCredit(a))||state.accounts.find(accountIsCredit);if(!card){toast('Configura prima la carta Nexi');return}
+ const name=(file.name||'').toLowerCase();refreshPaymentSelectors();
+ if(name.endsWith('.csv')||/csv/.test(file.type)){importSource.value=card.name;await importCSV(file);return}
+ if(name.endsWith('.pdf')||file.type==='application/pdf'){photoSource.value=card.name;await importPDFPreview(file,card.name);return}
+ if((file.type||'').startsWith('image/')){photoSource.value=card.name;setPhotoMode('bank');openModal('photoModal');await handlePhoto(file);return}
+ toast('Formato estratto non riconosciuto');
+}
+
 function upsertById(arr,obj){const i=arr.findIndex(x=>x.id===obj.id);if(i>=0)arr[i]={...arr[i],...obj};else arr.push(obj)}
 function accountIsMain(a){return !!a&&(a.primary===true||a.id==='mediolanum-main'||/mediolanum/i.test(a.name||''))}
 function accountIsSatispay(a){return !!a&&(a.id==='satispay'||/^satispay$/i.test(a.name||''))}
@@ -1291,7 +1623,8 @@ function txMatchesAccount(t,a){
  if(accountIsSatispay(a))return /satispay/.test(q);
  if(accountIsCredit(a))return /carta di credito|nexi|9011/.test(q)||q===name;
  if(/portafoglio|contanti/i.test(a.name||''))return /contanti|portafoglio/.test(q);
- return q&&name&&(q===name||q.includes(name)||name.includes(q));
+ const aliases=(a.aliases||[]).map(x=>String(x||'').toLowerCase());
+ return q&&name&&(q===name||q.includes(name)||name.includes(q)||aliases.some(v=>q===v||q.includes(v)||v.includes(q)));
 }
 function transferDeltaForAccount(t,a){
  const x=normMerchant((t.merchant||'')+' '+(t.providerType||''));const amount=Number(t.amount)||0;
@@ -1331,13 +1664,17 @@ function txBalanceDelta(t,a){
  if(type==='transfer')return transferDeltaForAccount(t,a);
  return 0;
 }
+function txAfterSnapshot(t,a){
+ const d=a?.snapshotDate||'';if(!d)return true;if(t.date>d)return true;if(t.date<d)return false;
+ const s=a.snapshotCreatedAt||'';return !!(s&&t.createdAt&&t.createdAt>s);
+}
 function currentAccountBalance(a){
  if(!a)return 0;
  if(/portafoglio|contanti/i.test(a.name||''))return Number(a.balance)||0; // saldo già aggiornato in inserimento/prelievo
- if(accountIsCredit(a))return Number(a.balance)||0;
- const snap=Number(a.balance)||0, d=a.snapshotDate||'';
+ if(accountIsCredit(a))return 0;
+ const snap=Number(a.balance)||0;
  if(accountIsInvestment(a)){
-   const delta=state.transactions.filter(t=>(!d||t.date>d)&&!suspectedDuplicate(t)&&(t.type||'')==='transfer').reduce((sum,t)=>{
+   const delta=state.transactions.filter(t=>txAfterSnapshot(t,a)&&!suspectedDuplicate(t)&&(t.type||'')==='transfer').reduce((sum,t)=>{
      const x=normMerchant((t.merchant||'')+' '+(t.providerType||'')),amt=Number(t.amount)||0;
      if(/deposito investimento|salvadanaio investito|azionario globale/.test(x))return sum+amt;
      if(/prelievo investimento/.test(x))return sum-amt;
@@ -1345,19 +1682,12 @@ function currentAccountBalance(a){
    },0);
    return Math.round((snap+delta)*100)/100;
  }
- return Math.round((snap+state.transactions.filter(t=>!d||t.date>d).reduce((sum,t)=>sum+txBalanceDelta(t,a),0))*100)/100;
+ return Math.round((snap+state.transactions.filter(t=>txAfterSnapshot(t,a)).reduce((sum,t)=>sum+txBalanceDelta(t,a),0))*100)/100;
 }
 function creditCardUsed(a){
- const snapDate=a.snapshotDate||'';
- const reset=state.transactions.filter(t=>(!snapDate||t.date>snapDate)&&/regolamento carta|pagamento nexi|addebito carta di credito/i.test(t.merchant||'')).sort((x,y)=>y.date.localeCompare(x.date))[0];
- const fromDate=reset?reset.date:snapDate,base=reset?0:(Number(a.used)||0);
- const delta=state.transactions.filter(t=>(!fromDate||t.date>fromDate)&&txMatchesAccount(t,a)&&!suspectedDuplicate(t)).reduce((sum,t)=>{
-   const type=t.type||'expense',amt=Number(t.amount)||0;
-   if(type==='expense')return sum+amt;
-   if(type==='refund')return sum-amt;
-   return sum;
- },0);
- return Math.max(0,Math.round((base+delta)*100)/100);
+ const list=state.transactions.filter(t=>(t.cardAccountId===a.id||txMatchesAccount(t,a))&&!suspectedDuplicate(t)&&['expense','refund'].includes(t.type||'expense')&&t.cardState!=='paid');
+ const total=list.reduce((sum,t)=>(t.type||'expense')==='refund'?sum-(Number(t.amount)||0):sum+(Number(t.amount)||0),0);
+ return Math.max(0,Math.round(total*100)/100);
 }
 function primaryAccountBalance(){
  const a=state.accounts.find(x=>x.primary===true)||state.accounts.find(x=>x.id==='mediolanum-main')||state.accounts.find(x=>/mediolanum/i.test(x.name||''));
@@ -1365,7 +1695,7 @@ function primaryAccountBalance(){
  return parseAmount(state.settings.balance);
 }
 function latestSpendableBalance(){
- return state.accounts.length?state.accounts.filter(a=>a.spendable!==false).reduce((sum,a)=>sum+currentAccountBalance(a),0):parseAmount(state.settings.balance);
+ return state.accounts.length?state.accounts.filter(a=>entityOpen(a)&&a.spendable!==false&&!accountIsCredit(a)).reduce((sum,a)=>sum+currentAccountBalance(a),0):parseAmount(state.settings.balance);
 }
 function historicalAccountBalance(a,year){
  const cur=new Date().getFullYear();
@@ -1376,26 +1706,31 @@ function historicalAccountBalance(a,year){
 }
 function renderAssets(){
  const curYear=new Date().getFullYear(), historical=selectedYear!==curYear;
- const investAccounts=state.accounts.filter(accountIsInvestment);
- const liquidAccounts=state.accounts.filter(a=>a.spendable!==false&&!accountIsCredit(a)&&!accountIsInvestment(a));
- const vals=liquidAccounts.map(a=>historicalAccountBalance(a,selectedYear)),knownLiquid=vals.filter(v=>v!==null),liquid=knownLiquid.reduce((s,v)=>s+v,0);
- const invVals=investAccounts.map(a=>historicalAccountBalance(a,selectedYear)),knownInv=invVals.filter(v=>v!==null),investments=knownInv.reduce((s,v)=>s+v,0);
- const reserved=historical?null:state.savingsPots.reduce((a,x)=>a+(Number(x.balance)||0),0);
- const debt=historical?null:state.debts.reduce((a,x)=>a+(Number(x.residual)||0),0);
+ const investAccounts=state.accounts.filter(a=>entityOpen(a)&&accountIsInvestment(a));
+ const liquidAccounts=state.accounts.filter(a=>entityOpen(a)&&a.spendable!==false&&!accountIsCredit(a)&&!accountIsInvestment(a));
+ const vals=liquidAccounts.map(a=>historicalAccountBalance(a,selectedYear)),knownLiquid=vals.filter(v=>v!==null),liquid=knownLiquid.reduce((sum,v)=>sum+v,0);
+ const invVals=investAccounts.map(a=>historicalAccountBalance(a,selectedYear)),knownInv=invVals.filter(v=>v!==null),investments=knownInv.reduce((sum,v)=>sum+v,0);
+ const livePots=state.savingsPots.filter(entityOpen),liveDebts=state.debts.filter(entityOpen);
+ const reserved=historical?null:livePots.reduce((sum,x)=>sum+(Number(x.balance)||0),0);
+ const debt=historical?null:liveDebts.reduce((sum,x)=>sum+(Number(x.residual)||0),0);
  liquidTotal.textContent=knownLiquid.length?euro(liquid):'—';
  reservedTotal.textContent=reserved===null?'—':euro(reserved);
  investmentTotal.textContent=knownInv.length?euro(investments):'—';
  debtTotal.textContent=debt===null?'—':euro(debt);
  const patrimonio=(knownLiquid.length?liquid:0)+(reserved||0)+(knownInv.length?investments:0);
  knownNet.textContent=(knownLiquid.length||reserved!==null||knownInv.length)?euro(patrimonio):'—';
- const visibleAccounts=state.accounts.filter(a=>!accountIsInvestment(a));
+ const visibleAccounts=state.accounts.filter(a=>entityOpen(a)&&!accountIsInvestment(a));
  accountsList.innerHTML=visibleAccounts.length?visibleAccounts.map(a=>{
-   if(accountIsCredit(a)&&!historical){const used=creditCardUsed(a),lim=Number(a.creditLimit)||0,avail=Math.max(0,lim-used);return `<div class="assetLine"><div><div class="assetName">${esc(a.name)}</div><div class="assetSub">Carta di credito · utilizzato ${euro(used)}${lim?' · disponibile '+euro(avail)+' / '+euro(lim):''}${a.snapshotDate?' · saldo carta certo '+new Date(a.snapshotDate+'T12:00').toLocaleDateString('it-IT'):''}</div></div><b>${euro(used)}</b></div>`;}
-   const v=historicalAccountBalance(a,selectedYear),label=historical?('situazione nota al 31/12/'+selectedYear):(a.snapshotDate?'saldo certo '+new Date(a.snapshotDate+'T12:00').toLocaleDateString('it-IT')+' · aggiornato coi movimenti successivi':'saldo calcolato');
-   return `<div class="assetLine"><div><div class="assetName">${esc(a.name)}</div><div class="assetSub">${esc(a.kind||'Conto')}${a.instrument?' · '+esc(a.instrument):''} · ${label}</div></div><b>${v===null?'—':euro(v)}</b></div>`;
+   const st=statusLabel(a.status);
+   if(accountIsCredit(a)&&!historical){
+     const used=creditCardUsed(a),lim=Number(a.creditLimit)||0,avail=Math.max(0,lim-used),stmt=nextConfirmedStatement(a.id),due=stmt?.dueDate||nextCreditDueDate(a),confirmed=stmt?(' · estratto confermato '+euro(stmt.total)):' · stima da movimenti';
+     return `<div class="assetLine"><div><div class="assetName">${esc(a.name)} ${st}</div><div class="assetSub">Carta di credito · da saldare ${euro(used)}${lim?' · disponibile '+euro(avail)+' / '+euro(lim):''}${due?' · prossimo addebito '+new Date(due+'T12:00').toLocaleDateString('it-IT'):''}${confirmed}</div></div><b>${euro(used)}</b></div>`;
+   }
+   const v=a.balanceKnown===false?null:historicalAccountBalance(a,selectedYear),label=historical?('situazione nota al 31/12/'+selectedYear):(a.snapshotDate?'saldo certo '+new Date(a.snapshotDate+'T12:00').toLocaleDateString('it-IT')+(a.snapshotTime?' '+a.snapshotTime:'')+' · aggiornato coi movimenti successivi':'saldo calcolato');
+   return `<div class="assetLine"><div><div class="assetName">${esc(a.name)} ${st}</div><div class="assetSub">${esc(a.kind||'Conto')}${a.instrument?' · '+esc(a.instrument):''} · ${a.balanceKnown===false?'saldo non impostato':label}</div></div><b>${v===null?'—':euro(v)}</b></div>`;
  }).join(''):'<div class="empty">Nessun conto registrato</div>';
- potsList.innerHTML=historical?'<div class="empty">Dati storici dei salvadanai non disponibili con precisione.</div>':(state.savingsPots.length?state.savingsPots.map(x=>`<div class="assetLine"><div><div class="assetName">${esc(x.name)}</div><div class="assetSub">${x.contribution?euro(x.contribution)+' al mese'+(x.dueDay?' · giorno '+x.dueDay:''):''}${x.progressPct&&!x.target?' · obiettivo da verificare':''}</div></div><b>${euro(x.balance)}${x.target?'<div class="assetSub">su '+euro(x.target)+'</div>':(x.progressPct?'<div class="assetSub">'+x.progressPct+'%</div>':'')}</b></div>`).join(''):'<div class="empty">Nessun salvadanaio</div>');
- debtsList.innerHTML=historical?'<div class="empty">Debito residuo storico non ricostruibile con precisione.</div>':(state.debts.length?state.debts.map(d=>`<div class="assetLine"><div><div class="assetName">${esc(d.name)}</div><div class="assetSub">${d.installment?euro(d.installment)+' / mese':''}${d.dueDay?' · giorno '+d.dueDay:''}${d.endDate?' · fine '+new Date(d.endDate+'T12:00').toLocaleDateString('it-IT'):''}</div></div><b class="debtVal">${euro(d.residual)}</b></div>`).join(''):'<div class="empty">Nessun finanziamento registrato</div>');
+ potsList.innerHTML=historical?'<div class="empty">Dati storici dei salvadanai non disponibili con precisione.</div>':(livePots.length?livePots.map(x=>`<div class="assetLine"><div><div class="assetName">${esc(x.name)} ${statusLabel(x.status)}</div><div class="assetSub">${x.contribution?euro(x.contribution)+' al mese'+(x.dueDay?' · giorno '+x.dueDay:''):''}${x.mode==='manual'?' · manuale':''}</div></div><b>${euro(x.balance)}${x.target?'<div class="assetSub">su '+euro(x.target)+'</div>':''}</b></div>`).join(''):'<div class="empty">Nessun salvadanaio</div>');
+ debtsList.innerHTML=historical?'<div class="empty">Debito residuo storico non ricostruibile con precisione.</div>':(liveDebts.length?liveDebts.map(d=>`<div class="assetLine"><div><div class="assetName">${esc(d.name)} ${statusLabel(d.status)}</div><div class="assetSub">${d.installment?euro(d.installment)+' / mese':''}${d.dueDay?' · giorno '+d.dueDay:''}${d.endDate?' · fine '+new Date(d.endDate+'T12:00').toLocaleDateString('it-IT'):''}</div></div><b class="debtVal">${euro(d.residual)}</b></div>`).join(''):'<div class="empty">Nessun finanziamento registrato</div>');
  renderGoals();renderMonthHistory();renderWarranties();
 }
 
@@ -1625,6 +1960,7 @@ function renderStats(){renderAssets();renderAnnual();
  verifyList.innerHTML=txHTML(state.transactions.filter(t=>!t.verified||t.reviewReason).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,20));
 }
 function renderAll(){
+ applyDueCreditStatements();
  headerMonth.textContent=monthName(currentMonth);
  renderYearFilters();renderMonthFilters();renderHome();renderMovements();renderStats();renderRecurringPanelsSafe();renderBudget();renderLearnedRules();
  const q=state.transactions.filter(t=>t.reviewReason).length,e=state.transactions.filter(t=>t.excluded).length;
@@ -1868,7 +2204,10 @@ function saveOCRReceipt(){
  saveState();closeModal('photoModal');currentMonth=monthKey(ocrD.value||today());renderAll();toast('Spesa registrata · correzione imparata ✓')
 }
 function saveBankOCR(){
- let added=0;document.querySelectorAll('.brCheck').forEach((ck,i)=>{if(!ck.checked)return;const wrap=ck.closest('div[style*="border-bottom"]');const merchant=wrap.querySelector('.brM').value.trim()||'Movimento',amount=parseAmount(wrap.querySelector('.brA').value),date=wrap.querySelector('.brD').value||today();if(!amount)return;let lower=normMerchant(merchant),key=Object.keys(state.rules).sort((a,b)=>b.length-a.length).find(k=>lower.includes(k));let lifeBudget=key&&Object.prototype.hasOwnProperty.call(state.budgetRules,key)?!!state.budgetRules[key]:undefined;ingestTransaction({id:'bank'+Date.now()+i,date,merchant,amount,category:key?state.rules[key]:'Altro',account:photoSource.value||state.settings.defaultAccount||'Carta',verified:false,reimb:false,origin:(window._bankOrigin||'statement-photo'),type:'expense',excluded:false,reviewReason:'',lifeBudget});added++});window._bankOrigin='statement-photo';saveState();closeModal('photoModal');renderAll();toast(added+' movimenti importati')
+ const rows=[];document.querySelectorAll('.brCheck').forEach((ck,i)=>{if(!ck.checked)return;const wrap=ck.closest('div[style*="border-bottom"]');const merchant=wrap.querySelector('.brM').value.trim()||'Movimento',amount=parseAmount(wrap.querySelector('.brA').value),date=wrap.querySelector('.brD').value||today();if(amount)rows.push({merchant,amount,date});});
+ const source=photoSource.value||state.settings.defaultAccount||'Carta';
+ if(isCreditSource(source)){closeModal('photoModal');stageCreditStatementRows(rows,source);window._bankOrigin='statement-photo';return}
+ let added=0;rows.forEach((r,i)=>{let lower=normMerchant(r.merchant),key=Object.keys(state.rules).sort((a,b)=>b.length-a.length).find(k=>lower.includes(k));let lifeBudget=key&&Object.prototype.hasOwnProperty.call(state.budgetRules,key)?!!state.budgetRules[key]:undefined;ingestTransaction({id:'bank'+Date.now()+i,date:r.date,merchant:r.merchant,amount:r.amount,category:key?state.rules[key]:'Altro',account:source,verified:false,reimb:false,origin:(window._bankOrigin||'statement-photo'),type:'expense',excluded:false,reviewReason:'',lifeBudget});added++});window._bankOrigin='statement-photo';saveState();closeModal('photoModal');renderAll();toast(added+' movimenti importati')
 }
 
 // Import unico, PDF testuali e riconciliazione
@@ -1905,7 +2244,10 @@ async function importCSV(file){
  const h=splitCSVLine(lines[0],sep).map(x=>x.toLowerCase().trim());
  const di=h.findIndex(x=>/data|date/.test(x)), mi=h.findIndex(x=>/descr|causale|merchant|esercente|operaz/.test(x)), ai=h.findIndex(x=>/importo|amount|valore/.test(x));
  if(di<0||ai<0){toast('Non riconosco le colonne del CSV');return}
- let n=0;const source=(document.getElementById('importSource')?.value)||state.settings.defaultAccount||'Carta';for(let i=1;i<lines.length;i++){let r=splitCSVLine(lines[i],sep);let rawd=r[di]||'', dm=rawd.match(/([0-3]?\d)[\/\-.]([01]?\d)[\/\-.](20\d{2}|\d{2})/);let date=dm?detectDate(dm[0]):today();let signed=parseSignedAmount(r[ai]),amount=Math.abs(signed);if(!amount)continue;let merchant=(mi>=0?r[mi]:'Movimento').trim(),lower=normMerchant(merchant),key=Object.keys(state.rules).sort((a,b)=>b.length-a.length).find(k=>lower.includes(k));let type=isRefundDescription(merchant)?'refund':(isIncomeDescription(merchant)?'income':'expense');let lifeBudget=key&&Object.prototype.hasOwnProperty.call(state.budgetRules,key)?!!state.budgetRules[key]:undefined;ingestTransaction({id:'csv'+Date.now()+i,date,merchant,amount,category:key?state.rules[key]:'Altro',account:source,verified:false,reimb:false,origin:'statement-csv',type,excluded:false,reviewReason:'',lifeBudget});n++}
+ const source=(document.getElementById('importSource')?.value)||state.settings.defaultAccount||'Carta',rows=[];
+ for(let i=1;i<lines.length;i++){let r=splitCSVLine(lines[i],sep);let rawd=r[di]||'',dm=rawd.match(/([0-3]?\d)[\/\-.]([01]?\d)[\/\-.](20\d{2}|\d{2})/);let date=dm?detectDate(dm[0]):today();let signed=parseSignedAmount(r[ai]),amount=Math.abs(signed);if(!amount)continue;rows.push({merchant:(mi>=0?r[mi]:'Movimento').trim(),amount,date,signed});}
+ if(isCreditSource(source)){stageCreditStatementRows(rows,source);return}
+ let n=0;for(const row of rows){let merchant=row.merchant,lower=normMerchant(merchant),key=Object.keys(state.rules).sort((a,b)=>b.length-a.length).find(k=>lower.includes(k));let type=isRefundDescription(merchant)?'refund':(isIncomeDescription(merchant)?'income':'expense');let lifeBudget=key&&Object.prototype.hasOwnProperty.call(state.budgetRules,key)?!!state.budgetRules[key]:undefined;ingestTransaction({id:'csv'+Date.now()+n,date:row.date,merchant,amount:row.amount,category:key?state.rules[key]:'Altro',account:source,verified:false,reimb:false,origin:'statement-csv',type,excluded:false,reviewReason:'',lifeBudget});n++}
  saveState();renderAll();toast(n+' movimenti importati');
 }
 function download(name,content,type){
@@ -1914,10 +2256,10 @@ function download(name,content,type){
 function exportBackup(){download('spese-backup-'+today()+'.json',JSON.stringify(state,null,2),'application/json')}
 async function restoreBackup(file){try{const x=JSON.parse(await file.text());if(!Array.isArray(x.transactions))throw 0;
  const coreBefore=readCoreSettings();
- state=x;if(!state.rules)state.rules={};if(!state.budgetRules)state.budgetRules={};if(!state.ocrRules)state.ocrRules={};if(!state.settings)state.settings={goal:0,balance:'',defaultAccount:'Carta',startDate:'2026-01-01'};if(!state.settings.startDate)state.settings.startDate='2026-01-01';if(!Array.isArray(state.recurring))state.recurring=[];if(!state.recurringPaid)state.recurringPaid={};if(!state.annualProfiles)state.annualProfiles={};if(!Array.isArray(state.accounts))state.accounts=[];if(!Array.isArray(state.savingsPots))state.savingsPots=[];if(!Array.isArray(state.debts))state.debts=[];if(!Array.isArray(state.futureExpenses))state.futureExpenses=[];if(!Array.isArray(state.goals))state.goals=[];if(!Array.isArray(state.warranties))state.warranties=[];if(!state.syncConfig)state.syncConfig={enabled:false,provider:'',ready:false};state.recurring.forEach(r=>{if(!r.startDate)r.startDate='2026-01-01';if(!r.kind)r.kind=r.category==='Abbonamenti'?'subscription':'commitment';});state.transactions.forEach(t=>{if(!t.type)t.type='expense';if(typeof t.excluded!=='boolean')t.excluded=false;if(!t.origin)t.origin='backup';if(!t.reviewReason)t.reviewReason='';});
+ state=x;if(!state.rules)state.rules={};if(!state.budgetRules)state.budgetRules={};if(!state.ocrRules)state.ocrRules={};if(!state.settings)state.settings={goal:0,balance:'',defaultAccount:'Carta',startDate:'2026-01-01'};if(!state.settings.startDate)state.settings.startDate='2026-01-01';if(!Array.isArray(state.recurring))state.recurring=[];if(!state.recurringPaid)state.recurringPaid={};if(!state.annualProfiles)state.annualProfiles={};if(!Array.isArray(state.accounts))state.accounts=[];if(!Array.isArray(state.savingsPots))state.savingsPots=[];if(!Array.isArray(state.debts))state.debts=[];if(!Array.isArray(state.futureExpenses))state.futureExpenses=[];if(!Array.isArray(state.goals))state.goals=[];if(!Array.isArray(state.warranties))state.warranties=[];if(!Array.isArray(state.creditStatements))state.creditStatements=[];if(!Array.isArray(state.balanceSnapshots))state.balanceSnapshots=[];if(!state.syncConfig)state.syncConfig={enabled:false,provider:'',ready:false};state.recurring.forEach(r=>{if(!r.startDate)r.startDate='2026-01-01';if(!r.kind)r.kind=r.category==='Abbonamenti'?'subscription':'commitment';});state.transactions.forEach(t=>{if(!t.type)t.type='expense';if(typeof t.excluded!=='boolean')t.excluded=false;if(!t.origin)t.origin='backup';if(!t.reviewReason)t.reviewReason='';});
  delete state.rules['pro loco'];delete state.rules['sumup *associazione'];delete state.rules['proloco'];
  if(coreBefore){if(!Number(state.settings.goal)&&Number(coreBefore.goal))state.settings.goal=Number(coreBefore.goal);if(!Number(state.settings.lifeBudget)&&Number(coreBefore.lifeBudget))state.settings.lifeBudget=Number(coreBefore.lifeBudget);if(!state.settings.defaultAccount&&coreBefore.defaultAccount)state.settings.defaultAccount=coreBefore.defaultAccount;}
- applyV189RecurringUpgrade();applyV190Upgrade();applyV191Upgrade();saveState();writeCoreSettings();if(state.transactions.length)currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0].date);renderAll();toast('Backup ripristinato ✓')}catch(e){toast('Backup non valido')}}
+ applyV189RecurringUpgrade();applyV190Upgrade();applyV191Upgrade();applyV192Upgrade();applyV195Upgrade();applyDueCreditStatements();refreshPaymentSelectors();saveState();writeCoreSettings();if(state.transactions.length)currentMonth=monthKey([...state.transactions].sort((a,b)=>b.date.localeCompare(a.date))[0].date);renderAll();toast('Backup ripristinato ✓')}catch(e){toast('Backup non valido')}}
 function exportCSV(){
  let s='Data;Descrizione;Importo;Categoria;Provenienza;Tipo;Origine;Escluso;Verificato;Per conto di altri;Rimborsata;Budget vita\n'+state.transactions.sort((a,b)=>b.date.localeCompare(a.date)).map(t=>[t.date,`"${t.merchant.replace(/"/g,'""')}"`,String(t.amount).replace('.',','),t.category,t.account,t.type||'expense',t.origin||'',t.excluded?'Si':'No',t.verified?'Si':'No',(t.reimb||t.thirdParty)?'Si':'No',t.reimbursed?'Si':'No',usesLifeBudget(t)?'Si':'No'].join(';')).join('\n');
  download('movimenti-spese-'+today()+'.csv','\ufeff'+s,'text/csv;charset=utf-8')
@@ -1929,6 +2271,7 @@ function saveSettings(){
  saveState();writeCoreSettings();closeModal('settingsModal');renderAll();toast('Impostazioni salvate');
 }
 settingsModal.addEventListener('click',()=>{
+ refreshPaymentSelectors();
  sGoal.value=state.settings.goal||'';sLifeBudget.value=state.settings.lifeBudget||'';sBalance.value=state.settings.balance||'';sDefaultAccount.value=state.settings.defaultAccount||'Carta';
  sYear.innerHTML=availableYears().map(y=>`<option value="${y}">${y}</option>`).join('');sYear.value=String(selectedYear);loadYearSettings();
 },{once:false});
